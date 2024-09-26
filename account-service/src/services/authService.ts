@@ -7,22 +7,15 @@ import { Result, success, failure } from '../statusCodeResult';
 import LoginRequest from '../requests/loginRequest';
 import LoginResponse from '../responses/loginResponse';
 
-import AccountService from './accountService';
+import env from '../../env';
 
-interface JwtConfig {
-  issuer: string;
-  audience: string;
-  secret: string;
-  expirationTimeInSeconds: number;
-}
+import AccountService from './accountService';
 
 export default class AuthService {
   private accountService: AccountService;
-  private config: JwtConfig;
 
-  constructor(accountService: AccountService, config: JwtConfig) {
+  constructor(accountService: AccountService) {
     this.accountService = accountService;
-    this.config = config;
   }
 
   login(request: LoginRequest): Result<LoginResponse> {
@@ -35,13 +28,13 @@ export default class AuthService {
     }
     const nowInSeconds = Date.now() / 1000;
     const payload = {
-      iss: this.config.issuer,
-      aud: this.config.audience,
+      iss: env.JWT_ISSUER,
+      aud: env.JWT_AUDIENCE,
       sub: result.data.id,
-      exp: nowInSeconds + this.config.expirationTimeInSeconds,
+      exp: nowInSeconds + env.JWT_EXPIRATION_TIME_IN_SECONDS,
       iat: nowInSeconds,
     };
-    const token = jwt.sign(payload, this.config.secret);
+    const token = jwt.sign(payload, env.JWT_SECRET);
     return success({ jwt: token });
   }
 }
