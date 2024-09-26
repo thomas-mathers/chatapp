@@ -9,7 +9,15 @@ dotenv.config();
 
 const accountRepository = new AccountRepository();
 const accountService = new AccountService(accountRepository);
-const authService = new AuthService(accountService, process.env.JWT_SECRET);
+
+const jwtConfig = {
+  issuer: process.env.JWT_ISSUER!,
+  audience: process.env.JWT_AUDIENCE!,
+  secret: process.env.JWT_SECRET!,
+  expirationTimeInSeconds: Number(process.env.JWT_EXPIRATION_TIME_IN_SECONDS!),
+};
+
+const authService = new AuthService(accountService, jwtConfig);
 
 const app = express();
 
