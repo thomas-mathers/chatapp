@@ -12,7 +12,12 @@ export default function jwtMiddleware(
   }
   const token = authorizationParts[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const options = {
+      issuer: process.env.JWT_ISSUER!,
+      audience: process.env.JWT_AUDIENCE!,
+      maxAge: Number(process.env.JWT_EXPIRATION_TIME_IN_SECONDS!),
+    };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!, options);
     req.accountId = decoded.sub as string;
     next();
   } catch (e) {
