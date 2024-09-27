@@ -9,7 +9,9 @@
     "lint:fix": "eslint --fix src",
     "lint": "eslint src",
     "type-check": "tsc --noEmit",
-    "build": "npm run lint && npm run format && tsc"
+    "clean": "rimraf dist",
+    "build": "npm run lint && npm run format && tsc",
+    "re-build": "npm run clean && npm run build"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +25,7 @@
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.9.0",
     "prettier": "3.3.3",
+    "rimraf": "^6.0.1",
     "tsx": "^4.19.1",
     "typescript-eslint": "^8.7.0"
   },

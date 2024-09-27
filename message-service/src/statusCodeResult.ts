@@ -14,7 +14,7 @@ export type Result<TSuccess> = ResultSuccess<TSuccess> | ResultFailure;
 
 export function success<T>(
   data: T,
-  statusCode: number = 200
+  statusCode: number = 200,
 ): ResultSuccess<T> {
   return { isSuccess: true, statusCode, data };
 }
