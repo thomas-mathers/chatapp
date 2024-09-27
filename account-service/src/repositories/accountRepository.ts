@@ -1,26 +1,20 @@
 import Account from '../models/account';
 
-export default class AccountRepository {
-  private accounts: Account[];
+const accounts: Account[] = [];
 
-  constructor(accounts: Account[] = []) {
-    this.accounts = accounts;
-  }
+export function createAccount(account: Account): Account {
+  accounts.push(account);
+  return account;
+}
 
-  createAccount(account: Account): Account {
-    this.accounts.push(account);
-    return account;
-  }
+export function containsAccount(id: string): boolean {
+  return accounts.some((account) => account.id === id);
+}
 
-  containsAccount(id: string): boolean {
-    return this.accounts.some((account) => account.id === id);
-  }
+export function getAccountById(id: string): Account | undefined {
+  return accounts.find((account) => account.id === id);
+}
 
-  getAccountById(id: string): Account | undefined {
-    return this.accounts.find((account) => account.id === id);
-  }
-
-  getAccounts(): Account[] {
-    return this.accounts;
-  }
+export function getAccounts(): Account[] {
+  return accounts;
 }

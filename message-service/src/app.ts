@@ -1,19 +1,14 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import expressWs from 'express-ws';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import env from '../env';
-import MessageRepository from './repositories/messageRepository';
-import MessageService from './services/messageService';
 import jwtMiddleware from './middlewares/jwtMiddleware';
+import MessageController from './controllers/messageController';
+import * as MessageService from './services/messageService';
 
 const { app, getWss } = expressWs(express());
-
-const wss = getWss();
-
-const messageRepository = new MessageRepository();
-const messageService = new MessageService(messageRepository, wss);
 
 app.use(bodyParser.json());
 app.use(
@@ -25,32 +20,20 @@ app.use(
         openapi: '3.0.0',
         info: { title: 'Message Service', version: '1.0.0' },
       },
-      apis: ['src/**/*.ts'],
+      apis: ['src/controllers/*.{ts,js}'],
     }),
   ),
 );
 app.use(jwtMiddleware);
+app.use('/messages', MessageController);
 
 app.ws('/realtime', (ws, req) => {
   ws.on('message', (message: string) => {
-    messageService.createMessage(req.accountId as string, message);
+    MessageService.createMessage(req.accountId as string, message);
+    getWss().clients.forEach((client) => {
+      client.send(message);
+    });
   });
-});
-
-/**
- * @openapi
- * /messages:
- *   get:
- *     description: Gets the list of messages.
- *     responses:
- *       200:
- *         description: Returns the list of messages.
- *       401:
- *         description: Unauthorized.
- */
-app.get('/messages', (req: Request, res: Response) => {
-  const { statusCode, data } = messageService.getMessages();
-  res.status(statusCode).json(data);
 });
 
 app.listen(env.PORT, () => {

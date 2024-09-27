@@ -1,20 +1,14 @@
 import Message from '../models/message';
 
-export default class MessageRepository {
-  private messages: Message[];
+const messages: Message[] = [];
 
-  constructor(messages: Message[] = []) {
-    this.messages = messages;
-  }
+export function createMessage(message: Message): Message {
+  messages.push(message);
+  return message;
+}
 
-  createMessage(message: Message): Message {
-    this.messages.push(message);
-    return message;
-  }
-
-  getMessages(): Message[] {
-    return this.messages
-      .slice()
-      .sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime());
-  }
+export function getMessages(): Message[] {
+  return messages
+    .slice()
+    .sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime());
 }

@@ -1,30 +1,18 @@
-import WebSocket from 'ws';
 import { Result, success } from '../statusCodeResult';
 import Message from '../models/message';
-import MessageRepository from '../repositories/messageRepository';
+import * as MessageRepository from '../repositories/messageRepository';
 
-export default class MessageService {
-  private messageRepository: MessageRepository;
-  private wss: WebSocket.Server;
+export function createMessage(
+  accountId: string,
+  content: string,
+): Result<Message> {
+  const message = MessageRepository.createMessage(
+    new Message(accountId, content),
+  );
 
-  constructor(messageRepository: MessageRepository, wss: WebSocket.Server) {
-    this.messageRepository = messageRepository;
-    this.wss = wss;
-  }
+  return success(message, 201);
+}
 
-  createMessage(accountId: string, content: string): Result<Message> {
-    const message = this.messageRepository.createMessage(
-      new Message(accountId, content),
-    );
-
-    this.wss.clients.forEach((client) => {
-      client.send(JSON.stringify(message));
-    });
-
-    return success(message, 201);
-  }
-
-  getMessages(): Result<Message[]> {
-    return success(this.messageRepository.getMessages());
-  }
+export function getMessages(): Result<Message[]> {
+  return success(MessageRepository.getMessages());
 }
