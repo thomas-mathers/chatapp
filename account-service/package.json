@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "main": "src/app.ts",
   "scripts": {
-    "dev": "tsx watch src/app.ts"
+    "start": "tsx watch src/app.ts",
+    "format:fix": "prettier src --write",
+    "format": "prettier src --check",
+    "lint:fix": "eslint --fix src",
+    "lint": "eslint src",
+    "type-check": "tsc --noEmit",
+    "build": "npm run lint && npm run format && tsc"
   },
   "author": "",
   "license": "ISC",
