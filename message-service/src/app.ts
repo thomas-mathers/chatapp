@@ -6,7 +6,7 @@ import swaggerUi from 'swagger-ui-express';
 
 import MessageController from './controllers/messageController';
 import env from './env';
-import jwtMiddleware from './middlewares/jwtMiddleware';
+import authMiddleware from './middlewares/authMiddleware';
 import * as MessageService from './services/messageService';
 
 const { app, getWss } = expressWs(express());
@@ -25,7 +25,7 @@ app.use(
     }),
   ),
 );
-app.use(jwtMiddleware);
+app.use(authMiddleware);
 app.use('/messages', MessageController);
 
 app.ws('/realtime', (ws, req) => {
