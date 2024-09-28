@@ -6,10 +6,11 @@ export default function jwtMiddleware(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
+): void {
   const authorizationParts = req.headers.authorization?.split(' ') ?? [];
   if (authorizationParts.length !== 2 || authorizationParts[0] !== 'Bearer') {
-    return res.status(401).json({ message: 'Unauthorized' });
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
   }
   const token = authorizationParts[1];
   try {
@@ -22,6 +23,6 @@ export default function jwtMiddleware(
     req.accountId = decoded.sub as string;
     next();
   } catch {
-    return res.status(401).json({ message: 'Unauthorized' });
+    res.status(401).json({ message: 'Unauthorized' });
   }
 }
