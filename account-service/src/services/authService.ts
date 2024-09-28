@@ -1,13 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
-
 import jwt from 'jsonwebtoken';
 
 import env from '@app/env';
-
-import { Result, success, failure } from '@app/statusCodeResult';
-
 import LoginRequest from '@app/requests/loginRequest';
 import LoginResponse from '@app/responses/loginResponse';
+import { Result, failure, success } from '@app/statusCodeResult';
 
 import * as AccountService from './accountService';
 

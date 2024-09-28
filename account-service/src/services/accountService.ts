@@ -1,11 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { failure, Result, success } from '@app/statusCodeResult';
-
+import Account from '@app/models/account';
 import * as AccountRepository from '@app/repositories/accountRepository';
 import CreateAccountRequest from '@app/requests/createAccountRequest';
 import AccountSummary from '@app/responses/accountSummary';
-import Account from '@app/models/account';
+import { Result, failure, success } from '@app/statusCodeResult';
 
 export function createAccount(request: CreateAccountRequest): Result<Account> {
   return AccountRepository.containsAccount(request.id)

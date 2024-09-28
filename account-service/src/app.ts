@@ -1,9 +1,10 @@
-import express from 'express';
 import bodyParser from 'body-parser';
-import env from './env';
-import swaggerUi from 'swagger-ui-express';
+import express from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+
 import { AccountController, AuthController } from './controllers';
+import env from './env';
 
 const app = express();
 

@@ -1,4 +1,5 @@
-import { Router, Request, Response } from 'express';
+import { Request, Response, Router } from 'express';
+
 import * as AuthService from '@app/services/authService';
 
 const router = Router();

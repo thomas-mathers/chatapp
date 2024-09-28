@@ -1,12 +1,13 @@
+import bodyParser from 'body-parser';
 import express from 'express';
 import expressWs from 'express-ws';
-import bodyParser from 'body-parser';
-import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+
+import MessageController from './controllers/messageController';
 import env from './env';
 import jwtMiddleware from './middlewares/jwtMiddleware';
 import * as MessageService from './services/messageService';
-import MessageController from './controllers/messageController';
 
 const { app, getWss } = expressWs(express());
 
