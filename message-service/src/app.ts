@@ -5,8 +5,8 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import env from './env';
 import jwtMiddleware from './middlewares/jwtMiddleware';
-import MessageController from './controllers/messageController';
 import * as MessageService from './services/messageService';
+import MessageController from './controllers/messageController';
 
 const { app, getWss } = expressWs(express());
 

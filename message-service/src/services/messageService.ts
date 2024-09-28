@@ -1,14 +1,18 @@
-import { Result, success } from '../statusCodeResult';
-import Message from '../models/message';
-import * as MessageRepository from '../repositories/messageRepository';
+import { v4 as uuidv4 } from 'uuid';
+import { Result, success } from '@app/statusCodeResult';
+import Message from '@app/models/message';
+import * as MessageRepository from '@app/repositories/messageRepository';
 
 export function createMessage(
   accountId: string,
   content: string,
 ): Result<Message> {
-  const message = MessageRepository.createMessage(
-    new Message(accountId, content),
-  );
+  const message = MessageRepository.createMessage({
+    id: uuidv4(),
+    accountId,
+    content: content,
+    dateCreated: new Date(),
+  });
 
   return success(message, 201);
 }

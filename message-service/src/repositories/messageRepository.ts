@@ -1,4 +1,4 @@
-import Message from '../models/message';
+import Message from '@app/models/message';
 
 const messages: Message[] = [];
 

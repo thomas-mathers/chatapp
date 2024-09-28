@@ -1,19 +1,21 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { failure, Result, success } from '../statusCodeResult';
+import { failure, Result, success } from '@app/statusCodeResult';
 
-import * as AccountRepository from '../repositories/accountRepository';
-import CreateAccountRequest from '../requests/createAccountRequest';
-import Account from '../models/account';
-import AccountSummary from '../responses/accountSummary';
+import * as AccountRepository from '@app/repositories/accountRepository';
+import CreateAccountRequest from '@app/requests/createAccountRequest';
+import AccountSummary from '@app/responses/accountSummary';
+import Account from '@app/models/account';
 
 export function createAccount(request: CreateAccountRequest): Result<Account> {
   return AccountRepository.containsAccount(request.id)
     ? failure(StatusCodes.CONFLICT)
     : success(
-        AccountRepository.createAccount(
-          new Account(request.id, request.password),
-        ),
+        AccountRepository.createAccount({
+          id: request.id,
+          password: request.password,
+          dateCreated: new Date(),
+        }),
         201,
       );
 }
