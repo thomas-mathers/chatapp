@@ -1,4 +1,4 @@
-import Account from '@app/models/account';
+import Account from '../models/account';
 
 const accounts: Account[] = [];
 

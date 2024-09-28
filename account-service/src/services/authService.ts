@@ -1,11 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 
-import env from '@app/env';
-import LoginRequest from '@app/requests/loginRequest';
-import LoginResponse from '@app/responses/loginResponse';
-import { Result, failure, success } from '@app/statusCodeResult';
-
+import env from '../env';
+import LoginRequest from '../requests/loginRequest';
+import LoginResponse from '../responses/loginResponse';
+import { Result, failure, success } from '../statusCodeResult';
 import * as AccountService from './accountService';
 
 export function login(request: LoginRequest): Result<LoginResponse> {

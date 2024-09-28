@@ -7,9 +7,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["./node_modules/@types"],
-    "outDir": "./dist",
-    "paths": {
-      "@app/*": ["./src/*"]
-    }
+    "outDir": "./dist"
   }
 }

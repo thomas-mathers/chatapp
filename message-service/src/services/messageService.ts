@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import Message from '@app/models/message';
-import * as MessageRepository from '@app/repositories/messageRepository';
-import { Result, success } from '@app/statusCodeResult';
+import Message from '../models/message';
+import * as MessageRepository from '../repositories/messageRepository';
+import { Result, success } from '../statusCodeResult';
 
 export function createMessage(
   accountId: string,

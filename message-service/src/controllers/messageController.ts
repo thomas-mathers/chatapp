@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 
-import * as MessageService from '@app/services/messageService';
+import * as MessageService from '../services/messageService';
 
 const router = Router();
 

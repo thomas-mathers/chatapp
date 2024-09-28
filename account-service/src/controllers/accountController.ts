@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 
-import * as AccountService from '@app/services/accountService';
+import * as AccountService from '../services/accountService';
 
 const router = Router();
 
