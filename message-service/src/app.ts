@@ -3,7 +3,7 @@ import expressWs from 'express-ws';
 import bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
-import env from '../env';
+import env from './env';
 import jwtMiddleware from './middlewares/jwtMiddleware';
 import MessageController from './controllers/messageController';
 import * as MessageService from './services/messageService';
@@ -20,7 +20,7 @@ app.use(
         openapi: '3.0.0',
         info: { title: 'Message Service', version: '1.0.0' },
       },
-      apis: ['src/controllers/*.{ts,js}'],
+      apis: ['**/controllers/*.{ts,js}'],
     }),
   ),
 );

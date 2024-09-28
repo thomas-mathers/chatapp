@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import env from '../env';
+import env from './env';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import { AccountController, AuthController } from './controllers';
@@ -18,7 +18,7 @@ app.use(
         openapi: '3.0.0',
         info: { title: 'Account Service', version: '1.0.0' },
       },
-      apis: ['src/controllers/*.{ts,js}'],
+      apis: ['**/controllers/*.{ts,js}'],
     }),
   ),
 );

@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import jwt from 'jsonwebtoken';
 
-import env from '../../env';
+import env from '../env';
 
 import { Result, success, failure } from '../statusCodeResult';
 
