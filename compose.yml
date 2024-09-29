@@ -6,8 +6,8 @@ services:
     ports:
       - 27017:27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+      MONGO_INITDB_ROOT_USERNAME: ${ACCOUNT_SERVICE_MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${ACCOUNT_SERVICE_MONGO_PASS}
     volumes:
       - account-service-mongo-data:/data/db
       - account-service-mongo-config:/data/configdb
@@ -19,18 +19,20 @@ services:
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASS}
-      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_BASICAUTH_USER}
-      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_BASICAUTH_PASS}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ACCOUNT_SERVICE_MONGO_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ACCOUNT_SERVICE_MONGO_PASS}
+      ME_CONFIG_BASICAUTH_USERNAME: ${ACCOUNT_SERVICE_MONGO_BASICAUTH_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ACCOUNT_SERVICE_MONGO_BASICAUTH_PASS}
       ME_CONFIG_MONGODB_ENABLE_ADMIN: true
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASS}@account-service-mongo:27017
+      ME_CONFIG_MONGODB_URL: mongodb://${ACCOUNT_SERVICE_MONGO_USER}:${ACCOUNT_SERVICE_MONGO_PASS}@account-service-mongo:27017
     depends_on:
       - account-service-mongo
 
   account-service:
     image: account-service:latest
     container_name: account-service
+    environment:
+      MONGO_CONNECTION_STRING: mongodb://${ACCOUNT_SERVICE_MONGO_USER}:${ACCOUNT_SERVICE_MONGO_PASS}@account-service-mongo:27017
     ports:
       - 3000:3000
     depends_on:
@@ -43,8 +45,8 @@ services:
     ports:
       - 27018:27018
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+      MONGO_INITDB_ROOT_USERNAME: ${MESSAGE_SERVICE_MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MESSAGE_SERVICE_MONGO_PASS}
     volumes:
       - message-service-mongo-data:/data/db
       - message-service-mongo-config:/data/configdb
@@ -55,12 +57,12 @@ services:
     ports:
       - 8082:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASS}
-      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_BASICAUTH_USER}
-      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_BASICAUTH_PASS}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MESSAGE_SERVICE_MONGO_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MESSAGE_SERVICE_MONGO_PASS}
+      ME_CONFIG_BASICAUTH_USERNAME: ${MESSAGE_SERVICE_MONGO_BASICAUTH_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MESSAGE_SERVICE_MONGO_BASICAUTH_PASS}
       ME_CONFIG_MONGODB_ENABLE_ADMIN: true
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASS}@message-service-mongo:27018
+      ME_CONFIG_MONGODB_URL: mongodb://${MESSAGE_SERVICE_MONGO_USER}:${MESSAGE_SERVICE_MONGO_PASS}@message-service-mongo:27018
     depends_on:
       - message-service-mongo
 
@@ -69,6 +71,8 @@ services:
     container_name: message-service
     ports:
       - 3001:3001
+    environment:
+      MONGO_CONNECTION_STRING: mongodb://${MESSAGE_SERVICE_MONGO_USER}:${MESSAGE_SERVICE_MONGO_PASS}@message-service-mongo:27018
     depends_on:
       - message-service-mongo
 
