@@ -32,11 +32,17 @@ app.use(handleErrorMiddleware);
 
 app.ws('/realtime', (ws, req) => {
   ws.on('message', async (content: string) => {
+    if (content.length === 0 || content.length > 255) {
+      ws.send(JSON.stringify({ content: 'Invalid message' }));
+      return;
+    }
+
     const message = await MessageService.createMessage(
       req.accountId,
       req.accountUsername,
       content,
     );
+
     getWss().clients.forEach((client) => {
       client.send(JSON.stringify(message));
     });

@@ -1,5 +1,7 @@
 import { Request, Response, Router } from 'express';
 
+import { handleRequestValidationMiddleware } from '../middlewares/handleRequestValidationMiddleware';
+import { createAccountRequestSchema } from '../requests/createAccountRequest';
 import * as AccountService from '../services/accountService';
 
 const router = Router();
@@ -13,10 +15,14 @@ const router = Router();
  *       201:
  *         description: Returns the new account.
  */
-router.post('/', async (req: Request, res: Response) => {
-  const { statusCode, data } = await AccountService.createAccount(req.body);
-  res.status(statusCode).json(data);
-});
+router.post(
+  '/',
+  handleRequestValidationMiddleware(createAccountRequestSchema),
+  async (req: Request, res: Response) => {
+    const { statusCode, data } = await AccountService.createAccount(req.body);
+    res.status(statusCode).json(data);
+  },
+);
 
 /**
  * @openapi
