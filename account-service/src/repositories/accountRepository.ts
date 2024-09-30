@@ -1,7 +1,7 @@
-import { client } from '../databaseClient';
+import { databaseClient } from '../databaseClient';
 import Account from '../models/account';
 
-const accountCollection = client.db().collection<Account>('accounts');
+const accountCollection = databaseClient.db().collection<Account>('accounts');
 
 export async function createAccount(account: Account): Promise<Account> {
   await accountCollection.insertOne(account);

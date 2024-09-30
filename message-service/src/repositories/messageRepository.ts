@@ -1,7 +1,7 @@
-import { client } from '../databaseClient';
+import { databaseClient } from '../databaseClient';
 import Message from '../models/message';
 
-const messageCollection = client.db().collection<Message>('messages');
+const messageCollection = databaseClient.db().collection<Message>('messages');
 
 export async function createMessage(message: Message): Promise<Message> {
   await messageCollection.insertOne(message);
