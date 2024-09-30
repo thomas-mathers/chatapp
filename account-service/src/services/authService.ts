@@ -7,8 +7,10 @@ import LoginResponse from '../responses/loginResponse';
 import { Result, failure, success } from '../statusCodeResult';
 import * as AccountService from './accountService';
 
-export function login(request: LoginRequest): Result<LoginResponse> {
-  const result = AccountService.getAccountById(request.id);
+export async function login(
+  request: LoginRequest,
+): Promise<Result<LoginResponse>> {
+  const result = await AccountService.getAccountByUsername(request.username);
   if (!result.isSuccess) {
     return failure(result.statusCode);
   }
@@ -19,7 +21,7 @@ export function login(request: LoginRequest): Result<LoginResponse> {
   const payload = {
     iss: env.JWT_ISSUER,
     aud: env.JWT_AUDIENCE,
-    sub: result.data.id,
+    sub: result.data._id,
     exp: nowInSeconds + env.JWT_EXPIRATION_TIME_IN_SECONDS,
     iat: nowInSeconds,
   };

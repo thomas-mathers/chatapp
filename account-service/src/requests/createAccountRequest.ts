@@ -1,4 +1,4 @@
 export default interface CreateAccountRequest {
-  id: string;
+  username: string;
   password: string;
 }

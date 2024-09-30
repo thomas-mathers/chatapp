@@ -13,8 +13,8 @@ const router = Router();
  *       201:
  *         description: Returns the new account.
  */
-router.post('/', (req: Request, res: Response) => {
-  const { statusCode, data } = AccountService.createAccount(req.body);
+router.post('/', async (req: Request, res: Response) => {
+  const { statusCode, data } = await AccountService.createAccount(req.body);
   res.status(statusCode).json(data);
 });
 
@@ -27,8 +27,8 @@ router.post('/', (req: Request, res: Response) => {
  *       200:
  *         description: Returns the list of accounts.
  */
-router.get('/', (req: Request, res: Response) => {
-  const { statusCode, data } = AccountService.getAccounts();
+router.get('/', async (req: Request, res: Response) => {
+  const { statusCode, data } = await AccountService.getAccounts();
   res.status(statusCode).json(data);
 });
 

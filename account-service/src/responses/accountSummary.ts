@@ -1,3 +1,5 @@
 export default interface AccountSummary {
-  id: string;
+  _id: string;
+  username: string;
+  dateCreated: Date;
 }

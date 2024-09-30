@@ -1,20 +1,24 @@
+import { client } from '../databaseClient';
 import Account from '../models/account';
 
-const accounts: Account[] = [];
+const accountCollection = client.db().collection<Account>('accounts');
 
-export function createAccount(account: Account): Account {
-  accounts.push(account);
+export async function createAccount(account: Account): Promise<Account> {
+  await accountCollection.insertOne(account);
   return account;
 }
 
-export function containsAccount(id: string): boolean {
-  return accounts.some((account) => account.id === id);
+export async function containsAccount(username: string): Promise<boolean> {
+  const document = getAccountByUsername(username);
+  return document !== null;
 }
 
-export function getAccountById(id: string): Account | undefined {
-  return accounts.find((account) => account.id === id);
+export async function getAccountByUsername(
+  username: string,
+): Promise<Account | null> {
+  return await accountCollection.findOne({ username });
 }
 
-export function getAccounts(): Account[] {
-  return accounts;
+export async function getAccounts(): Promise<Account[]> {
+  return await accountCollection.find({}).toArray();
 }
