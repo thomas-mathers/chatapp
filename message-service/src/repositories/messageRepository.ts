@@ -1,14 +1,13 @@
+import { client } from '../databaseClient';
 import Message from '../models/message';
 
-const messages: Message[] = [];
+const messageCollection = client.db().collection<Message>('messages');
 
-export function createMessage(message: Message): Message {
-  messages.push(message);
+export async function createMessage(message: Message): Promise<Message> {
+  await messageCollection.insertOne(message);
   return message;
 }
 
-export function getMessages(): Message[] {
-  return messages
-    .slice()
-    .sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime());
+export async function getMessages(): Promise<Message[]> {
+  return await messageCollection.find({}).sort({ dateCreated: 1 }).toArray();
 }

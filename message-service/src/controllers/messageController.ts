@@ -15,9 +15,9 @@ const router = Router();
  *       401:
  *         description: Unauthorized.
  */
-router.get('/', (req: Request, res: Response) => {
-  const { statusCode, data } = MessageService.getMessages();
-  res.status(statusCode).json(data);
+router.get('/', async (req: Request, res: Response) => {
+  const messages = await MessageService.getMessages();
+  res.json(messages);
 });
 
 export default router;

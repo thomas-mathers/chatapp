@@ -24,6 +24,7 @@ export async function login(
     sub: result.data._id,
     exp: nowInSeconds + env.JWT_EXPIRATION_TIME_IN_SECONDS,
     iat: nowInSeconds,
+    username: result.data.username,
   };
   const token = jwt.sign(payload, env.JWT_SECRET);
   return success({ jwt: token });

@@ -17,6 +17,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/mongodb": "^4.0.7",
     "@eslint/js": "^9.11.1",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/express": "^5.0.0",
@@ -36,9 +37,10 @@
   "dependencies": {
     "body-parser": "^1.20.3",
     "dotenv": "^16.4.5",
-    "express": "^4.21.0",
+    "express": "^5.0.0",
     "express-ws": "^5.0.2",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.9.0",
     "ncp": "^2.0.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",

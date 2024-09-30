@@ -1,23 +1,22 @@
-import { v4 as uuidv4 } from 'uuid';
-
 import Message from '../models/message';
 import * as MessageRepository from '../repositories/messageRepository';
-import { Result, success } from '../statusCodeResult';
 
-export function createMessage(
+export async function createMessage(
   accountId: string,
+  accountUsername: string,
   content: string,
-): Result<Message> {
-  const message = MessageRepository.createMessage({
-    id: uuidv4(),
+): Promise<Message> {
+  const message = await MessageRepository.createMessage({
     accountId,
-    content: content,
+    accountUsername,
+    content,
     dateCreated: new Date(),
   });
 
-  return success(message, 201);
+  return message;
 }
 
-export function getMessages(): Result<Message[]> {
-  return success(MessageRepository.getMessages());
+export async function getMessages(): Promise<Message[]> {
+  const messages = await MessageRepository.getMessages();
+  return messages;
 }

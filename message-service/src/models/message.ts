@@ -1,6 +1,7 @@
 export default interface Message {
-  id: string;
+  _id?: string;
   accountId: string;
+  accountUsername: string;
   content: string;
   dateCreated: Date;
 }
