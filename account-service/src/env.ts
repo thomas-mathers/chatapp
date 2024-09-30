@@ -9,7 +9,7 @@ const schema = z.object({
   JWT_AUDIENCE: z.string(),
   JWT_SECRET: z.string(),
   JWT_EXPIRATION_TIME_IN_SECONDS: z.coerce.number(),
-  MONGO_URI: z.string(),
+  ACCOUNT_SERVICE_MONGO_URI: z.string(),
 });
 
 const env = schema.parse(process.env);
