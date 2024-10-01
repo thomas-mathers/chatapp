@@ -3,7 +3,7 @@ import { MongoClient } from 'mongodb';
 import env from './env';
 import Account from './models/account';
 
-const databaseClient = new MongoClient(env.ACCOUNT_SERVICE_MONGO_URI);
+const databaseClient = new MongoClient(env.MONGO_URI);
 
 export async function connect() {
   await databaseClient.connect();

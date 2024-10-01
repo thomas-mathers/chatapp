@@ -10,7 +10,7 @@
     "lint": "eslint src",
     "type-check": "tsc --noEmit",
     "clean": "rimraf dist",
-    "build": "tsc && ncp .env dist/.env",
+    "build": "tsc",
     "re-build": "npm run clean && npm run build"
   },
   "author": "",
@@ -43,7 +43,6 @@
     "express-ws": "^5.0.2",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.9.0",
-    "ncp": "^2.0.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^10.0.0",
