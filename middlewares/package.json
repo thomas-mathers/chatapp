@@ -1,6 +1,6 @@
 {
-  "name": "chatapp-middlewares",
-  "version": "1.0.6",
+  "name": "chatapp.middlewares",
+  "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

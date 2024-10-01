@@ -1,5 +1,5 @@
 {
-  "name": "chatapp-account-service",
+  "name": "chatapp.account-service",
   "version": "1.0.0",
   "main": "src/app.ts",
   "scripts": {
@@ -34,8 +34,8 @@
   },
   "dependencies": {
     "body-parser": "^1.20.3",
-    "chatapp-account-service-contracts": "^1.0.5",
-    "chatapp-middlewares": "^1.0.6",
+    "chatapp.account-service-contracts": "^1.0.0",
+    "chatapp.middlewares": "^1.0.0",
     "dotenv": "^16.4.5",
     "express": "^5.0.0",
     "http-status-codes": "^2.3.0",

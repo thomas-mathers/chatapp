@@ -1,5 +1,5 @@
 import bodyParser from 'body-parser';
-import { handleErrorMiddleware } from 'chatapp-middlewares';
+import { handleErrorMiddleware } from 'chatapp.middlewares';
 import express from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';

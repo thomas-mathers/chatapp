@@ -1,4 +1,4 @@
-import { LoginRequest, LoginResponse } from 'chatapp-account-service-contracts';
+import { LoginRequest, LoginResponse } from 'chatapp.account-service-contracts';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 

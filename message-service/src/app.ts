@@ -2,8 +2,8 @@ import bodyParser from 'body-parser';
 import {
   CreateMessageRequest,
   createMessageRequestSchema,
-} from 'chatapp-message-service-contracts';
-import { handleErrorMiddleware } from 'chatapp-middlewares';
+} from 'chatapp.message-service-contracts';
+import { handleErrorMiddleware } from 'chatapp.middlewares';
 import express from 'express';
 import expressWs from 'express-ws';
 import swaggerJsdoc from 'swagger-jsdoc';

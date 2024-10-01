@@ -1,5 +1,5 @@
-import { createAccountRequestSchema } from 'chatapp-account-service-contracts';
-import { handleRequestValidationMiddleware } from 'chatapp-middlewares';
+import { createAccountRequestSchema } from 'chatapp.account-service-contracts';
+import { handleRequestValidationMiddleware } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 
 import * as AccountService from '../services/accountService';
