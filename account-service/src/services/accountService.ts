@@ -1,4 +1,4 @@
-import { CreateAccountRequest } from 'account-service-contracts';
+import { CreateAccountRequest } from 'chatapp-account-service-contracts';
 import { StatusCodes } from 'http-status-codes';
 import { MongoError } from 'mongodb';
 

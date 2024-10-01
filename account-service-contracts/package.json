@@ -1,5 +1,5 @@
 {
-  "name": "account-service-contracts",
+  "name": "chatapp-account-service-contracts",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.ts",
