@@ -5,7 +5,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 import { AccountController, AuthController } from './controllers';
-import { databaseClient } from './databaseClient';
+import { close, connect } from './databaseClient';
 import env from './env';
 
 const app = express()
@@ -29,13 +29,13 @@ const app = express()
 
 async function main() {
   try {
-    await databaseClient.connect();
+    await connect();
 
     app.listen(env.PORT, () => {
       console.log(`Server is running on port ${env.PORT}`);
     });
   } catch {
-    await databaseClient.close();
+    await close();
   }
 }
 

@@ -36,8 +36,10 @@ app.use('/messages', MessageController);
 app.use(handleErrorMiddleware);
 
 app.ws('/realtime', (ws, req) => {
-  ws.on('message', async (createMessageRequest: CreateMessageRequest) => {
+  ws.on('message', async (json: string) => {
     try {
+      const createMessageRequest: CreateMessageRequest = JSON.parse(json);
+
       const { success } =
         createMessageRequestSchema.safeParse(createMessageRequest);
 
