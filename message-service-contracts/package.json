@@ -1,10 +1,15 @@
 {
   "name": "chatapp-message-service-contracts",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc && ncp package.json dist/package.json"
+    "build": "tsup"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +18,7 @@
   },
   "devDependencies": {
     "ncp": "^2.0.0",
+    "tsup": "^8.3.0",
     "typescript": "^5.6.2"
   }
 }
