@@ -1,9 +1,9 @@
-import { NextFunction, Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
-import { UnknownKeysParam, ZodError, ZodRawShape, z } from 'zod';
+import { NextFunction, Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
+import { UnknownKeysParam, ZodError, ZodRawShape, z } from "zod";
 
 export function handleRequestValidationMiddleware(
-  schema: z.ZodObject<ZodRawShape, UnknownKeysParam>,
+  schema: z.ZodObject<ZodRawShape, UnknownKeysParam>
 ) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -25,8 +25,8 @@ export function handleRequestValidationMiddleware(
 
 function convertZodErrorToResponse(error: ZodError) {
   const errorMessages = error.errors.map((issue: z.ZodIssue) => ({
-    message: `${issue.path.join('.')} is ${issue.message}`,
+    message: `${issue.path.join(".")} is ${issue.message}`,
   }));
 
-  return { error: 'Invalid data', details: errorMessages };
+  return { error: "Invalid data", details: errorMessages };
 }

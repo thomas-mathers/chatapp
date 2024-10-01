@@ -1,9 +1,9 @@
+import { CreateAccountRequest } from 'account-service-contracts';
 import { StatusCodes } from 'http-status-codes';
 import { MongoError } from 'mongodb';
 
 import Account from '../models/account';
 import * as AccountRepository from '../repositories/accountRepository';
-import CreateAccountRequest from '../requests/createAccountRequest';
 import { Result, failure, success } from '../statusCodeResult';
 
 export async function createAccount(

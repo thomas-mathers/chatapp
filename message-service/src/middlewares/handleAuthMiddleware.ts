@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import env from '../env';
 
-export default function handleAuthMiddleware(
+export function handleAuthMiddleware(
   req: Request,
   res: Response,
   next: NextFunction,

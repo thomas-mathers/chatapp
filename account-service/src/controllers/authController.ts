@@ -1,7 +1,7 @@
+import { loginRequestSchema } from 'account-service-contracts';
 import { Request, Response, Router } from 'express';
+import { handleRequestValidationMiddleware } from 'middlewares';
 
-import { handleRequestValidationMiddleware } from '../middlewares/handleRequestValidationMiddleware';
-import { loginRequestSchema } from '../requests/loginRequest';
 import * as AuthService from '../services/authService';
 
 const router = Router();

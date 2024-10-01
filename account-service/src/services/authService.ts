@@ -1,9 +1,8 @@
+import { LoginRequest, LoginResponse } from 'account-service-contracts';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 
 import env from '../env';
-import LoginRequest from '../requests/loginRequest';
-import LoginResponse from '../responses/loginResponse';
 import { Result, failure, success } from '../statusCodeResult';
 import * as AccountService from './accountService';
 

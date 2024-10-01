@@ -1,12 +1,12 @@
 import bodyParser from 'body-parser';
 import express from 'express';
+import { handleErrorMiddleware } from 'middlewares';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 import { AccountController, AuthController } from './controllers';
 import { databaseClient } from './databaseClient';
 import env from './env';
-import { handleErrorMiddleware } from './middlewares/handleErrorMiddleware';
 
 const app = express()
   .use(bodyParser.json())
