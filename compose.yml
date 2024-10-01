@@ -32,7 +32,12 @@ services:
     image: account-service:latest
     container_name: account-service
     environment:
-      MONGO_CONNECTION_STRING: mongodb://${ACCOUNT_SERVICE_MONGO_USER}:${ACCOUNT_SERVICE_MONGO_PASS}@account-service-mongo:27017
+      PORT: 3000
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_TIME_IN_SECONDS: ${JWT_EXPIRATION_TIME_IN_SECONDS}
+      MONGO_URI: mongodb://${ACCOUNT_SERVICE_MONGO_USER}:${ACCOUNT_SERVICE_MONGO_PASS}@account-service-mongo:27017
     ports:
       - 3000:3000
     depends_on:
@@ -72,7 +77,12 @@ services:
     ports:
       - 3001:3001
     environment:
-      MONGO_CONNECTION_STRING: mongodb://${MESSAGE_SERVICE_MONGO_USER}:${MESSAGE_SERVICE_MONGO_PASS}@message-service-mongo:27018
+      PORT: 3001
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_TIME_IN_SECONDS: ${JWT_EXPIRATION_TIME_IN_SECONDS}
+      MONGO_URI: mongodb://${MESSAGE_SERVICE_MONGO_USER}:${MESSAGE_SERVICE_MONGO_PASS}@message-service-mongo:27018
     depends_on:
       - message-service-mongo
 
