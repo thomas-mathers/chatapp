@@ -2,8 +2,10 @@ import bcrypt from 'bcrypt';
 import {
   AccountSummary,
   CreateAccountRequest,
+  GetAccountsRequest,
   LoginRequest,
   LoginResponse,
+  Page,
 } from 'chatapp.account-service-contracts';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
@@ -38,11 +40,17 @@ export async function createAccount(
   }
 }
 
-export async function getAccounts(): Promise<Result<AccountSummary[]>> {
-  const accounts = await AccountRepository.getAccounts();
-  const accountSummaries = accounts.map(toAccountSummary);
+export async function getAccounts(
+  req: GetAccountsRequest,
+): Promise<Page<AccountSummary>> {
+  const page = await AccountRepository.getAccounts(req);
 
-  return success(accountSummaries);
+  const pageSummary: Page<AccountSummary> = {
+    ...page,
+    records: page.records.map(toAccountSummary),
+  };
+
+  return pageSummary;
 }
 
 export async function getAccountByUsername(
@@ -96,6 +104,10 @@ export async function login(
 }
 
 function toAccountSummary(account: Account): AccountSummary {
-  const { _id, ...rest } = account;
-  return { id: _id!, ...rest };
+  const { _id, username, dateCreated } = account;
+  return {
+    id: _id!,
+    username,
+    dateCreated,
+  };
 }

@@ -33,6 +33,6 @@ export async function getMessages(
 }
 
 function toMessageSummary(message: Message): MessageSummary {
-  const { _id, ...rest } = message;
-  return { id: _id!, ...rest };
+  const { _id, accountId, accountUsername, content, dateCreated } = message;
+  return { id: _id!, accountId, accountUsername, content, dateCreated };
 }

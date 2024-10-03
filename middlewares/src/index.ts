@@ -1,2 +1,3 @@
 export * from "./handleErrorMiddleware";
-export * from "./handleRequestValidationMiddleware";
+export * from "./handleRequestBodyValidationMiddleware";
+export * from "./handleRequestQueryValidationMiddleware";

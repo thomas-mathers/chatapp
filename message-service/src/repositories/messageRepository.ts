@@ -11,16 +11,12 @@ export async function createMessage(message: Message): Promise<Message> {
   return message;
 }
 
-export async function getMessages(
-  options: GetMessagesRequest,
-): Promise<Page<Message>> {
-  const {
-    page = 0,
-    pageSize = 10,
-    sortBy = 'dateCreated',
-    sortDirection = 'desc',
-  } = options;
-
+export async function getMessages({
+  page,
+  pageSize,
+  sortBy,
+  sortDirection,
+}: GetMessagesRequest): Promise<Page<Message>> {
   const totalRecords = await messageCollection.countDocuments();
 
   const skip = page * pageSize;

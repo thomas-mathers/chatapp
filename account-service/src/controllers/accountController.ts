@@ -1,8 +1,13 @@
 import {
+  GetAccountsRequest,
   createAccountRequestSchema,
+  getAccountsRequestSchema,
   loginRequestSchema,
 } from 'chatapp.account-service-contracts';
-import { handleRequestValidationMiddleware } from 'chatapp.middlewares';
+import {
+  handleRequestBodyValidationMiddleware,
+  handleRequestQueryValidationMiddleware,
+} from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 
 import * as AccountService from '../services/accountService';
@@ -20,7 +25,7 @@ const router = Router();
  */
 router.post(
   '/',
-  handleRequestValidationMiddleware(createAccountRequestSchema),
+  handleRequestBodyValidationMiddleware(createAccountRequestSchema),
   async (req: Request, res: Response) => {
     const { statusCode, data } = await AccountService.createAccount(req.body);
     res.status(statusCode).json(data);
@@ -38,7 +43,7 @@ router.post(
  */
 router.post(
   '/login',
-  handleRequestValidationMiddleware(loginRequestSchema),
+  handleRequestBodyValidationMiddleware(loginRequestSchema),
   async (req: Request, res: Response) => {
     const { statusCode, data } = await AccountService.login(req.body);
     res.status(statusCode).json(data);
@@ -54,9 +59,15 @@ router.post(
  *       200:
  *         description: Returns the list of accounts.
  */
-router.get('/', async (req: Request, res: Response) => {
-  const { statusCode, data } = await AccountService.getAccounts();
-  res.status(statusCode).json(data);
-});
+router.get(
+  '/',
+  handleRequestQueryValidationMiddleware(getAccountsRequestSchema),
+  async (req: Request, res: Response) => {
+    const getAccountsRequest: GetAccountsRequest =
+      getAccountsRequestSchema.parse(req.query);
+    const page = await AccountService.getAccounts(getAccountsRequest);
+    res.status(200).json(page);
+  },
+);
 
 export default router;

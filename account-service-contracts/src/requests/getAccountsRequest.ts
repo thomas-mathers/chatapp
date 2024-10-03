@@ -1,24 +1,18 @@
 import { z } from "zod";
-import { MessageSummary } from "../responses/messageSummary";
+import { AccountSummary } from "../responses/accountSummary";
 import { SortDirection } from "../sortDirection";
 
-type MessageSummaryKeys = keyof MessageSummary;
+type AccountSummaryKeys = keyof AccountSummary;
 
-const sortColumns: MessageSummaryKeys[] = [
-  "id",
-  "accountId",
-  "accountUsername",
-  "content",
-  "dateCreated",
-];
+const sortColumns: AccountSummaryKeys[] = ["id", "username", "dateCreated"];
 
 const [firstSortColumn, ...restSortColumns] = sortColumns;
 
-export const getMessagesRequestSchema = z.object({
+export const getAccountsRequestSchema = z.object({
   page: z.coerce.number().nonnegative().default(1).optional(),
   pageSize: z.coerce.number().int().min(1).max(1000).default(10).optional(),
   sortBy: z.enum([firstSortColumn, ...restSortColumns]).optional(),
   sortDirection: z.nativeEnum(SortDirection).optional(),
 });
 
-export type GetMessagesRequest = z.infer<typeof getMessagesRequestSchema>;
+export type GetAccountsRequest = z.infer<typeof getAccountsRequestSchema>;

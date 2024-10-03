@@ -1,3 +1,6 @@
+import { GetAccountsRequest, Page } from 'chatapp.account-service-contracts';
+import { Sort } from 'mongodb';
+
 import { getAccountsCollection } from '../databaseClient';
 import Account from '../models/account';
 
@@ -19,6 +22,29 @@ export async function getAccountByUsername(
   return await accountCollection.findOne({ username });
 }
 
-export async function getAccounts(): Promise<Account[]> {
-  return await accountCollection.find({}).toArray();
+export async function getAccounts({
+  page,
+  pageSize,
+  sortBy,
+  sortDirection,
+}: GetAccountsRequest): Promise<Page<Account>> {
+  const totalRecords = await accountCollection.countDocuments();
+
+  const skip = page * pageSize;
+  const limit = pageSize;
+  const sort: Sort = {
+    [sortBy]: sortDirection === 'asc' ? 1 : -1,
+  };
+
+  const records = await accountCollection
+    .find({}, { skip, limit, sort })
+    .toArray();
+
+  return {
+    records,
+    totalRecords,
+    page,
+    pageSize,
+    totalPages: Math.ceil(totalRecords / pageSize),
+  };
 }

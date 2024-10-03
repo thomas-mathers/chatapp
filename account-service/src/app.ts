@@ -4,7 +4,7 @@ import express from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import { AccountController, AuthController } from './controllers';
+import AccountController from './controllers/accountController';
 import { close, connect } from './databaseClient';
 import env from './env';
 
@@ -24,7 +24,6 @@ const app = express()
     ),
   )
   .use('/accounts', AccountController)
-  .use('/auth', AuthController)
   .use(handleErrorMiddleware);
 
 async function main() {
