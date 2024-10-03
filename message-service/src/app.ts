@@ -40,13 +40,7 @@ app.ws('/realtime', (ws, req) => {
     try {
       const createMessageRequest: CreateMessageRequest = JSON.parse(json);
 
-      const { success } =
-        createMessageRequestSchema.safeParse(createMessageRequest);
-
-      if (!success) {
-        ws.send(JSON.stringify({ error: 'Invalid request' }));
-        return;
-      }
+      createMessageRequestSchema.parse(createMessageRequest);
 
       const message = await MessageService.createMessage(
         req.accountId,

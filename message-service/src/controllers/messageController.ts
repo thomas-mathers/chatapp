@@ -1,3 +1,8 @@
+import {
+  GetMessagesRequest,
+  getMessagesRequestSchema,
+} from 'chatapp.message-service-contracts';
+import { handleRequestValidationMiddleware } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 
 import * as MessageService from '../services/messageService';
@@ -15,9 +20,14 @@ const router = Router();
  *       401:
  *         description: Unauthorized.
  */
-router.get('/', async (req: Request, res: Response) => {
-  const messages = await MessageService.getMessages();
-  res.json(messages);
-});
+router.get(
+  '/',
+  handleRequestValidationMiddleware(getMessagesRequestSchema),
+  async (req: Request, res: Response) => {
+    const queryOptions: GetMessagesRequest = req.body();
+    const page = await MessageService.getMessages(queryOptions);
+    res.json(page);
+  },
+);
 
 export default router;
