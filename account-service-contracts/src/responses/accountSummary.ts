@@ -1,5 +1,5 @@
 export interface AccountSummary {
-  _id: string;
+  id: string;
   username: string;
   dateCreated: Date;
 }

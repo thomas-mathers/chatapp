@@ -1,7 +1,4 @@
-import {
-  GetMessagesRequest,
-  getMessagesRequestSchema,
-} from 'chatapp.message-service-contracts';
+import { getMessagesRequestSchema } from 'chatapp.message-service-contracts';
 import { handleRequestValidationMiddleware } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 
@@ -24,8 +21,7 @@ router.get(
   '/',
   handleRequestValidationMiddleware(getMessagesRequestSchema),
   async (req: Request, res: Response) => {
-    const queryOptions: GetMessagesRequest = req.body();
-    const page = await MessageService.getMessages(queryOptions);
+    const page = await MessageService.getMessages(req.body());
     res.json(page);
   },
 );

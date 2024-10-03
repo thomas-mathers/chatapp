@@ -1,4 +1,7 @@
-import { createAccountRequestSchema } from 'chatapp.account-service-contracts';
+import {
+  createAccountRequestSchema,
+  loginRequestSchema,
+} from 'chatapp.account-service-contracts';
 import { handleRequestValidationMiddleware } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 
@@ -20,6 +23,24 @@ router.post(
   handleRequestValidationMiddleware(createAccountRequestSchema),
   async (req: Request, res: Response) => {
     const { statusCode, data } = await AccountService.createAccount(req.body);
+    res.status(statusCode).json(data);
+  },
+);
+
+/**
+ * @openapi
+ * /accounts/login:
+ *   get:
+ *     description: Log in.
+ *     responses:
+ *       200:
+ *         description: Returns a JWT.
+ */
+router.post(
+  '/login',
+  handleRequestValidationMiddleware(loginRequestSchema),
+  async (req: Request, res: Response) => {
+    const { statusCode, data } = await AccountService.login(req.body);
     res.status(statusCode).json(data);
   },
 );

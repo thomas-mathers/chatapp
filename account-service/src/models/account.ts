@@ -1,7 +1,5 @@
-import { ObjectId } from 'mongodb';
-
 export default interface Account {
-  _id?: ObjectId;
+  _id?: string;
   username: string;
   password: string;
   dateCreated: Date;
