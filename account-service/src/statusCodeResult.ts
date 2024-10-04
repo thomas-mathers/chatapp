@@ -1,7 +1,7 @@
 interface ResultSuccess<T> {
   isSuccess: true;
   statusCode: number;
-  data: T;
+  data?: T;
 }
 
 interface ResultFailure {
@@ -13,7 +13,7 @@ interface ResultFailure {
 export type Result<TSuccess> = ResultSuccess<TSuccess> | ResultFailure;
 
 export function success<T>(
-  data: T,
+  data?: T,
   statusCode: number = 200,
 ): ResultSuccess<T> {
   return { isSuccess: true, statusCode, data };

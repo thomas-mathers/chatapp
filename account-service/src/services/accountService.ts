@@ -1,6 +1,6 @@
-import bcrypt from 'bcrypt';
 import {
   AccountSummary,
+  ChangePasswordRequest,
   CreateAccountRequest,
   GetAccountsRequest,
   LoginRequest,
@@ -11,22 +11,24 @@ import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 import { MongoError } from 'mongodb';
 
-import env from '../env';
+import config from '../config';
 import Account from '../models/account';
 import * as AccountRepository from '../repositories/accountRepository';
 import { Result, failure, success } from '../statusCodeResult';
+import { hashPassword, verifyPassword } from '../util/cryptoUtil';
 
 export async function createAccount(
   request: CreateAccountRequest,
 ): Promise<Result<AccountSummary>> {
   try {
-    const salt = await bcrypt.genSalt();
-    const hash = await bcrypt.hash(request.password, salt);
+    const hash = await hashPassword(request.password);
 
     const account = await AccountRepository.createAccount({
       username: request.username,
       password: hash,
-      dateCreated: new Date(),
+      email: request.email,
+      emailVerified: false,
+      createdAt: new Date(),
     });
 
     const accountSummary = toAccountSummary(account);
@@ -67,6 +69,14 @@ export async function getAccountByUsername(
   return success(accountSummary);
 }
 
+export async function deleteAccount(id: string): Promise<Result<void>> {
+  const numDeleted = await AccountRepository.deleteAccountById(id);
+  if (numDeleted === 0) {
+    return failure(StatusCodes.NOT_FOUND);
+  }
+  return success();
+}
+
 export async function login(
   request: LoginRequest,
 ): Promise<Result<LoginResponse>> {
@@ -78,7 +88,7 @@ export async function login(
     return failure(StatusCodes.NOT_FOUND);
   }
 
-  const passwordMatch = await bcrypt.compare(
+  const passwordMatch = await verifyPassword(
     request.password,
     account.password,
   );
@@ -90,24 +100,48 @@ export async function login(
   const nowInSeconds = Date.now() / 1000;
 
   const payload = {
-    iss: env.JWT_ISSUER,
-    aud: env.JWT_AUDIENCE,
+    iss: config.jwt.issuer,
+    aud: config.jwt.audience,
     sub: account._id,
-    exp: nowInSeconds + env.JWT_EXPIRATION_TIME_IN_SECONDS,
+    exp: nowInSeconds + config.jwt.maxAgeInSeconds,
     iat: nowInSeconds,
     username: account.username,
   };
 
-  const token = jwt.sign(payload, env.JWT_SECRET);
+  const token = jwt.sign(payload, config.jwt.secret);
 
   return success({ jwt: token });
 }
 
+export async function changePassword(
+  id: string,
+  { oldPassword, newPassword }: ChangePasswordRequest,
+): Promise<Result<void>> {
+  const account = await AccountRepository.getAccountById(id);
+
+  if (!account) {
+    return failure(StatusCodes.NOT_FOUND);
+  }
+
+  const passwordMatch = await verifyPassword(oldPassword, account.password);
+
+  if (!passwordMatch) {
+    return failure(StatusCodes.UNAUTHORIZED);
+  }
+
+  const hash = await hashPassword(newPassword);
+
+  await AccountRepository.updateAccount({ ...account, password: hash });
+
+  return success();
+}
+
 function toAccountSummary(account: Account): AccountSummary {
-  const { _id, username, dateCreated } = account;
+  const { _id, username, email, createdAt } = account;
   return {
-    id: _id!,
+    id: _id!.toString(),
     username,
-    dateCreated,
+    email,
+    createdAt,
   };
 }

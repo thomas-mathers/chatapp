@@ -4,9 +4,9 @@ import express from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
+import config from './config';
 import AccountController from './controllers/accountController';
 import { close, connect } from './databaseClient';
-import env from './env';
 
 const app = express()
   .use(bodyParser.json())
@@ -30,8 +30,8 @@ async function main() {
   try {
     await connect();
 
-    app.listen(env.PORT, () => {
-      console.log(`Server is running on port ${env.PORT}`);
+    app.listen(config.port, () => {
+      console.log(`Server is running on port ${config.port}`);
     });
   } catch {
     await close();

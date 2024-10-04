@@ -1,5 +1,5 @@
 import { MongoClient } from 'mongodb';
 
-import env from './env';
+import env from './config';
 
-export const databaseClient = new MongoClient(env.MONGO_URI);
+export const databaseClient = new MongoClient(env.mongoUri);

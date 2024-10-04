@@ -4,7 +4,12 @@ import { SortDirection } from "../sortDirection";
 
 type AccountSummaryKeys = keyof AccountSummary;
 
-const sortColumns: AccountSummaryKeys[] = ["id", "username", "dateCreated"];
+const sortColumns: AccountSummaryKeys[] = [
+  "id",
+  "username",
+  "email",
+  "createdAt",
+];
 
 const [firstSortColumn, ...restSortColumns] = sortColumns;
 

@@ -1,9 +1,9 @@
 import { MongoClient } from 'mongodb';
 
-import env from './env';
+import env from './config';
 import Account from './models/account';
 
-const databaseClient = new MongoClient(env.MONGO_URI);
+const databaseClient = new MongoClient(env.mongoUri);
 
 export async function connect() {
   await databaseClient.connect();

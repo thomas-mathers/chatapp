@@ -1,15 +1,17 @@
 import {
-  GetAccountsRequest,
+  changePasswordRequestSchema,
   createAccountRequestSchema,
   getAccountsRequestSchema,
   loginRequestSchema,
 } from 'chatapp.account-service-contracts';
 import {
+  handleAuthMiddleware,
   handleRequestBodyValidationMiddleware,
   handleRequestQueryValidationMiddleware,
 } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 
+import env from '../config';
 import * as AccountService from '../services/accountService';
 
 const router = Router();
@@ -52,6 +54,21 @@ router.post(
 
 /**
  * @openapi
+ * /accounts/{accountId}/password:
+ *   put:
+ *     description: Changes pasword.
+ */
+router.post(
+  '/:accountId/password',
+  handleRequestBodyValidationMiddleware(changePasswordRequestSchema),
+  async (req: Request, res: Response) => {
+    await AccountService.changePassword(req.params.accountId, req.body);
+    res.status(200);
+  },
+);
+
+/**
+ * @openapi
  * /accounts:
  *   get:
  *     description: Gets the list of accounts.
@@ -61,12 +78,29 @@ router.post(
  */
 router.get(
   '/',
+  handleAuthMiddleware(env.jwt),
   handleRequestQueryValidationMiddleware(getAccountsRequestSchema),
   async (req: Request, res: Response) => {
-    const getAccountsRequest: GetAccountsRequest =
-      getAccountsRequestSchema.parse(req.query);
+    const getAccountsRequest = getAccountsRequestSchema.parse(req.query);
     const page = await AccountService.getAccounts(getAccountsRequest);
     res.status(200).json(page);
+  },
+);
+
+/**
+ * @openapi
+ * /accounts/{accountId}:
+ *   delete:
+ *     description: Deletes an account.
+ */
+router.delete(
+  '/:accountId',
+  handleAuthMiddleware(env.jwt),
+  async (req: Request, res: Response) => {
+    const { statusCode, data } = await AccountService.deleteAccount(
+      req.params.accountId,
+    );
+    res.status(statusCode).json(data);
   },
 );
 

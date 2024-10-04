@@ -3,16 +3,18 @@ import {
   CreateMessageRequest,
   createMessageRequestSchema,
 } from 'chatapp.message-service-contracts';
-import { handleErrorMiddleware } from 'chatapp.middlewares';
+import {
+  handleAuthMiddleware,
+  handleErrorMiddleware,
+} from 'chatapp.middlewares';
 import express from 'express';
 import expressWs from 'express-ws';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
+import config from './config';
 import MessageController from './controllers/messageController';
 import { databaseClient } from './databaseClient';
-import env from './env';
-import { handleAuthMiddleware } from './middlewares/handleAuthMiddleware';
 import * as MessageService from './services/messageService';
 
 const { app, getWss } = expressWs(express());
@@ -31,7 +33,7 @@ app.use(
     }),
   ),
 );
-app.use(handleAuthMiddleware);
+app.use(handleAuthMiddleware(config.jwt));
 app.use('/messages', MessageController);
 app.use(handleErrorMiddleware);
 
@@ -61,8 +63,8 @@ async function main() {
   try {
     await databaseClient.connect();
 
-    app.listen(env.PORT, () => {
-      console.log(`Server is running on port ${env.PORT}`);
+    app.listen(config.port, () => {
+      console.log(`Server is running on port ${config.port}`);
     });
   } catch {
     await databaseClient.close();
