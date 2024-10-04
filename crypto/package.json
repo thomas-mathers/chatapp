@@ -1,5 +1,5 @@
 {
-  "name": "chatapp.account-service-contracts",
+  "name": "chatapp.crypto",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
@@ -14,11 +14,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "zod": "^3.23.8"
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "tsup": "^8.3.0"
   },
   "devDependencies": {
-    "ncp": "^2.0.0",
-    "tsup": "^8.3.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.7",
     "typescript": "^5.6.2"
   }
 }

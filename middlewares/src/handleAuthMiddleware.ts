@@ -1,15 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
-
-export interface JwtOptions {
-  issuer: string;
-  audience: string;
-  maxAgeInSeconds: number;
-  secret: string;
-}
+import { JwtOptions, verifyJwt } from "chatapp.crypto";
 
 export const handleAuthMiddleware =
-  ({ issuer, audience, maxAgeInSeconds: maxAge, secret }: JwtOptions) =>
+  (options: JwtOptions) =>
   (req: Request, res: Response, next: NextFunction): void => {
     const authorizationSegments = req.headers.authorization?.split(" ") ?? [];
 
@@ -24,20 +17,15 @@ export const handleAuthMiddleware =
     const token = authorizationSegments[1];
 
     try {
-      const options: jwt.VerifyOptions = { issuer, audience, maxAge };
+      const userCredentials = verifyJwt(token, options);
 
-      const { sub, username } = jwt.verify(token, secret, options) as {
-        sub: string | undefined;
-        username: string | undefined;
-      };
-
-      if (sub === undefined || username === undefined) {
+      if (userCredentials === undefined) {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
 
-      req.accountId = sub;
-      req.accountUsername = username;
+      req.accountId = userCredentials.userId;
+      req.accountUsername = userCredentials.username;
 
       next();
     } catch {

@@ -1,6 +1,7 @@
 import { LoginResponse } from 'chatapp.account-service-contracts';
 import { StatusCodes } from 'http-status-codes';
 
+import config from '../config';
 import {
   getAccountByEmail,
   getAccountById,
@@ -9,7 +10,7 @@ import {
 } from '../repositories/accountRepository';
 import { Result, failure, success } from '../statusCodeResult';
 import { hashPassword, verifyPassword } from './cryptoService';
-import { createJwtForAccount, verifyJwt } from './jwtService';
+import { createJwt, verifyJwt } from './jwtService';
 
 export async function login(
   username: string,
@@ -27,7 +28,7 @@ export async function login(
     return failure(StatusCodes.UNAUTHORIZED);
   }
 
-  const jwt = createJwtForAccount(account);
+  const jwt = createJwt(account, config.jwt);
 
   return success({ jwt });
 }
@@ -68,7 +69,7 @@ export async function generatePasswordResetToken(
     return failure(StatusCodes.NOT_FOUND);
   }
 
-  const token = createJwtForAccount(account);
+  const token = createJwt(account);
 
   return success(token);
 }
