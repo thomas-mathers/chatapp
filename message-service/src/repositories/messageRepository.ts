@@ -1,4 +1,4 @@
-import { GetMessagesRequest, Page } from 'chatapp.message-service-contracts';
+import { GetMessagesRequest, Page, SortDirection } from 'chatapp.message-service-contracts';
 import { Sort } from 'mongodb';
 
 import { databaseClient } from '../databaseClient';
@@ -12,10 +12,10 @@ export async function createMessage(message: Message): Promise<Message> {
 }
 
 export async function getMessages({
-  page,
-  pageSize,
-  sortBy,
-  sortDirection,
+  page = 0,
+  pageSize = 10,
+  sortBy = 'dateCreated',
+  sortDirection = SortDirection.Asc,
 }: GetMessagesRequest): Promise<Page<Message>> {
   const totalRecords = await messageCollection.countDocuments();
 

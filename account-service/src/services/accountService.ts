@@ -2,19 +2,19 @@ import {
   AccountSummary,
   CreateAccountRequest,
 } from 'chatapp.account-service-contracts';
+import { createHash } from 'chatapp.crypto';
 import { StatusCodes } from 'http-status-codes';
 import { MongoError } from 'mongodb';
 
 import Account from '../models/account';
 import * as AccountRepository from '../repositories/accountRepository';
 import { Result, failure, success } from '../statusCodeResult';
-import { hashPassword } from './cryptoService';
 
 export async function createAccount(
   request: CreateAccountRequest,
 ): Promise<Result<AccountSummary>> {
   try {
-    const hash = await hashPassword(request.password);
+    const hash = await createHash(request.password);
 
     const account = await AccountRepository.createAccount({
       username: request.username,

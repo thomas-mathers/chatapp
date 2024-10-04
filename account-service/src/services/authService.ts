@@ -1,4 +1,5 @@
 import { LoginResponse } from 'chatapp.account-service-contracts';
+import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
 import { StatusCodes } from 'http-status-codes';
 
 import config from '../config';
@@ -9,8 +10,6 @@ import {
   updateAccount,
 } from '../repositories/accountRepository';
 import { Result, failure, success } from '../statusCodeResult';
-import { hashPassword, verifyPassword } from './cryptoService';
-import { createJwt, verifyJwt } from './jwtService';
 
 export async function login(
   username: string,
@@ -22,13 +21,16 @@ export async function login(
     return failure(StatusCodes.NOT_FOUND);
   }
 
-  const isPasswordCorrect = await verifyPassword(password, account.password);
+  const isPasswordCorrect = await verifyHash(password, account.password);
 
   if (!isPasswordCorrect) {
     return failure(StatusCodes.UNAUTHORIZED);
   }
 
-  const jwt = createJwt(account, config.jwt);
+  const jwt = createJwt(
+    { userId: account._id!.toString(), username: account.username },
+    config.jwt,
+  );
 
   return success({ jwt });
 }
@@ -44,16 +46,13 @@ export async function changePassword(
     return failure(StatusCodes.NOT_FOUND);
   }
 
-  const isOldPasswordCorrect = await verifyPassword(
-    oldPassword,
-    account.password,
-  );
+  const isOldPasswordCorrect = await verifyHash(oldPassword, account.password);
 
   if (!isOldPasswordCorrect) {
     return failure(StatusCodes.UNAUTHORIZED);
   }
 
-  const password = await hashPassword(newPassword);
+  const password = await createHash(newPassword);
 
   await updateAccount({ ...account, password });
 
@@ -69,7 +68,10 @@ export async function generatePasswordResetToken(
     return failure(StatusCodes.NOT_FOUND);
   }
 
-  const token = createJwt(account);
+  const token = createJwt(
+    { userId: account._id!.toString(), username: account.username },
+    config.jwt,
+  );
 
   return success(token);
 }
@@ -78,19 +80,19 @@ export async function resetPassword(
   token: string,
   newPassword: string,
 ): Promise<Result<void>> {
-  const { sub, username } = verifyJwt(token);
+  const userCredentials = verifyJwt(token, config.jwt);
 
-  if (sub === undefined || username === undefined) {
+  if (userCredentials === undefined) {
     return failure(StatusCodes.UNAUTHORIZED);
   }
 
-  const account = await getAccountById(sub);
+  const account = await getAccountById(userCredentials.userId);
 
   if (!account) {
     return failure(StatusCodes.NOT_FOUND);
   }
 
-  const password = await hashPassword(newPassword);
+  const password = await createHash(newPassword);
 
   await updateAccount({ ...account, password });
 
