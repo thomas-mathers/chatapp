@@ -1,29 +1,68 @@
-import {
-  changePasswordRequestSchema,
-  createAccountRequestSchema,
-  getAccountsRequestSchema,
-  loginRequestSchema,
-} from 'chatapp.account-service-contracts';
+import { createAccountRequestSchema } from 'chatapp.account-service-contracts';
 import {
   handleAuthMiddleware,
   handleRequestBodyValidationMiddleware,
-  handleRequestQueryValidationMiddleware,
 } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 
-import env from '../config';
+import config from '../config';
 import * as AccountService from '../services/accountService';
 
 const router = Router();
 
 /**
- * @openapi
+ * @swagger
  * /accounts:
  *   post:
- *     description: Creates a new account.
+ *     summary: Create a new account
+ *     tags: [Account]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: "john_doe"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "john.doe@example.com"
+ *               password:
+ *                 type: string
+ *                 example: "yourpassword"
  *     responses:
  *       201:
- *         description: Returns the new account.
+ *         description: Account created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   example: "12345"
+ *                 username:
+ *                   type: string
+ *                   example: "john_doe"
+ *                 email:
+ *                   type: string
+ *                   format: email
+ *                   example: "john.doe@example.com"
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2023-01-01T00:00:00.000Z"
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2023-01-02T00:00:00.000Z"
+ *       400:
+ *         description: Invalid request body
+ *       500:
+ *         description: Internal server error
  */
 router.post(
   '/',
@@ -35,72 +74,89 @@ router.post(
 );
 
 /**
- * @openapi
- * /accounts/login:
+ * @swagger
+ * /accounts/me:
  *   get:
- *     description: Log in.
+ *     summary: Get account details
+ *     tags: [Account]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Returns a JWT.
- */
-router.post(
-  '/login',
-  handleRequestBodyValidationMiddleware(loginRequestSchema),
-  async (req: Request, res: Response) => {
-    const { statusCode, data } = await AccountService.login(req.body);
-    res.status(statusCode).json(data);
-  },
-);
-
-/**
- * @openapi
- * /accounts/{accountId}/password:
- *   put:
- *     description: Changes pasword.
- */
-router.post(
-  '/:accountId/password',
-  handleRequestBodyValidationMiddleware(changePasswordRequestSchema),
-  async (req: Request, res: Response) => {
-    await AccountService.changePassword(req.params.accountId, req.body);
-    res.status(200);
-  },
-);
-
-/**
- * @openapi
- * /accounts:
- *   get:
- *     description: Gets the list of accounts.
- *     responses:
- *       200:
- *         description: Returns the list of accounts.
+ *         description: Account details retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   example: "12345"
+ *                 username:
+ *                   type: string
+ *                   example: "john_doe"
+ *                 email:
+ *                   type: string
+ *                   format: email
+ *                   example: "john.doe@example.com"
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2023-01-01T00:00:00.000Z"
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2023-01-02T00:00:00.000Z"
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Account not found
+ *       500:
+ *         description: Internal server error
  */
 router.get(
-  '/',
-  handleAuthMiddleware(env.jwt),
-  handleRequestQueryValidationMiddleware(getAccountsRequestSchema),
+  '/me',
+  handleAuthMiddleware(config.jwt),
   async (req: Request, res: Response) => {
-    const getAccountsRequest = getAccountsRequestSchema.parse(req.query);
-    const page = await AccountService.getAccounts(getAccountsRequest);
-    res.status(200).json(page);
+    const { statusCode, data } = await AccountService.getAccountById(
+      req.accountId,
+    );
+    res.status(statusCode).json(data);
   },
 );
 
 /**
- * @openapi
- * /accounts/{accountId}:
+ * @swagger
+ * /accounts/me:
  *   delete:
- *     description: Deletes an account.
+ *     summary: Delete account
+ *     tags: [Account]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Account deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Account deleted successfully"
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Account not found
+ *       500:
+ *         description: Internal server error
  */
 router.delete(
-  '/:accountId',
-  handleAuthMiddleware(env.jwt),
+  '/me',
+  handleAuthMiddleware(config.jwt),
   async (req: Request, res: Response) => {
-    const { statusCode, data } = await AccountService.deleteAccount(
-      req.params.accountId,
-    );
-    res.status(statusCode).json(data);
+    const { statusCode } = await AccountService.deleteAccount(req.accountId);
+    res.status(statusCode).json();
   },
 );
 

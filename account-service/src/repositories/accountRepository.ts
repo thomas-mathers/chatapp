@@ -30,6 +30,12 @@ export async function getAccountByUsername(
   return await accountCollection.findOne({ username });
 }
 
+export async function getAccountByEmail(
+  email: string,
+): Promise<Account | null> {
+  return await accountCollection.findOne({ email });
+}
+
 export async function getAccounts({
   page = 0,
   pageSize = 10,
