@@ -104,8 +104,12 @@ router.put(
   handleRequestBodyValidationMiddleware(changePasswordRequestSchema),
   async (req: Request, res: Response) => {
     const body: ChangePasswordRequest = req.body;
-    await changePassword(req.accountId, body.oldPassword, body.newPassword);
-    res.status(200);
+    const { statusCode } = await changePassword(
+      req.accountId,
+      body.oldPassword,
+      body.newPassword,
+    );
+    res.status(statusCode).json();
   },
 );
 
