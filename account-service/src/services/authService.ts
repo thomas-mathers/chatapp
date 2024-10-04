@@ -1,4 +1,7 @@
-import { LoginResponse } from 'chatapp.account-service-contracts';
+import {
+  LoginResponse,
+  PasswordResetTokenResponse,
+} from 'chatapp.account-service-contracts';
 import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
 import { StatusCodes } from 'http-status-codes';
 
@@ -61,7 +64,7 @@ export async function changePassword(
 
 export async function generatePasswordResetToken(
   email: string,
-): Promise<Result<string>> {
+): Promise<Result<PasswordResetTokenResponse>> {
   const account = await getAccountByEmail(email);
 
   if (!account) {
@@ -73,7 +76,7 @@ export async function generatePasswordResetToken(
     config.jwt,
   );
 
-  return success(token);
+  return success({ token });
 }
 
 export async function resetPassword(
