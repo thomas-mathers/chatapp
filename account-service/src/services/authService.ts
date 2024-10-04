@@ -1,44 +1,29 @@
 import { LoginResponse } from 'chatapp.account-service-contracts';
 import { StatusCodes } from 'http-status-codes';
-import jwt from 'jsonwebtoken';
 
-import config from '../config';
-import Account from '../models/account';
-import * as AccountRepository from '../repositories/accountRepository';
+import {
+  getAccountByEmail,
+  getAccountById,
+  getAccountByUsername,
+  updateAccount,
+} from '../repositories/accountRepository';
 import { Result, failure, success } from '../statusCodeResult';
-import * as CryptoService from './cryptoService';
-
-function createJwtForAccount(account: Account): string {
-  const nowInSeconds = Date.now() / 1000;
-
-  const payload = {
-    iss: config.jwt.issuer,
-    aud: config.jwt.audience,
-    sub: account._id,
-    exp: nowInSeconds + config.jwt.maxAgeInSeconds,
-    iat: nowInSeconds,
-    username: account.username,
-  };
-
-  return jwt.sign(payload, config.jwt.secret);
-}
+import { hashPassword, verifyPassword } from './cryptoService';
+import { createJwtForAccount, verifyJwt } from './jwtService';
 
 export async function login(
   username: string,
   password: string,
 ): Promise<Result<LoginResponse>> {
-  const account = await AccountRepository.getAccountByUsername(username);
+  const account = await getAccountByUsername(username);
 
   if (!account) {
     return failure(StatusCodes.NOT_FOUND);
   }
 
-  const passwordMatch = await CryptoService.verifyPassword(
-    password,
-    account.password,
-  );
+  const isPasswordCorrect = await verifyPassword(password, account.password);
 
-  if (!passwordMatch) {
+  if (!isPasswordCorrect) {
     return failure(StatusCodes.UNAUTHORIZED);
   }
 
@@ -52,24 +37,24 @@ export async function changePassword(
   oldPassword: string,
   newPassword: string,
 ): Promise<Result<void>> {
-  const account = await AccountRepository.getAccountById(id);
+  const account = await getAccountById(id);
 
   if (!account) {
     return failure(StatusCodes.NOT_FOUND);
   }
 
-  const passwordMatch = await CryptoService.verifyPassword(
+  const isOldPasswordCorrect = await verifyPassword(
     oldPassword,
     account.password,
   );
 
-  if (!passwordMatch) {
+  if (!isOldPasswordCorrect) {
     return failure(StatusCodes.UNAUTHORIZED);
   }
 
-  const hash = await CryptoService.hashPassword(newPassword);
+  const password = await hashPassword(newPassword);
 
-  await AccountRepository.updateAccount({ ...account, password: hash });
+  await updateAccount({ ...account, password });
 
   return success();
 }
@@ -77,7 +62,7 @@ export async function changePassword(
 export async function generatePasswordResetToken(
   email: string,
 ): Promise<Result<string>> {
-  const account = await AccountRepository.getAccountByEmail(email);
+  const account = await getAccountByEmail(email);
 
   if (!account) {
     return failure(StatusCodes.NOT_FOUND);
@@ -92,30 +77,21 @@ export async function resetPassword(
   token: string,
   newPassword: string,
 ): Promise<Result<void>> {
-  const options = {
-    issuer: config.jwt.issuer,
-    audience: config.jwt.audience,
-    maxAge: config.jwt.maxAgeInSeconds,
-  };
-
-  const { sub, username } = jwt.verify(token, config.jwt.secret, options) as {
-    sub: string | undefined;
-    username: string | undefined;
-  };
+  const { sub, username } = verifyJwt(token);
 
   if (sub === undefined || username === undefined) {
     return failure(StatusCodes.UNAUTHORIZED);
   }
 
-  const account = await AccountRepository.getAccountById(sub);
+  const account = await getAccountById(sub);
 
   if (!account) {
     return failure(StatusCodes.NOT_FOUND);
   }
 
-  const hash = await CryptoService.hashPassword(newPassword);
+  const password = await hashPassword(newPassword);
 
-  await AccountRepository.updateAccount({ ...account, password: hash });
+  await updateAccount({ ...account, password });
 
   return success();
 }

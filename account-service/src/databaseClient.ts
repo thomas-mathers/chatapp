@@ -20,4 +20,5 @@ export function getAccountsCollection() {
 
 async function createIndexes() {
   await getAccountsCollection().createIndex({ username: 1 }, { unique: true });
+  await getAccountsCollection().createIndex({ email: 1 }, { unique: true });
 }

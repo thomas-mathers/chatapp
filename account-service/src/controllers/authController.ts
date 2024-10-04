@@ -15,7 +15,12 @@ import {
 import { Request, Response, Router } from 'express';
 
 import config from '../config';
-import * as AuthService from '../services/authService';
+import {
+  changePassword,
+  generatePasswordResetToken,
+  login,
+  resetPassword,
+} from '../services/authService';
 
 const router = Router();
 
@@ -59,10 +64,7 @@ router.post(
   handleRequestBodyValidationMiddleware(loginRequestSchema),
   async (req: Request, res: Response) => {
     const body: LoginRequest = req.body;
-    const { statusCode, data } = await AuthService.login(
-      body.username,
-      body.password,
-    );
+    const { statusCode, data } = await login(body.username, body.password);
     res.status(statusCode).json(data);
   },
 );
@@ -102,11 +104,7 @@ router.put(
   handleRequestBodyValidationMiddleware(changePasswordRequestSchema),
   async (req: Request, res: Response) => {
     const body: ChangePasswordRequest = req.body;
-    await AuthService.changePassword(
-      req.accountId,
-      body.oldPassword,
-      body.newPassword,
-    );
+    await changePassword(req.accountId, body.oldPassword, body.newPassword);
     res.status(200);
   },
 );
@@ -141,9 +139,7 @@ router.post(
   handleRequestBodyValidationMiddleware(passwordResetTokenRequestSchema),
   async (req: Request, res: Response) => {
     const body: PasswordResetTokenRequest = req.body;
-    const { statusCode, data } = await AuthService.generatePasswordResetToken(
-      body.email,
-    );
+    const { statusCode, data } = await generatePasswordResetToken(body.email);
     res.status(statusCode).json(data);
   },
 );
@@ -180,7 +176,7 @@ router.post(
   handleRequestBodyValidationMiddleware(passwordResetRequestSchema),
   async (req: Request, res: Response) => {
     const body: PasswordResetRequest = req.body;
-    const { statusCode, data } = await AuthService.resetPassword(
+    const { statusCode, data } = await resetPassword(
       body.token,
       body.newPassword,
     );

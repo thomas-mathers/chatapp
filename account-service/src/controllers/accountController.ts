@@ -6,7 +6,11 @@ import {
 import { Request, Response, Router } from 'express';
 
 import config from '../config';
-import * as AccountService from '../services/accountService';
+import {
+  createAccount,
+  deleteAccount,
+  getAccountById,
+} from '../services/accountService';
 
 const router = Router();
 
@@ -68,7 +72,7 @@ router.post(
   '/',
   handleRequestBodyValidationMiddleware(createAccountRequestSchema),
   async (req: Request, res: Response) => {
-    const { statusCode, data } = await AccountService.createAccount(req.body);
+    const { statusCode, data } = await createAccount(req.body);
     res.status(statusCode).json(data);
   },
 );
@@ -118,9 +122,7 @@ router.get(
   '/me',
   handleAuthMiddleware(config.jwt),
   async (req: Request, res: Response) => {
-    const { statusCode, data } = await AccountService.getAccountById(
-      req.accountId,
-    );
+    const { statusCode, data } = await getAccountById(req.accountId);
     res.status(statusCode).json(data);
   },
 );
@@ -155,7 +157,7 @@ router.delete(
   '/me',
   handleAuthMiddleware(config.jwt),
   async (req: Request, res: Response) => {
-    const { statusCode } = await AccountService.deleteAccount(req.accountId);
+    const { statusCode } = await deleteAccount(req.accountId);
     res.status(statusCode).json();
   },
 );

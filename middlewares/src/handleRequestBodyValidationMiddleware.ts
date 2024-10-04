@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { UnknownKeysParam, ZodRawShape, z } from "zod";
-import { convertZodErrorToResponse } from "./convertZodErrorToResponse";
+import { convertZodErrorToResponse } from "./utils/convertZodErrorToResponse";
 
 export function handleRequestBodyValidationMiddleware(
   schema: z.ZodObject<ZodRawShape, UnknownKeysParam>
