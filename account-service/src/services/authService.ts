@@ -6,7 +6,7 @@ import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
 import { StatusCodes } from 'http-status-codes';
 
 import config from '../config';
-import { logger } from '../logger';
+import logger from '../logger';
 import {
   getAccountByEmail,
   getAccountById,

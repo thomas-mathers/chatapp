@@ -8,7 +8,7 @@ import config from './config';
 import AccountController from './controllers/accountController';
 import AuthController from './controllers/authController';
 import { close, connect } from './databaseClient';
-import { logger } from './logger';
+import logger from './logger';
 
 const app = express()
   .use(bodyParser.json())

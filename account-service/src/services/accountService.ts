@@ -6,7 +6,7 @@ import { createHash } from 'chatapp.crypto';
 import { StatusCodes } from 'http-status-codes';
 import { MongoError } from 'mongodb';
 
-import { logger } from '../logger';
+import logger from '../logger';
 import Account from '../models/account';
 import * as AccountRepository from '../repositories/accountRepository';
 import { Result, failure, success } from '../statusCodeResult';
