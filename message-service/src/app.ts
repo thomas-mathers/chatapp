@@ -15,6 +15,7 @@ import swaggerUi from 'swagger-ui-express';
 import config from './config';
 import MessageController from './controllers/messageController';
 import { databaseClient } from './databaseClient';
+import { logger } from './logger';
 import * as MessageService from './services/messageService';
 
 const { app, getWss } = expressWs(express());
@@ -51,6 +52,13 @@ app.use('/messages', MessageController);
 app.use(handleErrorMiddleware);
 
 app.ws('/realtime', (ws, req) => {
+  ws.on('close', () => {
+    logger.info('Client disconnected', {
+      accountId: req.accountId,
+      accountUsername: req.accountUsername,
+    });
+  });
+
   ws.on('message', async (json: string) => {
     try {
       const createMessageRequest: CreateMessageRequest = JSON.parse(json);
@@ -67,8 +75,17 @@ app.ws('/realtime', (ws, req) => {
         client.send(JSON.stringify(message));
       });
     } catch (error) {
-      console.error('Error processing realtime message:', error);
+      logger.error('Error processing realtime message', {
+        accountId: req.accountId,
+        accountUsername: req.accountUsername,
+        error: error,
+      });
     }
+  });
+
+  logger.info('Client connected', {
+    accountId: req.accountId,
+    accountUsername: req.accountUsername,
   });
 });
 
@@ -77,9 +94,10 @@ async function main() {
     await databaseClient.connect();
 
     app.listen(config.port, () => {
-      console.log(`Server is running on port ${config.port}`);
+      logger.info(`Server is running on port ${config.port}`);
     });
-  } catch {
+  } catch (e) {
+    logger.error('Failed to start the server', e);
     await databaseClient.close();
   }
 }

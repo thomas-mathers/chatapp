@@ -8,6 +8,7 @@ import config from './config';
 import AccountController from './controllers/accountController';
 import AuthController from './controllers/authController';
 import { close, connect } from './databaseClient';
+import { logger } from './logger';
 
 const app = express()
   .use(bodyParser.json())
@@ -46,9 +47,10 @@ async function main() {
     await connect();
 
     app.listen(config.port, () => {
-      console.log(`Server is running on port ${config.port}`);
+      logger.info(`Server is running on port ${config.port}`);
     });
-  } catch {
+  } catch (e) {
+    logger.error('Failed to start the server', e);
     await close();
   }
 }

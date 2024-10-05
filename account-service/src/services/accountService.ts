@@ -6,6 +6,7 @@ import { createHash } from 'chatapp.crypto';
 import { StatusCodes } from 'http-status-codes';
 import { MongoError } from 'mongodb';
 
+import { logger } from '../logger';
 import Account from '../models/account';
 import * as AccountRepository from '../repositories/accountRepository';
 import { Result, failure, success } from '../statusCodeResult';
@@ -25,6 +26,12 @@ export async function createAccount(
     });
 
     const accountSummary = toAccountSummary(account);
+
+    logger.info('Account created', {
+      id: account._id,
+      username: account.username,
+      email: account.email,
+    });
 
     return success(accountSummary, 201);
   } catch (error) {
@@ -51,9 +58,13 @@ export async function getAccountById(
 
 export async function deleteAccount(id: string): Promise<Result<void>> {
   const numDeleted = await AccountRepository.deleteAccountById(id);
+
   if (numDeleted === 0) {
     return failure(StatusCodes.NOT_FOUND);
   }
+
+  logger.info('Account deleted', { id });
+
   return success();
 }
 

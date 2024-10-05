@@ -6,6 +6,7 @@ import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
 import { StatusCodes } from 'http-status-codes';
 
 import config from '../config';
+import { logger } from '../logger';
 import {
   getAccountByEmail,
   getAccountById,
@@ -35,6 +36,12 @@ export async function login(
     config.jwt,
   );
 
+  logger.info('User logged in', {
+    id: account._id,
+    username: account.username,
+    email: account.email,
+  });
+
   return success({ jwt });
 }
 
@@ -59,6 +66,12 @@ export async function changePassword(
 
   await updateAccount({ ...account, password });
 
+  logger.info('User password changed', {
+    id: account._id,
+    username: account.username,
+    email: account.email,
+  });
+
   return success();
 }
 
@@ -75,6 +88,12 @@ export async function generatePasswordResetToken(
     { userId: account._id!.toString(), username: account.username },
     config.jwt,
   );
+
+  logger.info('Password reset token generated', {
+    id: account._id,
+    username: account.username,
+    email: account.email,
+  });
 
   return success({ token });
 }
@@ -98,6 +117,12 @@ export async function resetPassword(
   const password = await createHash(newPassword);
 
   await updateAccount({ ...account, password });
+
+  logger.info('User password reset', {
+    id: account._id,
+    username: account.username,
+    email: account.email,
+  });
 
   return success();
 }
