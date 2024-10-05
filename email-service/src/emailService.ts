@@ -1,8 +1,8 @@
 import { Resend } from "resend";
-import config from "./config";
-import EmailMessage from "./emailMessage";
+import { config } from "./config";
+import { EmailMessage } from "./emailMessage";
 
-const resend = new Resend(config.resendApiKey);
+const resend = new Resend(config.RESEND_API_KEY);
 
 export async function sendEmail({
   from,
@@ -18,4 +18,6 @@ export async function sendEmail({
     text,
     html,
   });
+
+  console.log(`Email sent to ${to}`);
 }

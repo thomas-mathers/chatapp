@@ -5,7 +5,7 @@ import {
 } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 
-import config from '../config';
+import { config } from '../config';
 import {
   createAccount,
   deleteAccount,
@@ -162,4 +162,4 @@ router.delete(
   },
 );
 
-export default router;
+export { router };

@@ -4,11 +4,12 @@ import express from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import config from './config';
-import AccountController from './controllers/accountController';
-import AuthController from './controllers/authController';
+import { config } from './config';
+import { router as AccountController } from './controllers/accountController';
+import { router as AdminController } from './controllers/adminController';
+import { router as AuthController } from './controllers/authController';
 import { close, connect } from './databaseClient';
-import logger from './logger';
+import { logger } from './logger';
 
 const app = express()
   .use(bodyParser.json())
@@ -40,6 +41,7 @@ const app = express()
   )
   .use('/accounts', AccountController)
   .use('/auth', AuthController)
+  .use('/admin', AdminController)
   .use(handleErrorMiddleware);
 
 async function main() {

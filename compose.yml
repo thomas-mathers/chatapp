@@ -86,8 +86,18 @@ services:
     depends_on:
       - message-service-mongo
 
+  rabbitmq:
+    image: "rabbitmq:management-alpine"
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - "rabbitmq_data:/data"
+
 volumes:
   account-service-mongo-data:
   account-service-mongo-config:
   message-service-mongo-data:
   message-service-mongo-config:
+  rabbitmq_data:

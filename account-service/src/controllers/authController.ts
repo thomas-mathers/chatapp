@@ -14,7 +14,7 @@ import {
 } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 
-import config from '../config';
+import { config } from '../config';
 import {
   changePassword,
   generatePasswordResetToken,
@@ -188,4 +188,4 @@ router.post(
   },
 );
 
-export default router;
+export { router };

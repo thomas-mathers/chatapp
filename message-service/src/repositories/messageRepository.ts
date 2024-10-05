@@ -1,8 +1,12 @@
-import { GetMessagesRequest, Page, SortDirection } from 'chatapp.message-service-contracts';
+import {
+  GetMessagesRequest,
+  Page,
+  SortDirection,
+} from 'chatapp.message-service-contracts';
 import { Sort } from 'mongodb';
 
 import { databaseClient } from '../databaseClient';
-import Message from '../models/message';
+import { Message } from '../models/message';
 
 const messageCollection = databaseClient.db().collection<Message>('messages');
 

@@ -4,7 +4,7 @@ import {
   Page,
 } from 'chatapp.message-service-contracts';
 
-import Message from '../models/message';
+import { Message } from '../models/message';
 import * as MessageRepository from '../repositories/messageRepository';
 
 export async function createMessage(

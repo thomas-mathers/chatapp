@@ -12,10 +12,10 @@ import expressWs from 'express-ws';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import config from './config';
-import MessageController from './controllers/messageController';
+import { config } from './config';
+import { router as MessageController } from './controllers/messageController';
 import { databaseClient } from './databaseClient';
-import logger from './logger';
+import { logger } from './logger';
 import * as MessageService from './services/messageService';
 
 const { app, getWss } = expressWs(express());

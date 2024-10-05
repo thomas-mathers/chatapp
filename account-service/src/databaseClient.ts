@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 
-import config from './config';
-import Account from './models/account';
+import { config } from './config';
+import { Account } from './models/account';
 
 const databaseClient = new MongoClient(config.mongoUri);
 

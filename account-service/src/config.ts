@@ -23,6 +23,4 @@ const schema = z
     mongoUri: obj.MONGO_URI,
   }));
 
-const config = schema.parse(process.env);
-
-export default config;
+export const config = schema.parse(process.env);

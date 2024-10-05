@@ -25,4 +25,4 @@ const schema = z
 
 const config = schema.parse(process.env);
 
-export default config;
+export { config }

@@ -1,4 +1,4 @@
-export default interface Message {
+export interface Message {
   _id?: string;
   accountId: string;
   accountUsername: string;
