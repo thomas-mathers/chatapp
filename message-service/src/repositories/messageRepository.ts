@@ -8,7 +8,7 @@ import { Collection, Sort } from 'mongodb';
 import { Message } from '../models/message';
 
 export class MessageRepository {
-  constructor(private messageCollection: Collection<Message>) {}
+  constructor(private readonly messageCollection: Collection<Message>) {}
 
   async createMessage(message: Message): Promise<Message> {
     await this.messageCollection.insertOne(message);

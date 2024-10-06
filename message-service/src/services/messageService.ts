@@ -8,7 +8,7 @@ import { Message } from '../models/message';
 import { MessageRepository } from '../repositories/messageRepository';
 
 export class MessageService {
-  constructor(private messageRepository: MessageRepository) {}
+  constructor(private readonly messageRepository: MessageRepository) {}
 
   async createMessage(
     accountId: string,
