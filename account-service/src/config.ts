@@ -8,6 +8,8 @@ export const configSchema = z
     JWT_SECRET: z.string(),
     JWT_EXPIRATION_TIME_IN_SECONDS: z.coerce.number(),
     MONGO_URI: z.string(),
+    RABBIT_MQ_URL: z.string(),
+    RABBIT_MQ_EXCHANGE_NAME: z.string(),
   })
   .transform(
     ({
@@ -17,6 +19,8 @@ export const configSchema = z
       JWT_SECRET,
       JWT_EXPIRATION_TIME_IN_SECONDS,
       MONGO_URI,
+      RABBIT_MQ_URL,
+      RABBIT_MQ_EXCHANGE_NAME,
     }) => ({
       port: PORT,
       jwt: {
@@ -25,7 +29,13 @@ export const configSchema = z
         secret: JWT_SECRET,
         expirationTimeInSeconds: JWT_EXPIRATION_TIME_IN_SECONDS,
       },
-      mongoUri: MONGO_URI,
+      mongo: {
+        uri: MONGO_URI,
+      },
+      rabbitMq: {
+        url: RABBIT_MQ_URL,
+        exchangeName: RABBIT_MQ_EXCHANGE_NAME,
+      },
     }),
   );
 

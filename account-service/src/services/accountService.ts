@@ -13,8 +13,8 @@ import { Result, failure, success } from '../statusCodeResult';
 
 export class AccountService {
   constructor(
-    private readonly accountRepository: AccountRepository,
     private readonly logger: Logger,
+    private readonly accountRepository: AccountRepository,
   ) {}
 
   async createAccount(

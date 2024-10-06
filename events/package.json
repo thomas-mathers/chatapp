@@ -1,0 +1,21 @@
+{
+  "name": "chatapp.events",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ncp": "^2.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.2"
+  }
+}

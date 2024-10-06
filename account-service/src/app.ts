@@ -1,3 +1,4 @@
+import ampq from 'amqplib';
 import bodyParser from 'body-parser';
 import { handleErrorMiddleware } from 'chatapp.middlewares';
 import dotenv from 'dotenv';
@@ -14,13 +15,20 @@ import { Account } from './models/account';
 import { AccountRepository } from './repositories/accountRepository';
 import { AccountService } from './services/accountService';
 import { AuthService } from './services/authService';
+import { EventProducerService } from './services/eventProducerService';
 
 async function main() {
   dotenv.config();
 
   const config = configSchema.parse(process.env);
 
-  const databaseClient = new MongoClient(config.mongoUri);
+  const logger = createLogger({
+    level: 'info',
+    format: format.combine(format.timestamp(), format.json()),
+    transports: [new transports.Console()],
+  });
+
+  const databaseClient = new MongoClient(config.mongo.uri);
 
   await databaseClient.connect();
 
@@ -31,17 +39,23 @@ async function main() {
   accountsCollection.createIndex({ username: 1 }, { unique: true });
   accountsCollection.createIndex({ email: 1 }, { unique: true });
 
-  const logger = createLogger({
-    level: 'info',
-    format: format.combine(format.timestamp(), format.json()),
-    transports: [new transports.Console()],
-  });
+  const ampqConnection = await ampq.connect(config.rabbitMq.url);
+  const ampqChannel = await ampqConnection.createChannel();
+
+  await ampqChannel.assertExchange(config.rabbitMq.exchangeName, 'topic', {});
+
+  const eventProducerService = new EventProducerService(ampqChannel, config);
 
   const accountRepository = new AccountRepository(accountsCollection);
-  const accountService = new AccountService(accountRepository, logger);
+  const accountService = new AccountService(logger, accountRepository);
   const accountController = new AccountController(config, accountService);
 
-  const authService = new AuthService(config, accountRepository, logger);
+  const authService = new AuthService(
+    config,
+    logger,
+    accountRepository,
+    eventProducerService,
+  );
   const authController = new AuthController(config, authService);
 
   express()

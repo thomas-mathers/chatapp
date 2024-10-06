@@ -1,44 +1,37 @@
-import ampq from "amqplib";
 import { createLogger, format, transports } from "winston";
+import { Resend } from "resend";
+import dotenv from "dotenv";
 
-import { config } from "./config";
-import { emailMessageSchema } from "./emailMessage";
-import { sendEmail } from "./emailService";
+import { EmailService } from "./services/emailService";
+import { configSchema } from "./config";
+import { EventConsumerService } from "./services/eventConsumerService";
+import { EventName } from "chatapp.events";
+import { RequestResetPasswordEventHandler } from "./event-handlers/requestResetPasswordEventHandler";
 
 async function main() {
+  dotenv.config();
+
+  const config = configSchema.parse(process.env);
+
   const logger = createLogger({
     level: "info",
     format: format.combine(format.timestamp(), format.json()),
     transports: [new transports.Console()],
   });
 
-  const ampqConnection = await ampq.connect(config.RABBIT_MQ_URL);
-  const ampqChannel = await ampqConnection.createChannel();
+  const resend = new Resend(config.RESEND_API_KEY);
 
-  await ampqChannel.assertQueue(config.RABBIT_MQ_QUEUE_NAME, {
-    durable: true,
-  });
+  const emailService = new EmailService(logger, resend);
 
-  ampqChannel.consume(config.RABBIT_MQ_QUEUE_NAME, async (message) => {
-    if (!message) {
-      return;
-    }
+  const eventHandlers = {
+    [EventName.REQUEST_RESET_PASSWORD]: new RequestResetPasswordEventHandler(
+      logger
+    ),
+  };
 
-    const { success, data, error } = emailMessageSchema.safeParse(
-      message.content.toString()
-    );
+  const eventService = new EventConsumerService(logger, config, eventHandlers);
 
-    if (!success) {
-      logger.error(`Invalid message: ${error}`);
-      return;
-    }
-
-    await sendEmail(data);
-
-    ampqChannel.ack(message);
-  });
-
-  logger.info("Consuming messages");
+  await eventService.listen();
 }
 
 main();

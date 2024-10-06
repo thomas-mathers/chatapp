@@ -118,7 +118,7 @@ export class AuthController {
 
     /**
      * @swagger
-     * /auth/password-reset-token:
+     * /auth/password-reset-requests:
      *   post:
      *     summary: Create a password reset token and send it to the user's email
      *     tags: [Auth]
@@ -142,19 +142,20 @@ export class AuthController {
      *         description: User not found
      */
     this._router.post(
-      '/password-reset-token',
+      '/password-reset-requests',
       handleRequestBodyValidationMiddleware(passwordResetTokenRequestSchema),
       async (req: Request, res: Response) => {
         const body: PasswordResetTokenRequest = req.body;
-        const { statusCode, data } =
-          await authService.generatePasswordResetToken(body.email);
+        const { statusCode, data } = await authService.resetPasswordRequest(
+          body.email,
+        );
         res.status(statusCode).json(data);
       },
     );
 
     /**
      * @swagger
-     * /auth/password-reset:
+     * /auth/password-resets:
      *   post:
      *     summary: Update the user's password using a password reset token
      *     tags: [Auth]
@@ -180,7 +181,7 @@ export class AuthController {
      *         description: Invalid or expired token
      */
     this._router.post(
-      '/password-reset',
+      '/password-resets',
       handleRequestBodyValidationMiddleware(passwordResetRequestSchema),
       async (req: Request, res: Response) => {
         const body: PasswordResetRequest = req.body;

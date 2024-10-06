@@ -1,20 +1,20 @@
-import {
-  LoginResponse,
-  PasswordResetTokenResponse,
-} from 'chatapp.account-service-contracts';
+import { LoginResponse } from 'chatapp.account-service-contracts';
 import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
 import { StatusCodes } from 'http-status-codes';
 import { Logger } from 'winston';
 
+import { EventName } from '../../../events/src/events';
 import { Config } from '../config';
 import { AccountRepository } from '../repositories/accountRepository';
 import { Result, failure, success } from '../statusCodeResult';
+import { EventProducerService } from './eventProducerService';
 
 export class AuthService {
   constructor(
     private readonly config: Config,
-    private readonly accountRepository: AccountRepository,
     private readonly logger: Logger,
+    private readonly accountRepository: AccountRepository,
+    private readonly eventProducerService: EventProducerService,
   ) {}
 
   async login(
@@ -80,9 +80,7 @@ export class AuthService {
     return success();
   }
 
-  async generatePasswordResetToken(
-    email: string,
-  ): Promise<Result<PasswordResetTokenResponse>> {
+  async resetPasswordRequest(email: string): Promise<Result<void>> {
     const account = await this.accountRepository.getAccountByEmail(email);
 
     if (!account) {
@@ -100,7 +98,17 @@ export class AuthService {
       email: account.email,
     });
 
-    return success({ token });
+    this.eventProducerService.produce({
+      name: EventName.REQUEST_RESET_PASSWORD,
+      payload: {
+        accountId: account._id!.toString(),
+        accountName: account.username,
+        accountEmail: account.email,
+        token,
+      },
+    });
+
+    return success();
   }
 
   async resetPassword(
