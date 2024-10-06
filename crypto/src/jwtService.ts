@@ -6,7 +6,12 @@ export function createJwt(
   credential: UserCredentials,
   options: JwtOptions
 ): string {
-  const { issuer, audience, maxAgeInSeconds, secret } = options;
+  const {
+    issuer,
+    audience,
+    expirationTimeInSeconds: maxAgeInSeconds,
+    secret,
+  } = options;
   const nowInSeconds = Date.now() / 1000;
 
   const payload = {
@@ -25,7 +30,7 @@ export function verifyJwt(
   token: string,
   options: JwtOptions
 ): UserCredentials | undefined {
-  const { issuer, audience, maxAgeInSeconds: maxAge, secret } = options;
+  const { issuer, audience, expirationTimeInSeconds: maxAge, secret } = options;
 
   const payload = verify(token, secret, { issuer, audience, maxAge }) as {
     sub: string | undefined;

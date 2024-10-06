@@ -1,49 +1,44 @@
 import ampq from "amqplib";
+import { createLogger, format, transports } from "winston";
 
 import { config } from "./config";
 import { emailMessageSchema } from "./emailMessage";
 import { sendEmail } from "./emailService";
-import { logger } from "./logger";
 
 async function main() {
-  try {
-    const ampqConnection = await ampq.connect(config.RABBIT_MQ_URL);
+  const logger = createLogger({
+    level: "info",
+    format: format.combine(format.timestamp(), format.json()),
+    transports: [new transports.Console()],
+  });
 
-    logger.info("Connected to RabbitMQ");
+  const ampqConnection = await ampq.connect(config.RABBIT_MQ_URL);
+  const ampqChannel = await ampqConnection.createChannel();
 
-    const emailChannel = await ampqConnection.createChannel();
+  await ampqChannel.assertQueue(config.RABBIT_MQ_QUEUE_NAME, {
+    durable: true,
+  });
 
-    logger.info("Created channel");
+  ampqChannel.consume(config.RABBIT_MQ_QUEUE_NAME, async (message) => {
+    if (!message) {
+      return;
+    }
 
-    await emailChannel.assertQueue(config.RABBIT_MQ_QUEUE_NAME, {
-      durable: true,
-    });
+    const { success, data, error } = emailMessageSchema.safeParse(
+      message.content.toString()
+    );
 
-    logger.info("Asserted queue");
+    if (!success) {
+      logger.error(`Invalid message: ${error}`);
+      return;
+    }
 
-    emailChannel.consume(config.RABBIT_MQ_QUEUE_NAME, async (message) => {
-      if (!message) {
-        return;
-      }
+    await sendEmail(data);
 
-      const { success, data, error } = emailMessageSchema.safeParse(
-        message.content.toString()
-      );
+    ampqChannel.ack(message);
+  });
 
-      if (!success) {
-        logger.error(`Invalid message: ${error}`);
-        return;
-      }
-
-      await sendEmail(data);
-
-      emailChannel.ack(message);
-    });
-
-    logger.info("Consuming messages");
-  } catch (error) {
-    logger.error(error);
-  }
+  logger.info("Consuming messages");
 }
 
 main();

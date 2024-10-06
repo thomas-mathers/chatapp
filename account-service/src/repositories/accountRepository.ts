@@ -1,46 +1,43 @@
-import { ObjectId } from 'mongodb';
+import { Collection, ObjectId } from 'mongodb';
 
-import { getAccountsCollection } from '../databaseClient';
 import { Account } from '../models/account';
 
-const accountCollection = getAccountsCollection();
+export class AccountRepository {
+  constructor(private readonly accountCollection: Collection<Account>) {}
 
-export async function createAccount(account: Account): Promise<Account> {
-  await accountCollection.insertOne(account);
-  return account;
-}
+  async createAccount(account: Account): Promise<Account> {
+    await this.accountCollection.insertOne(account);
+    return account;
+  }
 
-export async function containsAccount(username: string): Promise<boolean> {
-  const document = getAccountByUsername(username);
-  return document !== null;
-}
+  async containsAccount(username: string): Promise<boolean> {
+    const document = this.getAccountByUsername(username);
+    return document !== null;
+  }
 
-export async function getAccountById(id: string): Promise<Account | null> {
-  return await accountCollection.findOne({ _id: new ObjectId(id) });
-}
+  async getAccountById(id: string): Promise<Account | null> {
+    return await this.accountCollection.findOne({ _id: new ObjectId(id) });
+  }
 
-export async function getAccountByUsername(
-  username: string,
-): Promise<Account | null> {
-  return await accountCollection.findOne({ username });
-}
+  async getAccountByUsername(username: string): Promise<Account | null> {
+    return await this.accountCollection.findOne({ username });
+  }
 
-export async function getAccountByEmail(
-  email: string,
-): Promise<Account | null> {
-  return await accountCollection.findOne({ email });
-}
+  async getAccountByEmail(email: string): Promise<Account | null> {
+    return await this.accountCollection.findOne({ email });
+  }
 
-export async function updateAccount(replacement: Account): Promise<Account> {
-  const { username } = replacement;
-  await accountCollection.replaceOne({ username }, replacement);
-  return replacement;
-}
+  async updateAccount(replacement: Account): Promise<Account> {
+    const { username } = replacement;
+    await this.accountCollection.replaceOne({ username }, replacement);
+    return replacement;
+  }
 
-export async function deleteAccountById(id: string): Promise<number> {
-  const { deletedCount } = await accountCollection.deleteOne(
-    { _id: new ObjectId(id) },
-    {},
-  );
-  return deletedCount;
+  async deleteAccountById(id: string): Promise<number> {
+    const { deletedCount } = await this.accountCollection.deleteOne(
+      { _id: new ObjectId(id) },
+      {},
+    );
+    return deletedCount;
+  }
 }

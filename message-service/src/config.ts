@@ -1,9 +1,6 @@
-import dotenv from 'dotenv';
 import z from 'zod';
 
-dotenv.config();
-
-const schema = z
+export const configSchema = z
   .object({
     PORT: z.coerce.number(),
     JWT_ISSUER: z.string(),
@@ -12,17 +9,24 @@ const schema = z
     JWT_EXPIRATION_TIME_IN_SECONDS: z.coerce.number(),
     MONGO_URI: z.string(),
   })
-  .transform((obj) => ({
-    port: obj.PORT,
-    jwt: {
-      issuer: obj.JWT_ISSUER,
-      audience: obj.JWT_AUDIENCE,
-      secret: obj.JWT_SECRET,
-      maxAgeInSeconds: obj.JWT_EXPIRATION_TIME_IN_SECONDS,
-    },
-    mongoUri: obj.MONGO_URI,
-  }));
+  .transform(
+    ({
+      PORT,
+      JWT_ISSUER,
+      JWT_AUDIENCE,
+      JWT_SECRET,
+      JWT_EXPIRATION_TIME_IN_SECONDS,
+      MONGO_URI,
+    }) => ({
+      port: PORT,
+      jwt: {
+        issuer: JWT_ISSUER,
+        audience: JWT_AUDIENCE,
+        secret: JWT_SECRET,
+        expirationTimeInSeconds: JWT_EXPIRATION_TIME_IN_SECONDS,
+      },
+      mongoUri: MONGO_URI,
+    }),
+  );
 
-const config = schema.parse(process.env);
-
-export { config }
+export type Config = z.infer<typeof configSchema>;

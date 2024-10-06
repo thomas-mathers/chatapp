@@ -5,67 +5,72 @@ import {
 import { createHash } from 'chatapp.crypto';
 import { StatusCodes } from 'http-status-codes';
 import { MongoError } from 'mongodb';
+import { Logger } from 'winston';
 
-import { logger } from '../logger';
 import { Account } from '../models/account';
-import * as AccountRepository from '../repositories/accountRepository';
+import { AccountRepository } from '../repositories/accountRepository';
 import { Result, failure, success } from '../statusCodeResult';
 
-export async function createAccount(
-  request: CreateAccountRequest,
-): Promise<Result<AccountSummary>> {
-  try {
-    const hash = await createHash(request.password);
+export class AccountService {
+  constructor(
+    private readonly accountRepository: AccountRepository,
+    private readonly logger: Logger,
+  ) {}
 
-    const account = await AccountRepository.createAccount({
-      username: request.username,
-      password: hash,
-      email: request.email,
-      emailVerified: false,
-      createdAt: new Date(),
-    });
+  async createAccount(
+    request: CreateAccountRequest,
+  ): Promise<Result<AccountSummary>> {
+    try {
+      const hash = await createHash(request.password);
+
+      const account = await this.accountRepository.createAccount({
+        username: request.username,
+        password: hash,
+        email: request.email,
+        emailVerified: false,
+        createdAt: new Date(),
+      });
+
+      const accountSummary = toAccountSummary(account);
+
+      this.logger.info('Account created', {
+        id: account._id,
+        username: account.username,
+        email: account.email,
+      });
+
+      return success(accountSummary, 201);
+    } catch (error) {
+      if (error instanceof MongoError && error.code === 11000) {
+        return failure(StatusCodes.CONFLICT);
+      }
+      throw error;
+    }
+  }
+
+  async getAccountById(id: string): Promise<Result<AccountSummary>> {
+    const account = await this.accountRepository.getAccountById(id);
+
+    if (!account) {
+      return failure(StatusCodes.NOT_FOUND);
+    }
 
     const accountSummary = toAccountSummary(account);
 
-    logger.info('Account created', {
-      id: account._id,
-      username: account.username,
-      email: account.email,
-    });
+    return success(accountSummary);
+  }
 
-    return success(accountSummary, 201);
-  } catch (error) {
-    if (error instanceof MongoError && error.code === 11000) {
-      return failure(StatusCodes.CONFLICT);
+  async deleteAccount(id: string): Promise<Result<void>> {
+    const numDeleted = await this.accountRepository.deleteAccountById(id);
+
+    if (numDeleted === 0) {
+      return failure(StatusCodes.NOT_FOUND);
     }
-    throw error;
+
+    this.logger.info('Account deleted', { id });
+
+    return success();
   }
-}
-
-export async function getAccountById(
-  id: string,
-): Promise<Result<AccountSummary>> {
-  const account = await AccountRepository.getAccountById(id);
-
-  if (!account) {
-    return failure(StatusCodes.NOT_FOUND);
-  }
-
-  const accountSummary = toAccountSummary(account);
-
-  return success(accountSummary);
-}
-
-export async function deleteAccount(id: string): Promise<Result<void>> {
-  const numDeleted = await AccountRepository.deleteAccountById(id);
-
-  if (numDeleted === 0) {
-    return failure(StatusCodes.NOT_FOUND);
-  }
-
-  logger.info('Account deleted', { id });
-
-  return success();
 }
 
 function toAccountSummary(account: Account): AccountSummary {

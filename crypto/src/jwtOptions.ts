@@ -1,6 +1,6 @@
 export interface JwtOptions {
   issuer: string;
   audience: string;
-  maxAgeInSeconds: number;
+  expirationTimeInSeconds: number;
   secret: string;
 }

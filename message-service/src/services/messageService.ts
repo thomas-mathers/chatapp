@@ -5,31 +5,33 @@ import {
 } from 'chatapp.message-service-contracts';
 
 import { Message } from '../models/message';
-import * as MessageRepository from '../repositories/messageRepository';
+import { MessageRepository } from '../repositories/messageRepository';
 
-export async function createMessage(
-  accountId: string,
-  accountUsername: string,
-  content: string,
-): Promise<MessageSummary> {
-  const message = await MessageRepository.createMessage({
-    accountId,
-    accountUsername,
-    content,
-    dateCreated: new Date(),
-  });
+export class MessageService {
+  constructor(private messageRepository: MessageRepository) {}
 
-  return toMessageSummary(message);
-}
+  async createMessage(
+    accountId: string,
+    accountUsername: string,
+    content: string,
+  ): Promise<MessageSummary> {
+    const message = await this.messageRepository.createMessage({
+      accountId,
+      accountUsername,
+      content,
+      dateCreated: new Date(),
+    });
 
-export async function getMessages(
-  req: GetMessagesRequest,
-): Promise<Page<MessageSummary>> {
-  const page = await MessageRepository.getMessages(req);
-  return {
-    ...page,
-    records: page.records.map(toMessageSummary),
-  };
+    return toMessageSummary(message);
+  }
+
+  async getMessages(req: GetMessagesRequest): Promise<Page<MessageSummary>> {
+    const page = await this.messageRepository.getMessages(req);
+    return {
+      ...page,
+      records: page.records.map(toMessageSummary),
+    };
+  }
 }
 
 function toMessageSummary(message: Message): MessageSummary {
