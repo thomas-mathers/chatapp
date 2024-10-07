@@ -29,7 +29,11 @@ async function main() {
   const eventHandlers = {
     [ChatAppEventName.REQUEST_RESET_PASSWORD]: {
       schema: requestResetPasswordSchema,
-      eventHandler: new RequestResetPasswordEventHandler(logger),
+      eventHandler: new RequestResetPasswordEventHandler(
+        config,
+        logger,
+        emailService
+      ),
     },
   };
 

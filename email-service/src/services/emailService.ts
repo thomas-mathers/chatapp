@@ -9,7 +9,7 @@ export class EmailService {
   ) {}
 
   async send({ from, to, subject, text, html }: EmailMessage): Promise<void> {
-    await this.resend.emails.send({
+    const { data, error } = await this.resend.emails.send({
       from,
       to,
       subject,
@@ -17,6 +17,12 @@ export class EmailService {
       html,
     });
 
-    this.logger.info(`Email sent to ${to}`);
+    if (error) {
+      this.logger.error("Error sending email", { to, subject, error });
+
+      throw new Error(error.message);
+    }
+
+    this.logger.info("Successfully sent email", { to, subject, data });
   }
 }

@@ -1,8 +1,6 @@
 import ampq from "amqplib";
 import { Logger } from "winston";
-import { EventHandler } from "../eventHandler";
 import { ChatAppEventName } from "../chatAppEventName";
-import { ChatAppEvent } from "../chatAppEvent";
 import { EventHandlerRegistration } from "../eventHandlerRegistration";
 
 export class EventConsumerService {
@@ -38,12 +36,22 @@ export class EventConsumerService {
         );
 
         if (!success) {
-          this.logger.error("Error parsing message", { content, error });
+          this.logger.error("Error parsing message", { name, content, error });
           ampqChannel.reject(message, false);
           return;
         }
 
-        await registration.eventHandler.handle(data);
+        try {
+          await registration.eventHandler.handle(data);
+        } catch (error) {
+          this.logger.error("Error handling message", {
+            name,
+            error,
+          });
+
+          ampqChannel.reject(message, false);
+          return;
+        }
 
         ampqChannel.ack(message);
       });
