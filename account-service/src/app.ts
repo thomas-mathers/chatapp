@@ -1,5 +1,6 @@
 import ampq from 'amqplib';
 import bodyParser from 'body-parser';
+import { EventProducerService } from 'chatapp.event-sourcing';
 import { handleErrorMiddleware } from 'chatapp.middlewares';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -15,7 +16,6 @@ import { Account } from './models/account';
 import { AccountRepository } from './repositories/accountRepository';
 import { AccountService } from './services/accountService';
 import { AuthService } from './services/authService';
-import { EventProducerService } from './services/eventProducerService';
 
 async function main() {
   dotenv.config();
@@ -44,7 +44,10 @@ async function main() {
 
   await ampqChannel.assertExchange(config.rabbitMq.exchangeName, 'topic', {});
 
-  const eventProducerService = new EventProducerService(ampqChannel, config);
+  const eventProducerService = new EventProducerService(
+    ampqChannel,
+    config.rabbitMq.exchangeName,
+  );
 
   const accountRepository = new AccountRepository(accountsCollection);
   const accountService = new AccountService(logger, accountRepository);

@@ -1,5 +1,5 @@
 {
-  "name": "chatapp.events",
+  "name": "chatapp.event-sourcing",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
@@ -14,8 +14,14 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/amqplib": "^0.10.5",
     "ncp": "^2.0.0",
     "tsup": "^8.3.0",
     "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.4",
+    "winston": "^3.15.0",
+    "zod": "^3.23.8"
   }
 }

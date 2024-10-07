@@ -1,13 +1,12 @@
 import { LoginResponse } from 'chatapp.account-service-contracts';
 import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
+import { ChatAppEventName, EventProducerService } from 'chatapp.event-sourcing';
 import { StatusCodes } from 'http-status-codes';
 import { Logger } from 'winston';
 
-import { EventName } from '../../../events/src/events';
 import { Config } from '../config';
 import { AccountRepository } from '../repositories/accountRepository';
 import { Result, failure, success } from '../statusCodeResult';
-import { EventProducerService } from './eventProducerService';
 
 export class AuthService {
   constructor(
@@ -99,13 +98,11 @@ export class AuthService {
     });
 
     this.eventProducerService.produce({
-      name: EventName.REQUEST_RESET_PASSWORD,
-      payload: {
-        accountId: account._id!.toString(),
-        accountName: account.username,
-        accountEmail: account.email,
-        token,
-      },
+      name: ChatAppEventName.REQUEST_RESET_PASSWORD,
+      accountId: account._id!.toString(),
+      accountName: account.username,
+      accountEmail: account.email,
+      token,
     });
 
     return success();

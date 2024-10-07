@@ -4,8 +4,11 @@ import dotenv from "dotenv";
 
 import { EmailService } from "./services/emailService";
 import { configSchema } from "./config";
-import { EventConsumerService } from "./services/eventConsumerService";
-import { EventName } from "chatapp.events";
+import {
+  ChatAppEventName,
+  EventConsumerService,
+  requestResetPasswordSchema,
+} from "chatapp.event-sourcing";
 import { RequestResetPasswordEventHandler } from "./event-handlers/requestResetPasswordEventHandler";
 
 async function main() {
@@ -24,14 +27,20 @@ async function main() {
   const emailService = new EmailService(logger, resend);
 
   const eventHandlers = {
-    [EventName.REQUEST_RESET_PASSWORD]: new RequestResetPasswordEventHandler(
-      logger
-    ),
+    [ChatAppEventName.REQUEST_RESET_PASSWORD]: {
+      schema: requestResetPasswordSchema,
+      eventHandler: new RequestResetPasswordEventHandler(logger),
+    },
   };
 
-  const eventService = new EventConsumerService(logger, config, eventHandlers);
+  const eventService = new EventConsumerService(
+    logger,
+    config.RABBIT_MQ_URL,
+    config.RABBIT_MQ_EXCHANGE_NAME,
+    eventHandlers
+  );
 
-  await eventService.listen();
+  await eventService.consume();
 }
 
 main();
