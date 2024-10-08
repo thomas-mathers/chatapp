@@ -9,7 +9,15 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup"
+    "start": "tsx watch src/app.ts",
+    "format:fix": "prettier src --write",
+    "format": "prettier src --check",
+    "lint:fix": "eslint --fix src",
+    "lint": "eslint src",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf dist",
+    "build": "tsup",
+    "re-build": "npm run clean && npm run build"
   },
   "author": "",
   "license": "ISC",

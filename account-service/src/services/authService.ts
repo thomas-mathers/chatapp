@@ -1,6 +1,7 @@
 import { LoginResponse } from 'chatapp.account-service-contracts';
 import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
 import { ChatAppEventName, EventService } from 'chatapp.event-sourcing';
+import { ChatAppLogger } from 'chatapp.logging';
 import { StatusCodes } from 'http-status-codes';
 
 import { Config } from '../config';
