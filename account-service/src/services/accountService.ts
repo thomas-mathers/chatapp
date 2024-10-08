@@ -3,9 +3,9 @@ import {
   CreateAccountRequest,
 } from 'chatapp.account-service-contracts';
 import { createHash } from 'chatapp.crypto';
+import { ChatAppLogger } from 'chatapp.logging';
 import { StatusCodes } from 'http-status-codes';
 import { MongoError } from 'mongodb';
-import { Logger } from 'winston';
 
 import { Account } from '../models/account';
 import { AccountRepository } from '../repositories/accountRepository';
@@ -13,7 +13,7 @@ import { Result, failure, success } from '../statusCodeResult';
 
 export class AccountService {
   constructor(
-    private readonly logger: Logger,
+    private readonly logger: ChatAppLogger,
     private readonly accountRepository: AccountRepository,
   ) {}
 

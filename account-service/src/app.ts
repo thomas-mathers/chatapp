@@ -1,12 +1,12 @@
 import bodyParser from 'body-parser';
 import { EventService } from 'chatapp.event-sourcing';
+import { ChatAppLogger } from 'chatapp.logging';
 import { handleErrorMiddleware } from 'chatapp.middlewares';
 import dotenv from 'dotenv';
 import express from 'express';
 import { MongoClient } from 'mongodb';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { createLogger, format, transports } from 'winston';
 
 import { configSchema } from './config';
 import { AccountController } from './controllers/accountController';
@@ -21,11 +21,7 @@ async function main() {
 
   const config = configSchema.parse(process.env);
 
-  const logger = createLogger({
-    level: 'info',
-    format: format.combine(format.timestamp(), format.json()),
-    transports: [new transports.Console()],
-  });
+  const logger = new ChatAppLogger();
 
   const databaseClient = new MongoClient(config.mongo.uri);
 

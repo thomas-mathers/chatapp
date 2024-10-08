@@ -1,10 +1,10 @@
+import { ChatAppLogger } from 'chatapp.logging';
 import {
   CreateMessageRequest,
   createMessageRequestSchema,
 } from 'chatapp.message-service-contracts';
 import { Router } from 'express';
 import { Instance } from 'express-ws';
-import { Logger } from 'winston';
 
 import { MessageService } from '../services/messageService';
 
@@ -14,7 +14,7 @@ export class RealtimeController {
   constructor(
     readonly messageService: MessageService,
     readonly expressWsInstance: Instance,
-    readonly logger: Logger,
+    readonly logger: ChatAppLogger,
   ) {
     expressWsInstance.applyTo(this._router);
 

@@ -1,15 +1,15 @@
-import { Logger } from "winston";
 import { EventHandler, RequestResetPassword } from "chatapp.event-sourcing";
 import { EmailService } from "../services/emailService";
 import { Config } from "../config";
 import { EmailMessage } from "../emailMessage";
+import { ChatAppLogger } from "chatapp.logging";
 
 export class RequestResetPasswordEventHandler
   implements EventHandler<RequestResetPassword>
 {
   constructor(
     private readonly config: Config,
-    private readonly logger: Logger,
+    private readonly logger: ChatAppLogger,
     private readonly emailService: EmailService
   ) {}
 

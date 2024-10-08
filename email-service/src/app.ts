@@ -1,14 +1,14 @@
-import { createLogger, format, transports } from "winston";
 import { Resend } from "resend";
 import dotenv from "dotenv";
-
-import { EmailService } from "./services/emailService";
-import { configSchema } from "./config";
 import {
   ChatAppEventName,
   EventService,
   requestResetPasswordSchema,
 } from "chatapp.event-sourcing";
+import { ChatAppLogger } from "chatapp.logging";
+
+import { EmailService } from "./services/emailService";
+import { configSchema } from "./config";
 import { RequestResetPasswordEventHandler } from "./event-handlers/requestResetPasswordEventHandler";
 
 async function main() {
@@ -16,24 +16,7 @@ async function main() {
 
   const config = configSchema.parse(process.env);
 
-  const logger = createLogger({
-    level: "info",
-    format: format.combine(
-      format.timestamp({
-        format: "YYYY-MM-DD h:mm:ss a",
-      }),
-      format.colorize(),
-      format.printf(({ timestamp, level, message, ...rest }) => {
-        if (Object.keys(rest).length > 0) {
-          const json = JSON.stringify(rest, null, 2);
-          return `[${timestamp}] ${level}: ${message}\r\n\r\n${json}\r\n`;
-        } else {
-          return `[${timestamp}] ${level}: ${message}\r\n`;
-        }
-      })
-    ),
-    transports: [new transports.Console()],
-  });
+  const logger = new ChatAppLogger();
 
   const resend = new Resend(config.RESEND_API_KEY);
 
