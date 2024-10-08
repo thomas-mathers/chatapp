@@ -9,9 +9,9 @@ export class EventService {
   private ampqChannel!: ampq.Channel;
 
   constructor(
+    private readonly logger: Logger,
     private readonly url: string,
     private readonly exchangeName: string,
-    private readonly logger: Logger,
     private readonly registrations: {
       [key in ChatAppEventName]?: EventHandlerRegistration<any>;
     }

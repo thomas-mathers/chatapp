@@ -20,7 +20,7 @@ export class EmailService {
     if (error) {
       this.logger.error("Error sending email", { to, subject, error });
 
-      throw new Error(error.message);
+      throw error;
     }
 
     this.logger.info("Successfully sent email", { to, subject, data });

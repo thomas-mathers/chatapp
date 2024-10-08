@@ -21,7 +21,6 @@ export class RequestResetPasswordEventHandler
     this.logger.info("Sending reset password email", {
       accountEmail,
       accountName,
-      token,
     });
 
     try {
@@ -32,8 +31,7 @@ export class RequestResetPasswordEventHandler
       this.logger.error("Error sending reset password email", {
         accountEmail,
         accountName,
-        token,
-        error,
+        error: error.message,
       });
 
       throw error;

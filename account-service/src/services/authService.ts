@@ -1,6 +1,6 @@
 import { LoginResponse } from 'chatapp.account-service-contracts';
 import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
-import { ChatAppEventName, EventProducerService } from 'chatapp.event-sourcing';
+import { ChatAppEventName, EventService } from 'chatapp.event-sourcing';
 import { StatusCodes } from 'http-status-codes';
 import { Logger } from 'winston';
 
@@ -13,7 +13,7 @@ export class AuthService {
     private readonly config: Config,
     private readonly logger: Logger,
     private readonly accountRepository: AccountRepository,
-    private readonly eventProducerService: EventProducerService,
+    private readonly eventService: EventService,
   ) {}
 
   async login(
@@ -97,7 +97,7 @@ export class AuthService {
       email: account.email,
     });
 
-    this.eventProducerService.produce({
+    this.eventService.produce({
       name: ChatAppEventName.REQUEST_RESET_PASSWORD,
       accountId: account._id!.toString(),
       accountName: account.username,

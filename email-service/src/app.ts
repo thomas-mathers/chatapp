@@ -6,7 +6,7 @@ import { EmailService } from "./services/emailService";
 import { configSchema } from "./config";
 import {
   ChatAppEventName,
-  EventConsumerService,
+  EventService,
   requestResetPasswordSchema,
 } from "chatapp.event-sourcing";
 import { RequestResetPasswordEventHandler } from "./event-handlers/requestResetPasswordEventHandler";
@@ -18,7 +18,20 @@ async function main() {
 
   const logger = createLogger({
     level: "info",
-    format: format.combine(format.timestamp(), format.json()),
+    format: format.combine(
+      format.timestamp({
+        format: "YYYY-MM-DD h:mm:ss a",
+      }),
+      format.colorize(),
+      format.printf(({ timestamp, level, message, ...rest }) => {
+        if (Object.keys(rest).length > 0) {
+          const json = JSON.stringify(rest, null, 2);
+          return `[${timestamp}] ${level}: ${message}\r\n\r\n${json}\r\n`;
+        } else {
+          return `[${timestamp}] ${level}: ${message}\r\n`;
+        }
+      })
+    ),
     transports: [new transports.Console()],
   });
 
@@ -37,13 +50,14 @@ async function main() {
     },
   };
 
-  const eventService = new EventConsumerService(
+  const eventService = new EventService(
     logger,
     config.RABBIT_MQ_URL,
     config.RABBIT_MQ_EXCHANGE_NAME,
     eventHandlers
   );
 
+  await eventService.connect();
   await eventService.consume();
 }
 
