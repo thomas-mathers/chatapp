@@ -1,0 +1,21 @@
+{
+  "name": "chatapp.middlewares",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint . --config ../../eslint.config.mjs",
+    "format": "prettier --config ../../.prettierrc --write ."
+  },
+  "dependencies": {
+    "express": "^5.0.0",
+    "http-status-codes": "^2.3.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "typescript": "^5.6.2"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

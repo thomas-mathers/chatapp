@@ -87,13 +87,13 @@ services:
       - message-service-mongo
 
   rabbitmq:
-    image: "rabbitmq:management-alpine"
+    image: 'rabbitmq:management-alpine'
     container_name: rabbitmq
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - '5672:5672'
+      - '15672:15672'
     volumes:
-      - "rabbitmq_data:/data"
+      - 'rabbitmq_data:/data'
 
 volumes:
   account-service-mongo-data:

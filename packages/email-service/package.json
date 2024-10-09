@@ -1,0 +1,25 @@
+{
+  "name": "chatapp.email-service",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "tsx src/app.ts",
+    "lint": "eslint . --config ../../eslint.config.mjs",
+    "format": "prettier --config ../../.prettierrc --write ."
+  },
+  "dependencies": {
+    "chatapp.event-sourcing": "1.0.0",
+    "chatapp.logging": "1.0.0",
+    "dotenv": "^16.4.5",
+    "resend": "^4.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}
