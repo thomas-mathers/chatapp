@@ -12,6 +12,8 @@ export class ChatAppLogger {
     timestampFormat = 'YYYY-MM-DD h:mm:ss a',
     maxLogFileSize = 10 * 1024 * 10234,
     maxLogFiles = 7,
+    logFilename = 'logs/combined.log',
+    errorLogFilename = 'logs/error.log',
   }: Partial<LogOptions> = {}) {
     this.logger = createLogger({
       level,
@@ -28,14 +30,14 @@ export class ChatAppLogger {
         new transports.Console(),
         new transports.File({
           level: 'error',
-          filename: 'error.log',
+          filename: errorLogFilename,
           maxsize: maxLogFileSize,
           maxFiles: maxLogFiles,
           tailable: true,
           zippedArchive: true,
         }),
         new transports.File({
-          filename: 'combined.log',
+          filename: logFilename,
           maxsize: maxLogFileSize,
           maxFiles: maxLogFiles,
           tailable: true,

@@ -5,4 +5,6 @@ export interface LogOptions {
   timestampFormat: string;
   maxLogFileSize: number;
   maxLogFiles: number;
+  logFilename: string;
+  errorLogFilename: string;
 }
