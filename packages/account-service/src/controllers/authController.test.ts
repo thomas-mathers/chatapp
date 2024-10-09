@@ -156,4 +156,40 @@ describe('AuthController', () => {
       expect(response.status).toBe(200);
     });
   });
+
+  describe('POST /auth/password-reset-requests', () => {
+    it('should return 400 when email is missing', async () => {
+      const response = await request(app).post('/auth/password-reset-requests');
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 404 when email is not found', async () => {
+      const response = await request(app)
+        .post('/auth/password-reset-requests')
+        .send({ email: faker.internet.email() });
+
+      expect(response.status).toBe(404);
+    });
+
+    it('should return 200 when email is found', async () => {
+      const newAccount: Partial<CreateAccountRequest> = {
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+      };
+
+      const createdResponse = await request(app)
+        .post('/accounts')
+        .send(newAccount);
+
+      expect(createdResponse.status).toBe(201);
+
+      const response = await request(app)
+        .post('/auth/password-reset-requests')
+        .send({ email: newAccount.email });
+
+      expect(response.status).toBe(200);
+    });
+  });
 });
