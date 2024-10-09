@@ -10,6 +10,15 @@ export const configSchema = z
     MONGO_URI: z.string(),
     RABBIT_MQ_URL: z.string(),
     RABBIT_MQ_EXCHANGE_NAME: z.string(),
+    LOG_LEVEL: z.enum([
+      'error',
+      'warn',
+      'info',
+      'http',
+      'verbose',
+      'debug',
+      'silly',
+    ]),
   })
   .transform(
     ({
@@ -21,6 +30,7 @@ export const configSchema = z
       MONGO_URI,
       RABBIT_MQ_URL,
       RABBIT_MQ_EXCHANGE_NAME,
+      LOG_LEVEL,
     }) => ({
       port: PORT,
       jwt: {
@@ -35,6 +45,9 @@ export const configSchema = z
       rabbitMq: {
         url: RABBIT_MQ_URL,
         exchangeName: RABBIT_MQ_EXCHANGE_NAME,
+      },
+      logging: {
+        level: LOG_LEVEL,
       },
     }),
   );

@@ -1,6 +1,6 @@
 import bodyParser from 'body-parser';
 import { EventService } from 'chatapp.event-sourcing';
-import { ChatAppLogger } from 'chatapp.logging';
+import { ChatAppLogger, LogLevel } from 'chatapp.logging';
 import { handleErrorMiddleware } from 'chatapp.middlewares';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -16,12 +16,17 @@ import { AccountRepository } from './repositories/accountRepository';
 import { AccountService } from './services/accountService';
 import { AuthService } from './services/authService';
 
-async function main() {
-  dotenv.config();
+export async function launchApp() {
+  const envName = process.env.NODE_ENV ?? '';
+  const envFile = `${envName}.env`;
+
+  dotenv.config({ path: envFile });
 
   const config = configSchema.parse(process.env);
 
-  const logger = new ChatAppLogger();
+  const logger = new ChatAppLogger({
+    level: config.logging.level as LogLevel,
+  });
 
   const databaseClient = new MongoClient(config.mongo.uri);
 
@@ -55,7 +60,7 @@ async function main() {
   );
   const authController = new AuthController(config, authService);
 
-  express()
+  const app = express()
     .use(bodyParser.json())
     .use(
       '/api-docs',
@@ -85,10 +90,13 @@ async function main() {
     )
     .use('/accounts', accountController.router)
     .use('/auth', authController.router)
-    .use(handleErrorMiddleware)
-    .listen(config.port, () => {
-      logger.info(`Server is running on port ${config.port}`);
-    });
+    .use(handleErrorMiddleware);
+
+  app.listen(config.port, () => {
+    logger.info(`Server is running on port ${config.port}`);
+  });
+
+  return app;
 }
 
-main();
+launchApp();

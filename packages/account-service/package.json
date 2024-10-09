@@ -5,7 +5,8 @@
   "scripts": {
     "start": "tsx src/app.ts",
     "lint": "eslint . --config ../../eslint.config.mjs",
-    "format": "prettier --config ../../.prettierrc --write ."
+    "format": "prettier --config ../../.prettierrc --write .",
+    "test": "vitest --config vitest.config.mts"
   },
   "dependencies": {
     "body-parser": "^1.20.3",
@@ -23,10 +24,15 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.0.3",
     "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.13",
+    "@types/supertest": "^6.0.2",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.6",
-    "tsx": "^4.19.1"
+    "supertest": "^7.0.0",
+    "tsx": "^4.19.1",
+    "vitest": "^2.1.2"
   },
   "exports": {
     ".": "./src/index.ts"

@@ -5,12 +5,16 @@ services:
     restart: always
     ports:
       - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${ACCOUNT_SERVICE_MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${ACCOUNT_SERVICE_MONGO_PASS}
     volumes:
       - account-service-mongo-data:/data/db
       - account-service-mongo-config:/data/configdb
+
+  account-service-mongo-test:
+    image: mongo
+    container_name: account-service-mongo-test
+    restart: always
+    ports:
+      - 27019:27017
 
   account-service-mongo-express:
     image: mongo-express
@@ -19,27 +23,7 @@ services:
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ACCOUNT_SERVICE_MONGO_USER}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ACCOUNT_SERVICE_MONGO_PASS}
-      ME_CONFIG_BASICAUTH_USERNAME: ${ACCOUNT_SERVICE_MONGO_BASICAUTH_USER}
-      ME_CONFIG_BASICAUTH_PASSWORD: ${ACCOUNT_SERVICE_MONGO_BASICAUTH_PASS}
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
-      ME_CONFIG_MONGODB_URL: mongodb://${ACCOUNT_SERVICE_MONGO_USER}:${ACCOUNT_SERVICE_MONGO_PASS}@account-service-mongo:27017
-    depends_on:
-      - account-service-mongo
-
-  account-service:
-    image: account-service:latest
-    container_name: account-service
-    environment:
-      PORT: 3000
-      JWT_ISSUER: ${JWT_ISSUER}
-      JWT_AUDIENCE: ${JWT_AUDIENCE}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRATION_TIME_IN_SECONDS: ${JWT_EXPIRATION_TIME_IN_SECONDS}
-      MONGO_URI: mongodb://${ACCOUNT_SERVICE_MONGO_USER}:${ACCOUNT_SERVICE_MONGO_PASS}@account-service-mongo:27017
-    ports:
-      - 3000:3000
+      ME_CONFIG_MONGODB_URL: mongodb://account-service-mongo:27017
     depends_on:
       - account-service-mongo
 
@@ -49,12 +33,16 @@ services:
     container_name: message-service-mongo
     ports:
       - 27018:27018
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MESSAGE_SERVICE_MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MESSAGE_SERVICE_MONGO_PASS}
     volumes:
       - message-service-mongo-data:/data/db
       - message-service-mongo-config:/data/configdb
+
+  message-service-mongo-test:
+    image: mongo
+    container_name: message-service-mongo-test
+    restart: always
+    ports:
+      - 27020:27017
 
   message-service-mongo-express:
     image: mongo-express
@@ -62,27 +50,7 @@ services:
     ports:
       - 8082:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MESSAGE_SERVICE_MONGO_USER}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MESSAGE_SERVICE_MONGO_PASS}
-      ME_CONFIG_BASICAUTH_USERNAME: ${MESSAGE_SERVICE_MONGO_BASICAUTH_USER}
-      ME_CONFIG_BASICAUTH_PASSWORD: ${MESSAGE_SERVICE_MONGO_BASICAUTH_PASS}
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
-      ME_CONFIG_MONGODB_URL: mongodb://${MESSAGE_SERVICE_MONGO_USER}:${MESSAGE_SERVICE_MONGO_PASS}@message-service-mongo:27018
-    depends_on:
-      - message-service-mongo
-
-  message-service:
-    image: message-service:latest
-    container_name: message-service
-    ports:
-      - 3001:3001
-    environment:
-      PORT: 3001
-      JWT_ISSUER: ${JWT_ISSUER}
-      JWT_AUDIENCE: ${JWT_AUDIENCE}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRATION_TIME_IN_SECONDS: ${JWT_EXPIRATION_TIME_IN_SECONDS}
-      MONGO_URI: mongodb://${MESSAGE_SERVICE_MONGO_USER}:${MESSAGE_SERVICE_MONGO_PASS}@message-service-mongo:27018
+      ME_CONFIG_MONGODB_URL: mongodb://message-service-mongo:27018
     depends_on:
       - message-service-mongo
 
