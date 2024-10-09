@@ -9,9 +9,6 @@
   "dependencies": {
     "winston": "^3.15.0"
   },
-  "devDependencies": {
-    "typescript": "^5.6.2"
-  },
   "exports": {
     ".": "./src/index.ts"
   }
