@@ -5,7 +5,8 @@
   "scripts": {
     "start": "tsx src/app.ts",
     "lint": "eslint . --config ../../eslint.config.mjs",
-    "format": "prettier --config ../../.prettierrc --write ."
+    "format": "prettier --config ../../.prettierrc --write .",
+    "test": "vitest --config vitest.config.mts"
   },
   "dependencies": {
     "body-parser": "^1.20.3",
@@ -13,19 +14,22 @@
     "chatapp.message-service-contracts": "1.0.0",
     "chatapp.middlewares": "1.0.0",
     "dotenv": "^16.4.5",
-    "express-ws": "^5.0.2",
     "express": "^5.0.0",
     "mongodb": "^6.9.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "ws": "^8.18.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/express-ws": "^3.0.5",
+    "@faker-js/faker": "^9.0.3",
     "@types/express": "^5.0.0",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.6",
-    "tsx": "^4.19.1"
+    "@types/ws": "^8.5.12",
+    "supertest": "^7.0.0",
+    "tsx": "^4.19.1",
+    "vitest": "^2.1.2"
   },
   "exports": {
     ".": "./src/index.ts"

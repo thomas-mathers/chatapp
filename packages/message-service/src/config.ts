@@ -8,6 +8,16 @@ export const configSchema = z
     JWT_SECRET: z.string(),
     JWT_EXPIRATION_TIME_IN_SECONDS: z.coerce.number(),
     MONGO_URI: z.string(),
+    WEB_SOCKET_SERVER_PORT: z.coerce.number(),
+    LOG_LEVEL: z.enum([
+      'error',
+      'warn',
+      'info',
+      'http',
+      'verbose',
+      'debug',
+      'silly',
+    ]),
   })
   .transform(
     ({
@@ -17,6 +27,8 @@ export const configSchema = z
       JWT_SECRET,
       JWT_EXPIRATION_TIME_IN_SECONDS,
       MONGO_URI,
+      WEB_SOCKET_SERVER_PORT,
+      LOG_LEVEL,
     }) => ({
       port: PORT,
       jwt: {
@@ -25,7 +37,15 @@ export const configSchema = z
         secret: JWT_SECRET,
         expirationTimeInSeconds: JWT_EXPIRATION_TIME_IN_SECONDS,
       },
-      mongoUri: MONGO_URI,
+      mongo: {
+        uri: MONGO_URI,
+      },
+      wss: {
+        port: WEB_SOCKET_SERVER_PORT,
+      },
+      logging: {
+        level: LOG_LEVEL,
+      },
     }),
   );
 

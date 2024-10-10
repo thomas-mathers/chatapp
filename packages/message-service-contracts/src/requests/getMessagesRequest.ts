@@ -16,7 +16,7 @@ const sortColumns: MessageSummaryKeys[] = [
 const [firstSortColumn, ...restSortColumns] = sortColumns;
 
 export const getMessagesRequestSchema = z.object({
-  page: z.coerce.number().nonnegative().default(1).optional(),
+  page: z.coerce.number().int().min(1).default(1).optional(),
   pageSize: z.coerce.number().int().min(1).max(1000).default(10).optional(),
   sortBy: z.enum([firstSortColumn, ...restSortColumns]).optional(),
   sortDirection: z.nativeEnum(SortDirection).optional(),

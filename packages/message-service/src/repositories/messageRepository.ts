@@ -8,10 +8,10 @@ import { Collection, Sort } from 'mongodb';
 import { Message } from '../models/message';
 
 export class MessageRepository {
-  constructor(private readonly messageCollection: Collection<Message>) {}
+  constructor(private readonly messages: Collection<Message>) {}
 
   async createMessage(message: Message): Promise<Message> {
-    await this.messageCollection.insertOne(message);
+    await this.messages.insertOne(message);
     return message;
   }
 
@@ -21,7 +21,7 @@ export class MessageRepository {
     sortBy = 'dateCreated',
     sortDirection = SortDirection.Asc,
   }: GetMessagesRequest): Promise<Page<Message>> {
-    const totalRecords = await this.messageCollection.countDocuments();
+    const totalRecords = await this.messages.countDocuments();
 
     const skip = page * pageSize;
     const limit = pageSize;
@@ -29,7 +29,7 @@ export class MessageRepository {
       [sortBy]: sortDirection === 'asc' ? 1 : -1,
     };
 
-    const records = await this.messageCollection
+    const records = await this.messages
       .find({}, { skip, limit, sort })
       .toArray();
 

@@ -1,19 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { CreateAccountRequest } from 'chatapp.account-service-contracts';
-import { Express } from 'express';
 import request from 'supertest';
-
-import { launchApp } from '../app';
+import { describe, it } from 'vitest';
 
 describe('AuthController', () => {
-  let app: Express;
-
-  beforeAll(async () => {
-    app = await launchApp();
-  });
-
   describe('PUT /auth/me/password', () => {
-    it('should return 401 when no token is provided', async () => {
+    it('should return 401 when no token is provided', async ({ app }) => {
       const response = await request(app).put('/auth/me/password').send({
         oldPassword: faker.internet.password(),
         newPassword: faker.internet.password(),
@@ -22,7 +14,9 @@ describe('AuthController', () => {
       expect(response.status).toBe(401);
     });
 
-    it('should return 401 when an invalid token is provided', async () => {
+    it('should return 401 when an invalid token is provided', async ({
+      app,
+    }) => {
       const response = await request(app)
         .put('/auth/me/password')
         .set('Authorization', 'Bearer invalidtoken')
@@ -34,7 +28,7 @@ describe('AuthController', () => {
       expect(response.status).toBe(401);
     });
 
-    it('should return 400 when old password is missing', async () => {
+    it('should return 400 when old password is missing', async ({ app }) => {
       const newAccount: Partial<CreateAccountRequest> = {
         username: faker.internet.userName(),
         email: faker.internet.email(),
@@ -64,7 +58,7 @@ describe('AuthController', () => {
       expect(response.status).toBe(400);
     });
 
-    it('should return 400 when new password is missing', async () => {
+    it('should return 400 when new password is missing', async ({ app }) => {
       const newAccount: Partial<CreateAccountRequest> = {
         username: faker.internet.userName(),
         email: faker.internet.email(),
@@ -94,7 +88,7 @@ describe('AuthController', () => {
       expect(response.status).toBe(400);
     });
 
-    it('should return 401 when old password is incorrect', async () => {
+    it('should return 401 when old password is incorrect', async ({ app }) => {
       const newAccount: Partial<CreateAccountRequest> = {
         username: faker.internet.userName(),
         email: faker.internet.email(),
@@ -125,7 +119,7 @@ describe('AuthController', () => {
       expect(response.status).toBe(401);
     });
 
-    it('should return 200 when old password is correct', async () => {
+    it('should return 200 when old password is correct', async ({ app }) => {
       const newAccount: Partial<CreateAccountRequest> = {
         username: faker.internet.userName(),
         email: faker.internet.email(),
@@ -158,13 +152,13 @@ describe('AuthController', () => {
   });
 
   describe('POST /auth/password-reset-requests', () => {
-    it('should return 400 when email is missing', async () => {
+    it('should return 400 when email is missing', async ({ app }) => {
       const response = await request(app).post('/auth/password-reset-requests');
 
       expect(response.status).toBe(400);
     });
 
-    it('should return 404 when email is not found', async () => {
+    it('should return 404 when email is not found', async ({ app }) => {
       const response = await request(app)
         .post('/auth/password-reset-requests')
         .send({ email: faker.internet.email() });
@@ -172,7 +166,7 @@ describe('AuthController', () => {
       expect(response.status).toBe(404);
     });
 
-    it('should return 200 when email is found', async () => {
+    it('should return 200 when email is found', async ({ app }) => {
       const newAccount: Partial<CreateAccountRequest> = {
         username: faker.internet.userName(),
         email: faker.internet.email(),

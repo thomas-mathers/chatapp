@@ -1,4 +1,7 @@
-import { getMessagesRequestSchema } from 'chatapp.message-service-contracts';
+import {
+  CreateMessageRequest,
+  getMessagesRequestSchema,
+} from 'chatapp.message-service-contracts';
 import { handleRequestQueryValidationMiddleware } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 
@@ -93,6 +96,61 @@ export class MessageController {
         res.json(page);
       },
     );
+
+    /**
+     * @swagger
+     * /:
+     *   post:
+     *     summary: Create a new message
+     *     tags: [Messages]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               content:
+     *                 type: string
+     *                 example: "Hello, world!"
+     *     responses:
+     *       200:
+     *         description: Message created successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 id:
+     *                   type: string
+     *                   example: "60d0fe4f5311236168a109ca"
+     *                 content:
+     *                   type: string
+     *                   example: "Hello, world!"
+     *                 accountId:
+     *                   type: string
+     *                   example: "60d0fe4f5311236168a109cb"
+     *                 accountUsername:
+     *                   type: string
+     *                   example: "john_doe"
+     *                 createdAt:
+     *                   type: string
+     *                   format: date-time
+     *                   example: "2021-06-22T14:48:00.000Z"
+     *       400:
+     *         description: Invalid request
+     *       500:
+     *         description: Internal server error
+     */
+    this._router.post('/', async (req: Request, res: Response) => {
+      const body: CreateMessageRequest = req.body;
+      const message = await messageService.createMessage(
+        req.accountId,
+        req.accountUsername,
+        body.content,
+      );
+      res.json(message);
+    });
   }
 
   get router(): Router {
