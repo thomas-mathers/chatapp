@@ -34,7 +34,13 @@ export class MessageService {
   }
 }
 
-function toMessageSummary(message: Message): MessageSummary {
+export function toMessageSummary(message: Message): MessageSummary {
   const { _id, accountId, accountUsername, content, dateCreated } = message;
-  return { id: _id!, accountId, accountUsername, content, dateCreated };
+  return {
+    id: _id!,
+    accountId,
+    accountUsername,
+    content,
+    dateCreated: dateCreated.toISOString(),
+  };
 }

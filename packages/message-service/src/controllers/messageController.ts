@@ -149,7 +149,7 @@ export class MessageController {
         req.accountUsername,
         body.content,
       );
-      res.json(message);
+      res.status(201).json(message);
     });
   }
 

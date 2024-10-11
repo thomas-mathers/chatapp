@@ -6,7 +6,6 @@ import { SortDirection } from '../sortDirection';
 type MessageSummaryKeys = keyof MessageSummary;
 
 const sortColumns: MessageSummaryKeys[] = [
-  'id',
   'accountId',
   'accountUsername',
   'content',

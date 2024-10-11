@@ -16,14 +16,14 @@ export class MessageRepository {
   }
 
   async getMessages({
-    page = 0,
+    page = 1,
     pageSize = 10,
     sortBy = 'dateCreated',
     sortDirection = SortDirection.Asc,
   }: GetMessagesRequest): Promise<Page<Message>> {
     const totalRecords = await this.messages.countDocuments();
 
-    const skip = page * pageSize;
+    const skip = (page - 1) * pageSize;
     const limit = pageSize;
     const sort: Sort = {
       [sortBy]: sortDirection === 'asc' ? 1 : -1,
