@@ -1,4 +1,4 @@
-import { ChatAppLogger, LogLevel } from 'chatapp.logging';
+import { LogLevel, Logger } from 'chatapp.logging';
 import dotenv from 'dotenv';
 import { MongoClient } from 'mongodb';
 
@@ -11,7 +11,7 @@ import { createIndexes } from './setupDatabase';
 
 export interface Services {
   config: Config;
-  logger: ChatAppLogger;
+  logger: Logger;
   messageController: MessageController;
   mongoClient: MongoClient;
 }
@@ -23,7 +23,7 @@ export async function setupServices(): Promise<Services> {
 
   const config = configSchema.parse(process.env);
 
-  const logger = new ChatAppLogger({ level: config.logging.level as LogLevel });
+  const logger = new Logger({ level: config.logging.level as LogLevel });
 
   const mongoClient = new MongoClient(config.mongo.uri);
 

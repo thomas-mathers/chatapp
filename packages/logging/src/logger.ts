@@ -1,11 +1,16 @@
-import { Logger, createLogger, format, transports } from 'winston';
+import {
+  Logger as WinstonLogger,
+  createLogger,
+  format,
+  transports,
+} from 'winston';
 
 import { LogLevel } from './logLevel';
 import { LogOptions } from './logOptions';
 import { printf } from './utils/printf';
 
-export class ChatAppLogger {
-  private readonly logger: Logger;
+export class Logger {
+  private readonly logger: WinstonLogger;
 
   constructor({
     level = LogLevel.Info,

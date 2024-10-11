@@ -1,5 +1,5 @@
 import ampq from 'amqplib';
-import { ChatAppLogger } from 'chatapp.logging';
+import { Logger } from 'chatapp.logging';
 
 import { ChatAppEvent } from '../chatAppEvent';
 import { ChatAppEventName } from '../chatAppEventName';
@@ -10,7 +10,7 @@ export class EventService {
   private ampqChannel!: ampq.Channel;
 
   constructor(
-    private readonly logger: ChatAppLogger,
+    private readonly logger: Logger,
     private readonly url: string,
     private readonly exchangeName: string,
     private readonly registrations: {

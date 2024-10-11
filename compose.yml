@@ -1,6 +1,7 @@
 services:
   account-service-mongo:
     image: mongo
+    command: mongod --port 27017
     container_name: account-service-mongo
     restart: always
     ports:
@@ -8,13 +9,6 @@ services:
     volumes:
       - account-service-mongo-data:/data/db
       - account-service-mongo-config:/data/configdb
-
-  account-service-mongo-test:
-    image: mongo
-    container_name: account-service-mongo-test
-    restart: always
-    ports:
-      - 27019:27017
 
   account-service-mongo-express:
     image: mongo-express
@@ -27,32 +21,68 @@ services:
     depends_on:
       - account-service-mongo
 
-  message-service-mongo:
+  account-service-mongo-test:
     image: mongo
     command: mongod --port 27018
-    container_name: message-service-mongo
+    container_name: account-service-mongo-test
+    restart: always
     ports:
       - 27018:27018
     volumes:
-      - message-service-mongo-data:/data/db
-      - message-service-mongo-config:/data/configdb
+      - account-service-mongo-test-data:/data/db
+      - account-service-mongo-test-config:/data/configdb
 
-  message-service-mongo-test:
-    image: mongo
-    container_name: message-service-mongo-test
+  account-service-mongo-test-express:
+    image: mongo-express
+    container_name: account-service-mongo-test-express
     restart: always
     ports:
-      - 27020:27017
+      - 8082:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://account-service-mongo-test:27018
+    depends_on:
+      - account-service-mongo-test
+
+  message-service-mongo:
+    image: mongo
+    command: mongod --port 27019
+    container_name: message-service-mongo
+    ports:
+      - 27019:27019
+    volumes:
+      - message-service-mongo-data:/data/db
+      - message-service-mongo-config:/data/configdb
 
   message-service-mongo-express:
     image: mongo-express
     container_name: message-service-mongo-express
     ports:
-      - 8082:8081
+      - 8083:8081
     environment:
-      ME_CONFIG_MONGODB_URL: mongodb://message-service-mongo:27018
+      ME_CONFIG_MONGODB_URL: mongodb://message-service-mongo:27019
     depends_on:
       - message-service-mongo
+
+  message-service-mongo-test:
+    image: mongo
+    command: mongod --port 27020
+    container_name: message-service-mongo-test
+    restart: always
+    ports:
+      - 27020:27020
+    volumes:
+      - message-service-mongo-test-data:/data/db
+      - message-service-mongo-test-config:/data/configdb
+
+  message-service-mongo-test-express:
+    image: mongo-express
+    container_name: message-service-mongo-test-express
+    ports:
+      - 8084:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://message-service-mongo-test:27020
+    depends_on:
+      - message-service-mongo-test
 
   rabbitmq:
     image: 'rabbitmq:management-alpine'
@@ -61,11 +91,25 @@ services:
       - '5672:5672'
       - '15672:15672'
     volumes:
-      - 'rabbitmq_data:/data'
+      - rabbitmq:/var/lib/rabbitmq
+
+  rabbitmq-test:
+    image: 'rabbitmq:management-alpine'
+    container_name: rabbitmq-test
+    ports:
+      - '5673:5672'
+      - '15673:15672'
+    volumes:
+      - rabbitmq-test:/var/lib/rabbitmq
 
 volumes:
   account-service-mongo-data:
   account-service-mongo-config:
+  account-service-mongo-test-data:
+  account-service-mongo-test-config:
   message-service-mongo-data:
   message-service-mongo-config:
-  rabbitmq_data:
+  message-service-mongo-test-data:
+  message-service-mongo-test-config:
+  rabbitmq:
+  rabbitmq-test:
