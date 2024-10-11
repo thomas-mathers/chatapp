@@ -9,4 +9,9 @@ export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
   eslintConfigPrettier,
+  {
+    rules: {
+      'object-shorthand': 'error',
+    },
+  },
 ];
