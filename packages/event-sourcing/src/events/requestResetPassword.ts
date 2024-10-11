@@ -1,9 +1,9 @@
 import z from 'zod';
 
-import { ChatAppEventName } from '../chatAppEventName';
+import { EventName } from '../eventName';
 
 export const requestResetPasswordSchema = z.object({
-  name: z.literal(ChatAppEventName.REQUEST_RESET_PASSWORD),
+  name: z.literal(EventName.REQUEST_RESET_PASSWORD),
   accountId: z.string(),
   accountName: z.string(),
   accountEmail: z.string(),

@@ -1,9 +1,9 @@
 import z from 'zod';
 
-import { ChatAppEventName } from '../chatAppEventName';
+import { EventName } from '../eventName';
 
 export const accountCreatedSchema = z.object({
-  name: z.literal(ChatAppEventName.ACCOUNT_CREATED),
+  name: z.literal(EventName.ACCOUNT_CREATED),
   accountId: z.string(),
   accountName: z.string(),
   accountEmail: z.string(),

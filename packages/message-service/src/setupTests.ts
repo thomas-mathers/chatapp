@@ -1,29 +1,44 @@
 import { faker } from '@faker-js/faker';
 import { createJwt } from 'chatapp.crypto';
+import { Logger } from 'chatapp.logging';
 import { TestContext, afterEach, beforeEach } from 'vitest';
 
-import { run } from './app';
-import { setupServices } from './setupServices';
+import { launchHttpServer, setupDatabase } from './app';
+import { parseConfigFromFile } from './config';
+
+const config = parseConfigFromFile(
+  process.env.NODE_ENV === 'test' ? 'test.env' : '.env',
+);
 
 beforeEach(async (context: TestContext) => {
-  const services = await setupServices();
+  context.token = createJwt(
+    {
+      userId: faker.string.uuid(),
+      username: faker.internet.userName(),
+    },
+    config.jwt,
+  );
 
-  context.credentials = {
-    userId: faker.string.uuid(),
-    username: faker.internet.userName(),
-  };
+  const logger = new Logger({ level: config.logging.level });
 
-  context.token = createJwt(context.credentials, services.config.jwt);
+  const { mongoClient, mongoDatabase } = await setupDatabase(
+    config,
+    generateTestDatabaseName(),
+  );
 
-  context.mongoClient = services.mongoClient;
-  context.mongoSession = context.mongoClient.startSession();
-  context.mongoSession.startTransaction();
+  const app = launchHttpServer(config, logger, mongoDatabase);
 
-  context.app = run(services);
+  context.app = app;
+  context.mongoClient = mongoClient;
+  context.mongoDatabase = mongoDatabase;
 });
 
-afterEach(async ({ mongoClient, mongoSession }: TestContext) => {
-  await mongoSession.abortTransaction();
-  mongoSession.endSession();
+afterEach(async ({ mongoClient, mongoDatabase, app }) => {
+  await mongoDatabase.dropDatabase();
   await mongoClient.close();
+  app.close();
 });
+
+function generateTestDatabaseName(): string {
+  return `test_db_${faker.string.uuid()}`;
+}

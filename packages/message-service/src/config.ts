@@ -1,3 +1,5 @@
+import { LogLevel } from 'chatapp.logging';
+import dotenv from 'dotenv';
 import z from 'zod';
 
 export const configSchema = z
@@ -44,9 +46,15 @@ export const configSchema = z
         port: WEB_SOCKET_SERVER_PORT,
       },
       logging: {
-        level: LOG_LEVEL,
+        level: LOG_LEVEL as LogLevel,
       },
     }),
   );
 
 export type Config = z.infer<typeof configSchema>;
+
+export function parseConfigFromFile(path: string): Config {
+  const { parsed } = dotenv.config({ path });
+
+  return configSchema.parse(parsed);
+}

@@ -2,10 +2,10 @@ import ampq from 'amqplib';
 import { Logger } from 'chatapp.logging';
 
 import { ChatAppEvent } from '../chatAppEvent';
-import { ChatAppEventName } from '../chatAppEventName';
 import { EventHandlerRegistration } from '../eventHandlerRegistration';
+import { EventName } from '../eventName';
 
-export class EventService {
+export class EventBus {
   private ampqConnection!: ampq.Connection;
   private ampqChannel!: ampq.Channel;
 
@@ -14,8 +14,8 @@ export class EventService {
     private readonly url: string,
     private readonly exchangeName: string,
     private readonly registrations: {
-      [key in ChatAppEventName]?: EventHandlerRegistration<unknown>;
-    },
+      [key in EventName]?: EventHandlerRegistration<unknown>;
+    } = {},
   ) {}
 
   async connect() {

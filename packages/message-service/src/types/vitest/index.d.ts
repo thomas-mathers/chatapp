@@ -1,14 +1,13 @@
 import { UserCredentials } from 'chatapp.crypto';
-import { Application } from 'express';
-import { MongoClient } from 'mongodb';
+import { Server } from 'http';
 
 export {};
 
 declare module 'vitest' {
   export interface TestContext {
     mongoClient: MongoClient;
-    mongoSession: ClientSession;
-    app: Application;
+    mongoDatabase: Db;
+    app: Server;
     credentials: UserCredentials;
     token: string;
   }
