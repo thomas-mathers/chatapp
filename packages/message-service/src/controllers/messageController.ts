@@ -17,6 +17,8 @@ export class MessageController {
      *   get:
      *     summary: Retrieve a list of messages
      *     tags: [Messages]
+     *     security:
+     *       - bearerAuth: []
      *     parameters:
      *       - in: query
      *         name: page

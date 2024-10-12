@@ -31,19 +31,28 @@ export function verifyJwt(
   token: string,
   options: JwtOptions,
 ): UserCredentials | undefined {
-  const { issuer, audience, expirationTimeInSeconds: maxAge, secret } = options;
+  try {
+    const {
+      issuer,
+      audience,
+      expirationTimeInSeconds: maxAge,
+      secret,
+    } = options;
 
-  const payload = verify(token, secret, { issuer, audience, maxAge }) as {
-    sub: string | undefined;
-    username: string | undefined;
-  };
+    const payload = verify(token, secret, { issuer, audience, maxAge }) as {
+      sub: string | undefined;
+      username: string | undefined;
+    };
 
-  if (payload.sub === undefined || payload.username === undefined) {
+    if (payload.sub === undefined || payload.username === undefined) {
+      return undefined;
+    }
+
+    return {
+      userId: payload.sub,
+      username: payload.username,
+    };
+  } catch {
     return undefined;
   }
-
-  return {
-    userId: payload.sub,
-    username: payload.username,
-  };
 }

@@ -1,6 +1,3 @@
-import { Server } from 'http';
-import { Db, MongoClient } from 'mongodb';
-
 export {};
 
 declare module 'vitest' {

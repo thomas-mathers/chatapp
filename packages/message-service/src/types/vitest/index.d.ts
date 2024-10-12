@@ -1,6 +1,3 @@
-import { UserCredentials } from 'chatapp.crypto';
-import { Server } from 'http';
-
 export {};
 
 declare module 'vitest' {
@@ -10,5 +7,6 @@ declare module 'vitest' {
     app: Server;
     credentials: UserCredentials;
     token: string;
+    webSocketServer: WebSocketServer;
   }
 }
