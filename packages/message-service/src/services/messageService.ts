@@ -41,6 +41,6 @@ export function toMessageSummary(message: Message): MessageSummary {
     accountId,
     accountUsername,
     content,
-    dateCreated,
+    dateCreated: dateCreated.toISOString(),
   };
 }

@@ -1,3 +1,8 @@
+import { UserCredentials } from 'chatapp.crypto';
+import { Server } from 'http';
+import { Db, MongoClient } from 'mongodb';
+import { Server as WebSocketServer } from 'ws';
+
 export {};
 
 declare module 'vitest' {

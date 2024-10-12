@@ -12,7 +12,7 @@ import { Db, MongoClient } from 'mongodb';
 import internal from 'stream';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { Server as WebSocketServer } from 'ws';
+import { WebSocketServer } from 'ws';
 
 import { Config, parseConfigFromFile } from './config';
 import { MessageController } from './controllers/messageController';

@@ -3,5 +3,5 @@ export interface MessageSummary {
   accountId: string;
   accountUsername: string;
   content: string;
-  dateCreated: Date;
+  dateCreated: string;
 }
