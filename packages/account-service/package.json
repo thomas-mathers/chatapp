@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "tsx src/app.ts",
+    "start": "tsx src/index.ts",
     "lint": "eslint . --config ../../eslint.config.mjs",
     "format": "prettier --config ../../.prettierrc --write .",
     "test": "vitest --config vitest.config.mts"

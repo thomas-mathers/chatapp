@@ -12,7 +12,9 @@ describe('AccountController', () => {
         password: faker.internet.password(),
       };
 
-      const response = await request(app).post('/accounts').send(newAccount);
+      const response = await request(app.httpServer)
+        .post('/accounts')
+        .send(newAccount);
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('id');
@@ -26,7 +28,9 @@ describe('AccountController', () => {
         password: faker.internet.password(),
       };
 
-      const response = await request(app).post('/accounts').send(newAccount);
+      const response = await request(app.httpServer)
+        .post('/accounts')
+        .send(newAccount);
 
       expect(response.status).toBe(400);
     });
@@ -37,7 +41,9 @@ describe('AccountController', () => {
         password: faker.internet.password(),
       };
 
-      const response = await request(app).post('/accounts').send(newAccount);
+      const response = await request(app.httpServer)
+        .post('/accounts')
+        .send(newAccount);
 
       expect(response.status).toBe(400);
     });
@@ -48,7 +54,9 @@ describe('AccountController', () => {
         email: faker.internet.email(),
       };
 
-      const response = await request(app).post('/accounts').send(newAccount);
+      const response = await request(app.httpServer)
+        .post('/accounts')
+        .send(newAccount);
 
       expect(response.status).toBe(400);
     });
@@ -60,7 +68,7 @@ describe('AccountController', () => {
         password: faker.internet.password(),
       };
 
-      const createdResponse = await request(app)
+      const createdResponse = await request(app.httpServer)
         .post('/accounts')
         .send(existingAccount);
 
@@ -72,7 +80,7 @@ describe('AccountController', () => {
         password: faker.internet.password(),
       };
 
-      const conflictResponse = await request(app)
+      const conflictResponse = await request(app.httpServer)
         .post('/accounts')
         .send(conflictingAccount);
 
@@ -86,7 +94,7 @@ describe('AccountController', () => {
         password: faker.internet.password(),
       };
 
-      const createdResponse = await request(app)
+      const createdResponse = await request(app.httpServer)
         .post('/accounts')
         .send(existingAccount);
 
@@ -98,7 +106,7 @@ describe('AccountController', () => {
         password: faker.internet.password(),
       };
 
-      const conflictResponse = await request(app)
+      const conflictResponse = await request(app.httpServer)
         .post('/accounts')
         .send(conflictingAccount);
 
@@ -108,7 +116,7 @@ describe('AccountController', () => {
 
   describe('GET /accounts/me', () => {
     it('should return 401 when no token is provided', async ({ app }) => {
-      const response = await request(app).get('/accounts/me');
+      const response = await request(app.httpServer).get('/accounts/me');
 
       expect(response.status).toBe(401);
     });
@@ -116,7 +124,7 @@ describe('AccountController', () => {
     it('should return 401 when an invalid token is provided', async ({
       app,
     }) => {
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .get('/accounts/me')
         .set('Authorization', 'Bearer invalid-token');
 
@@ -130,20 +138,22 @@ describe('AccountController', () => {
         password: faker.internet.password(),
       };
 
-      const createdResponse = await request(app)
+      const createdResponse = await request(app.httpServer)
         .post('/accounts')
         .send(newAccount);
 
       expect(createdResponse.status).toBe(201);
 
-      const authResponse = await request(app).post('/auth/login').send({
-        username: newAccount.username,
-        password: newAccount.password,
-      });
+      const authResponse = await request(app.httpServer)
+        .post('/auth/login')
+        .send({
+          username: newAccount.username,
+          password: newAccount.password,
+        });
 
       expect(authResponse.status).toBe(200);
 
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .get('/accounts/me')
         .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
@@ -156,7 +166,7 @@ describe('AccountController', () => {
 
   describe('DELETE /accounts/me', () => {
     it('should return 401 when no token is provided', async ({ app }) => {
-      const response = await request(app).delete('/accounts/me');
+      const response = await request(app.httpServer).delete('/accounts/me');
 
       expect(response.status).toBe(401);
     });
@@ -164,7 +174,7 @@ describe('AccountController', () => {
     it('should return 401 when an invalid token is provided', async ({
       app,
     }) => {
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .delete('/accounts/me')
         .set('Authorization', 'Bearer invalid-token');
 
@@ -178,20 +188,22 @@ describe('AccountController', () => {
         password: faker.internet.password(),
       };
 
-      const createdResponse = await request(app)
+      const createdResponse = await request(app.httpServer)
         .post('/accounts')
         .send(newAccount);
 
       expect(createdResponse.status).toBe(201);
 
-      const authResponse = await request(app).post('/auth/login').send({
-        username: newAccount.username,
-        password: newAccount.password,
-      });
+      const authResponse = await request(app.httpServer)
+        .post('/auth/login')
+        .send({
+          username: newAccount.username,
+          password: newAccount.password,
+        });
 
       expect(authResponse.status).toBe(200);
 
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .delete('/accounts/me')
         .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 

@@ -8,7 +8,7 @@ import { Db, MongoClient } from 'mongodb';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
-import { Config, parseConfigFromFile } from './config';
+import { Config } from './config';
 import { AccountController } from './controllers/accountController';
 import { AuthController } from './controllers/authController';
 import { Account } from './models/account';
@@ -37,84 +37,91 @@ const swaggerDoc = swaggerJsdoc({
   apis: ['**/controllers/*.{ts,js}'],
 });
 
-export async function setupDatabase(
-  config: Config,
-  databaseName: string | undefined = undefined,
-): Promise<{
-  mongoClient: MongoClient;
-  mongoDatabase: Db;
-}> {
-  const mongoClient = new MongoClient(config.mongo.uri);
-  await mongoClient.connect();
+export class App {
+  private constructor(
+    private readonly _logger: Logger,
+    private readonly _httpServer: Server,
+    private readonly _eventBus: EventBus,
+    private readonly _mongoClient: MongoClient,
+    private readonly _mongoDatabase: Db,
+  ) {}
 
-  const mongoDatabase = mongoClient.db(databaseName);
+  static async launch(config: Config): Promise<App> {
+    const logger = new Logger({ level: config.logging.level });
 
-  const accountsCollection = mongoDatabase.collection<Account>('accounts');
+    const mongoClient = new MongoClient(config.mongo.uri);
+    await mongoClient.connect();
 
-  await accountsCollection.createIndex({ username: 1 }, { unique: true });
-  await accountsCollection.createIndex({ email: 1 }, { unique: true });
+    const mongoDatabase = mongoClient.db(config.mongo.databaseName);
 
-  return { mongoClient, mongoDatabase };
-}
+    const accountsCollection = mongoDatabase.collection<Account>('accounts');
 
-export async function setupEventBus(
-  logger: Logger,
-  config: Config,
-): Promise<EventBus> {
-  const eventBus = new EventBus(
-    logger,
-    config.rabbitMq.url,
-    config.rabbitMq.exchangeName,
-  );
+    await accountsCollection.createIndex({ username: 1 }, { unique: true });
+    await accountsCollection.createIndex({ email: 1 }, { unique: true });
 
-  await eventBus.connect();
+    const eventBus = new EventBus(
+      logger,
+      config.rabbitMq.url,
+      config.rabbitMq.exchangeName,
+    );
 
-  return eventBus;
-}
+    await eventBus.connect();
 
-export function launchHttpServer(
-  config: Config,
-  logger: Logger,
-  mongoDatabase: Db,
-  eventBus: EventBus,
-): Server {
-  const accountsCollection = mongoDatabase.collection<Account>('accounts');
+    const accountRepository = new AccountRepository(accountsCollection);
+    const accountService = new AccountService(logger, accountRepository);
+    const accountController = new AccountController(config, accountService);
 
-  const accountRepository = new AccountRepository(accountsCollection);
-  const accountService = new AccountService(logger, accountRepository);
-  const accountController = new AccountController(config, accountService);
+    const authService = new AuthService(
+      config,
+      logger,
+      accountRepository,
+      eventBus,
+    );
+    const authController = new AuthController(config, authService);
 
-  const authService = new AuthService(
-    config,
-    logger,
-    accountRepository,
-    eventBus,
-  );
-  const authController = new AuthController(config, authService);
+    const httpServer = express()
+      .use(bodyParser.json())
+      .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
+      .use('/accounts', accountController.router)
+      .use('/auth', authController.router)
+      .use(handleErrorMiddleware)
+      .listen(config.port, () => {
+        logger.info(`Server is running on port ${config.port}`);
+      });
 
-  return express()
-    .use(bodyParser.json())
-    .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
-    .use('/accounts', accountController.router)
-    .use('/auth', authController.router)
-    .use(handleErrorMiddleware)
-    .listen(config.port, () => {
-      logger.info(`Server is running on port ${config.port}`);
+    return new App(logger, httpServer, eventBus, mongoClient, mongoDatabase);
+  }
+
+  async dropDatabase() {
+    await this._mongoDatabase.dropDatabase();
+  }
+
+  async close() {
+    await this.closeHttpServer();
+    await this.closeEventBus();
+    await this.closeMongoClient();
+  }
+
+  get httpServer() {
+    return this._httpServer;
+  }
+
+  private async closeHttpServer() {
+    return new Promise<void>((resolve) => {
+      this._httpServer.close(() => {
+        this._logger.info('HTTP server closed');
+        resolve();
+      });
     });
+  }
+
+  private async closeEventBus() {
+    await this._eventBus.close();
+    this._logger.info('Event bus closed');
+  }
+
+  private async closeMongoClient(): Promise<void> {
+    await this._mongoClient.close();
+    this._logger.info('Mongo client closed');
+  }
 }
-
-async function main() {
-  const config = parseConfigFromFile(
-    process.env.NODE_ENV === 'test' ? 'test.env' : '.env',
-  );
-
-  const logger = new Logger({ level: config.logging.level });
-
-  const { mongoDatabase } = await setupDatabase(config);
-
-  const eventBus = await setupEventBus(logger, config);
-
-  launchHttpServer(config, logger, mongoDatabase, eventBus);
-}
-
-main();

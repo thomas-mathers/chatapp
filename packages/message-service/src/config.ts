@@ -10,6 +10,7 @@ export const configSchema = z
     JWT_SECRET: z.string(),
     JWT_EXPIRATION_TIME_IN_SECONDS: z.coerce.number(),
     MONGO_URI: z.string(),
+    MONGO_DATABASE_NAME: z.string().optional(),
     WEB_SOCKET_SERVER_PORT: z.coerce.number(),
     LOG_LEVEL: z.enum([
       'error',
@@ -29,6 +30,7 @@ export const configSchema = z
       JWT_SECRET,
       JWT_EXPIRATION_TIME_IN_SECONDS,
       MONGO_URI,
+      MONGO_DATABASE_NAME,
       WEB_SOCKET_SERVER_PORT,
       LOG_LEVEL,
     }) => ({
@@ -41,6 +43,7 @@ export const configSchema = z
       },
       mongo: {
         uri: MONGO_URI,
+        databaseName: MONGO_DATABASE_NAME,
       },
       wss: {
         port: WEB_SOCKET_SERVER_PORT,
@@ -53,8 +56,8 @@ export const configSchema = z
 
 export type Config = z.infer<typeof configSchema>;
 
-export function parseConfigFromFile(path: string): Config {
-  const { parsed } = dotenv.config({ path });
+export function getConfig(env: string = process.env.NODE_ENV ?? ''): Config {
+  const { parsed } = dotenv.config({ path: `${env}.env` });
 
   return configSchema.parse(parsed);
 }

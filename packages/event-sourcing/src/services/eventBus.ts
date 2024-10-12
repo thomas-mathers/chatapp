@@ -25,6 +25,11 @@ export class EventBus {
     await this.ampqChannel.assertExchange(this.exchangeName, 'topic', {});
   }
 
+  async close() {
+    await this.ampqChannel.close();
+    await this.ampqConnection.close();
+  }
+
   async produce(event: ChatAppEvent): Promise<void> {
     this.ampqChannel.publish(
       this.exchangeName,

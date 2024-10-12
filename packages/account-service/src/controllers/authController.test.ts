@@ -6,10 +6,12 @@ import { describe, it } from 'vitest';
 describe('AuthController', () => {
   describe('PUT /auth/me/password', () => {
     it('should return 401 when no token is provided', async ({ app }) => {
-      const response = await request(app).put('/auth/me/password').send({
-        oldPassword: faker.internet.password(),
-        newPassword: faker.internet.password(),
-      });
+      const response = await request(app.httpServer)
+        .put('/auth/me/password')
+        .send({
+          oldPassword: faker.internet.password(),
+          newPassword: faker.internet.password(),
+        });
 
       expect(response.status).toBe(401);
     });
@@ -17,7 +19,7 @@ describe('AuthController', () => {
     it('should return 401 when an invalid token is provided', async ({
       app,
     }) => {
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .put('/auth/me/password')
         .set('Authorization', 'Bearer invalidtoken')
         .send({
@@ -35,20 +37,22 @@ describe('AuthController', () => {
         password: faker.internet.password(),
       };
 
-      const createdResponse = await request(app)
+      const createdResponse = await request(app.httpServer)
         .post('/accounts')
         .send(newAccount);
 
       expect(createdResponse.status).toBe(201);
 
-      const authResponse = await request(app).post('/auth/login').send({
-        username: newAccount.username,
-        password: newAccount.password,
-      });
+      const authResponse = await request(app.httpServer)
+        .post('/auth/login')
+        .send({
+          username: newAccount.username,
+          password: newAccount.password,
+        });
 
       expect(authResponse.status).toBe(200);
 
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .put('/auth/me/password')
         .set('Authorization', `Bearer ${authResponse.body.jwt}`)
         .send({
@@ -65,20 +69,22 @@ describe('AuthController', () => {
         password: faker.internet.password(),
       };
 
-      const createdResponse = await request(app)
+      const createdResponse = await request(app.httpServer)
         .post('/accounts')
         .send(newAccount);
 
       expect(createdResponse.status).toBe(201);
 
-      const authResponse = await request(app).post('/auth/login').send({
-        username: newAccount.username,
-        password: newAccount.password,
-      });
+      const authResponse = await request(app.httpServer)
+        .post('/auth/login')
+        .send({
+          username: newAccount.username,
+          password: newAccount.password,
+        });
 
       expect(authResponse.status).toBe(200);
 
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .put('/auth/me/password')
         .set('Authorization', `Bearer ${authResponse.body.jwt}`)
         .send({
@@ -95,20 +101,22 @@ describe('AuthController', () => {
         password: faker.internet.password(),
       };
 
-      const createdResponse = await request(app)
+      const createdResponse = await request(app.httpServer)
         .post('/accounts')
         .send(newAccount);
 
       expect(createdResponse.status).toBe(201);
 
-      const authResponse = await request(app).post('/auth/login').send({
-        username: newAccount.username,
-        password: newAccount.password,
-      });
+      const authResponse = await request(app.httpServer)
+        .post('/auth/login')
+        .send({
+          username: newAccount.username,
+          password: newAccount.password,
+        });
 
       expect(authResponse.status).toBe(200);
 
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .put('/auth/me/password')
         .set('Authorization', `Bearer ${authResponse.body.jwt}`)
         .send({
@@ -126,20 +134,22 @@ describe('AuthController', () => {
         password: faker.internet.password(),
       };
 
-      const createdResponse = await request(app)
+      const createdResponse = await request(app.httpServer)
         .post('/accounts')
         .send(newAccount);
 
       expect(createdResponse.status).toBe(201);
 
-      const authResponse = await request(app).post('/auth/login').send({
-        username: newAccount.username,
-        password: newAccount.password,
-      });
+      const authResponse = await request(app.httpServer)
+        .post('/auth/login')
+        .send({
+          username: newAccount.username,
+          password: newAccount.password,
+        });
 
       expect(authResponse.status).toBe(200);
 
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .put('/auth/me/password')
         .set('Authorization', `Bearer ${authResponse.body.jwt}`)
         .send({
@@ -153,13 +163,15 @@ describe('AuthController', () => {
 
   describe('POST /auth/password-reset-requests', () => {
     it('should return 400 when email is missing', async ({ app }) => {
-      const response = await request(app).post('/auth/password-reset-requests');
+      const response = await request(app.httpServer).post(
+        '/auth/password-reset-requests',
+      );
 
       expect(response.status).toBe(400);
     });
 
     it('should return 404 when email is not found', async ({ app }) => {
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .post('/auth/password-reset-requests')
         .send({ email: faker.internet.email() });
 
@@ -173,13 +185,13 @@ describe('AuthController', () => {
         password: faker.internet.password(),
       };
 
-      const createdResponse = await request(app)
+      const createdResponse = await request(app.httpServer)
         .post('/accounts')
         .send(newAccount);
 
       expect(createdResponse.status).toBe(201);
 
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .post('/auth/password-reset-requests')
         .send({ email: newAccount.email });
 

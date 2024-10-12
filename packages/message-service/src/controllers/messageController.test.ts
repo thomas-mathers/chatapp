@@ -62,14 +62,14 @@ function compareByDateCreated(a: Message, b: Message): number {
 describe('MessageController', () => {
   describe('GET /messages', () => {
     it('should return 401 when no token is provided', async ({ app }) => {
-      const response = await request(app).get('/messages');
+      const response = await request(app.httpServer).get('/messages');
       expect(response.status).toBe(401);
     });
 
     it('should return 401 when an invalid token is provided', async ({
       app,
     }) => {
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .get('/messages')
         .set('Authorization', 'Bearer invalid-token');
 
@@ -80,7 +80,7 @@ describe('MessageController', () => {
       app,
       token,
     }) => {
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .get('/messages')
         .set('Authorization', `Bearer ${token}`);
 
@@ -90,7 +90,7 @@ describe('MessageController', () => {
     it.for([[-1], [0], [1.5], [1001], [''], ['abc']])(
       'should return 400 when page size is %s',
       async (pageSize, { app, token }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ pageSize });
@@ -102,7 +102,7 @@ describe('MessageController', () => {
     it.for([[-1], [0], [1.5], [''], ['abc']])(
       'should return 400 when page is %s',
       async (page, { app, token }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ page });
@@ -114,7 +114,7 @@ describe('MessageController', () => {
     it.for([[-1], [0], [1.5], [''], ['abc']])(
       'should return 400 when sortBy is %s',
       async (sortBy, { app, token }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ sortBy });
@@ -126,7 +126,7 @@ describe('MessageController', () => {
     it.for([[-1], [0], [1.5], [''], ['abc']])(
       'should return 400 when sortDirection is %s',
       async (sortDirection, { app, token }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ sortDirection });
@@ -139,7 +139,7 @@ describe('MessageController', () => {
       app,
       token,
     }) => {
-      const response = await request(app)
+      const response = await request(app.httpServer)
         .get('/messages')
         .set('Authorization', `Bearer ${token}`);
 
@@ -154,8 +154,9 @@ describe('MessageController', () => {
     });
 
     describe('with messages', () => {
-      beforeEach(async ({ mongoDatabase }) => {
-        const messageCollection = mongoDatabase.collection<Message>('messages');
+      beforeEach(async ({ app }) => {
+        const messageCollection =
+          app.mongoDatabase.collection<Message>('messages');
 
         await messageCollection.insertMany(messages);
       });
@@ -164,7 +165,7 @@ describe('MessageController', () => {
         app,
         token,
       }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ sortBy: 'accountId' });
@@ -183,7 +184,7 @@ describe('MessageController', () => {
         app,
         token,
       }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ sortBy: 'accountId', sortDirection: 'desc' });
@@ -205,7 +206,7 @@ describe('MessageController', () => {
         app,
         token,
       }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ sortBy: 'accountUsername' });
@@ -226,7 +227,7 @@ describe('MessageController', () => {
         app,
         token,
       }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ sortBy: 'accountUsername', sortDirection: 'desc' });
@@ -248,7 +249,7 @@ describe('MessageController', () => {
         app,
         token,
       }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ sortBy: 'content' });
@@ -267,7 +268,7 @@ describe('MessageController', () => {
         app,
         token,
       }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ sortBy: 'content', sortDirection: 'desc' });
@@ -289,7 +290,7 @@ describe('MessageController', () => {
         app,
         token,
       }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`);
 
@@ -309,7 +310,7 @@ describe('MessageController', () => {
         app,
         token,
       }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ sortDirection: 'desc' });
@@ -328,7 +329,7 @@ describe('MessageController', () => {
       });
 
       it('should return the first page of messages', async ({ app, token }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ page: 1, pageSize: 3 });
@@ -350,7 +351,7 @@ describe('MessageController', () => {
         app,
         token,
       }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ page: 2, pageSize: 3 });
@@ -372,7 +373,7 @@ describe('MessageController', () => {
         app,
         token,
       }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ page: 3, pageSize: 3 });
@@ -391,7 +392,7 @@ describe('MessageController', () => {
         app,
         token,
       }) => {
-        const response = await request(app)
+        const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
           .query({ pageSize: 10 });

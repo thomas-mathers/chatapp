@@ -10,6 +10,7 @@ export const configSchema = z
     JWT_SECRET: z.string(),
     JWT_EXPIRATION_TIME_IN_SECONDS: z.coerce.number(),
     MONGO_URI: z.string(),
+    MONGO_DATABASE_NAME: z.string().optional(),
     RABBIT_MQ_URL: z.string(),
     RABBIT_MQ_EXCHANGE_NAME: z.string(),
     LOG_LEVEL: z.enum([
@@ -30,6 +31,7 @@ export const configSchema = z
       JWT_SECRET,
       JWT_EXPIRATION_TIME_IN_SECONDS,
       MONGO_URI,
+      MONGO_DATABASE_NAME,
       RABBIT_MQ_URL,
       RABBIT_MQ_EXCHANGE_NAME,
       LOG_LEVEL,
@@ -43,6 +45,7 @@ export const configSchema = z
       },
       mongo: {
         uri: MONGO_URI,
+        databaseName: MONGO_DATABASE_NAME,
       },
       rabbitMq: {
         url: RABBIT_MQ_URL,
@@ -56,8 +59,8 @@ export const configSchema = z
 
 export type Config = z.infer<typeof configSchema>;
 
-export function parseConfigFromFile(path: string): Config {
-  const { parsed } = dotenv.config({ path });
+export function getConfig(env: string = process.env.NODE_ENV ?? ''): Config {
+  const { parsed } = dotenv.config({ path: `${env}.env` });
 
   return configSchema.parse(parsed);
 }

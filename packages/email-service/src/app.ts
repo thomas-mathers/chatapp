@@ -1,47 +1,58 @@
 import {
-  ChatAppEventName,
-  EventService,
+  EventBus,
+  EventName,
   requestResetPasswordSchema,
 } from 'chatapp.event-sourcing';
-import { ChatAppLogger } from 'chatapp.logging';
-import dotenv from 'dotenv';
+import { Logger } from 'chatapp.logging';
 import { Resend } from 'resend';
 
-import { configSchema } from './config';
+import { Config } from './config';
 import { RequestResetPasswordEventHandler } from './event-handlers/requestResetPasswordEventHandler';
 import { EmailService } from './services/emailService';
 
-async function main() {
-  dotenv.config();
+export class App {
+  private constructor(
+    private _logger: Logger,
+    private _eventBus: EventBus,
+  ) {}
 
-  const config = configSchema.parse(process.env);
+  static async launch(config: Config): Promise<App> {
+    const logger = new Logger();
 
-  const logger = new ChatAppLogger();
+    const resend = new Resend(config.RESEND_API_KEY);
 
-  const resend = new Resend(config.RESEND_API_KEY);
+    const emailService = new EmailService(logger, resend);
 
-  const emailService = new EmailService(logger, resend);
+    const eventHandlers = {
+      [EventName.REQUEST_RESET_PASSWORD]: {
+        schema: requestResetPasswordSchema,
+        eventHandler: new RequestResetPasswordEventHandler(
+          config,
+          logger,
+          emailService,
+        ),
+      },
+    };
 
-  const eventHandlers = {
-    [ChatAppEventName.REQUEST_RESET_PASSWORD]: {
-      schema: requestResetPasswordSchema,
-      eventHandler: new RequestResetPasswordEventHandler(
-        config,
-        logger,
-        emailService,
-      ),
-    },
-  };
+    const eventService = new EventBus(
+      logger,
+      config.RABBIT_MQ_URL,
+      config.RABBIT_MQ_EXCHANGE_NAME,
+      eventHandlers,
+    );
 
-  const eventService = new EventService(
-    logger,
-    config.RABBIT_MQ_URL,
-    config.RABBIT_MQ_EXCHANGE_NAME,
-    eventHandlers,
-  );
+    await eventService.connect();
+    await eventService.consume();
 
-  await eventService.connect();
-  await eventService.consume();
+    return new App(logger, eventService);
+  }
+
+  async close() {
+    await this.closeEventBus();
+  }
+
+  private async closeEventBus() {
+    await this._eventBus.close();
+    this._logger.info('Event bus closed');
+  }
 }
-
-main();

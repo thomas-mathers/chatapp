@@ -14,7 +14,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { WebSocketServer } from 'ws';
 
-import { Config, parseConfigFromFile } from './config';
+import { Config } from './config';
 import { MessageController } from './controllers/messageController';
 import { Message } from './models/message';
 import { MessageRepository } from './repositories/messageRepository';
@@ -40,27 +40,6 @@ const swaggerDoc = swaggerJsdoc({
   },
   apis: ['**/controllers/*.{ts,js}'],
 });
-
-export async function setupDatabase(
-  config: Config,
-  databaseName: string | undefined = undefined,
-): Promise<{
-  mongoClient: MongoClient;
-  mongoDatabase: Db;
-}> {
-  const mongoClient = new MongoClient(config.mongo.uri);
-  await mongoClient.connect();
-
-  const mongoDatabase = mongoClient.db(databaseName);
-
-  const messagesCollection = mongoDatabase.collection<Message>('messages');
-
-  await messagesCollection.createIndex({ accountId: 1 });
-  await messagesCollection.createIndex({ accountUsername: 1 });
-  await messagesCollection.createIndex({ dateCreated: 1 });
-
-  return { mongoClient, mongoDatabase };
-}
 
 function getAuthorizationToken(request: IncomingMessage): string | undefined {
   const authorizationSegments = request.headers.authorization?.split(' ') ?? [];
@@ -102,7 +81,7 @@ function handleUpgrade(config: Config, webSocketServer: WebSocketServer) {
   };
 }
 
-export function launchWebSocketServer(
+function launchWebSocketServer(
   logger: Logger,
   messageService: MessageService,
 ): WebSocketServer {
@@ -146,43 +125,93 @@ export function launchWebSocketServer(
   return webSocketServer;
 }
 
-export function launchHttpServer(
-  config: Config,
-  logger: Logger,
-  messageService: MessageService,
-  webSocketServer: WebSocketServer,
-): Server {
-  const messageController = new MessageController(messageService);
+export class App {
+  private constructor(
+    private readonly _logger: Logger,
+    private readonly _httpServer: Server,
+    private readonly _mongoClient: MongoClient,
+    private readonly _mongoDatabase: Db,
+    private readonly _webSocketServer: WebSocketServer,
+  ) {}
 
-  return express()
-    .use(bodyParser.json())
-    .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
-    .use(handleAuthMiddleware(config.jwt))
-    .use('/messages', messageController.router)
-    .use(handleErrorMiddleware)
-    .listen(config.port, () => {
-      logger.info(`Server is running on port ${config.port}`);
-    })
-    .on('upgrade', handleUpgrade(config, webSocketServer));
+  static async launch(config: Config): Promise<App> {
+    const logger = new Logger({ level: config.logging.level });
+
+    const mongoClient = new MongoClient(config.mongo.uri);
+    await mongoClient.connect();
+
+    const mongoDatabase = mongoClient.db(config.mongo.databaseName);
+
+    const messagesCollection = mongoDatabase.collection<Message>('messages');
+
+    await messagesCollection.createIndex({ accountId: 1 });
+    await messagesCollection.createIndex({ accountUsername: 1 });
+    await messagesCollection.createIndex({ dateCreated: 1 });
+
+    const messageRepository = new MessageRepository(messagesCollection);
+    const messageService = new MessageService(messageRepository);
+    const messageController = new MessageController(messageService);
+
+    const webSocketServer = launchWebSocketServer(logger, messageService);
+
+    const httpServer = express()
+      .use(bodyParser.json())
+      .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
+      .use(handleAuthMiddleware(config.jwt))
+      .use('/messages', messageController.router)
+      .use(handleErrorMiddleware)
+      .listen(config.port, () => {
+        logger.info(`Server is running on port ${config.port}`);
+      })
+      .on('upgrade', handleUpgrade(config, webSocketServer));
+
+    return new App(
+      logger,
+      httpServer,
+      mongoClient,
+      mongoDatabase,
+      webSocketServer,
+    );
+  }
+
+  async dropDatabase() {
+    await this._mongoDatabase.dropDatabase();
+  }
+
+  async close() {
+    await this.closeHttpServer();
+    await this.closeWebSocketServer();
+    await this.closeMongoClient();
+  }
+
+  private async closeHttpServer() {
+    return new Promise<void>((resolve) => {
+      this._httpServer.close(() => {
+        this._logger.info('HTTP server closed');
+        resolve();
+      });
+    });
+  }
+
+  private closeWebSocketServer(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      this._webSocketServer.close(() => {
+        this._logger.info('WebSocket server closed');
+        resolve();
+      });
+    });
+  }
+
+  private async closeMongoClient(): Promise<void> {
+    await this._mongoClient.close();
+    this._logger.info('Mongo client closed');
+  }
+
+  get httpServer(): Server {
+    return this._httpServer;
+  }
+
+  get mongoDatabase(): Db {
+    return this._mongoDatabase;
+  }
 }
-
-async function main() {
-  const config = parseConfigFromFile(
-    process.env.NODE_ENV === 'test' ? 'test.env' : '.env',
-  );
-
-  const logger = new Logger({ level: config.logging.level });
-
-  const { mongoDatabase } = await setupDatabase(config);
-
-  const messagesCollection = mongoDatabase.collection<Message>('messages');
-
-  const messageRepository = new MessageRepository(messagesCollection);
-  const messageService = new MessageService(messageRepository);
-
-  const webSocketServer = launchWebSocketServer(logger, messageService);
-
-  launchHttpServer(config, logger, messageService, webSocketServer);
-}
-
-main();
