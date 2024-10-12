@@ -1,11 +1,11 @@
-import { ChatAppLogger } from 'chatapp.logging';
+import { Logger } from 'chatapp.logging';
 import { Resend } from 'resend';
 
 import { EmailMessage } from '../emailMessage';
 
 export class EmailService {
   constructor(
-    private readonly logger: ChatAppLogger,
+    private readonly logger: Logger,
     private readonly resend: Resend,
   ) {}
 

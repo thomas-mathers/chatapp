@@ -1,5 +1,5 @@
 import { EventHandler, RequestResetPassword } from 'chatapp.event-sourcing';
-import { ChatAppLogger } from 'chatapp.logging';
+import { Logger } from 'chatapp.logging';
 
 import { Config } from '../config';
 import { EmailMessage } from '../emailMessage';
@@ -10,7 +10,7 @@ export class RequestResetPasswordEventHandler
 {
   constructor(
     private readonly config: Config,
-    private readonly logger: ChatAppLogger,
+    private readonly logger: Logger,
     private readonly emailService: EmailService,
   ) {}
 

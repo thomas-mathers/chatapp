@@ -1,6 +1,6 @@
 import { UserCredentials } from 'chatapp.crypto';
 
-import { App } from '../../app';
+import { App } from '../../../app';
 
 export {};
 
