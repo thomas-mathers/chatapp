@@ -1,15 +1,20 @@
 import { Button, Stack, TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 
+interface ResetPasswordFormState {
+  newPassword: string;
+  newPasswordConfirm: string;
+}
+
 export const ResetPasswordForm = () => {
-  const { control, formState, handleSubmit } = useForm({
+  const { control, formState, handleSubmit } = useForm<ResetPasswordFormState>({
     defaultValues: {
       newPassword: '',
       newPasswordConfirm: '',
     },
   });
 
-  const onSubmit = (data: unknown) => {
+  const onSubmit = (data: ResetPasswordFormState) => {
     console.log(data);
   };
 

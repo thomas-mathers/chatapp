@@ -2,8 +2,15 @@ import { Button, Link, Stack, TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 
+interface RegisterFormState {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  username: string;
+}
+
 export const RegisterForm = () => {
-  const { control, formState, handleSubmit } = useForm({
+  const { control, formState, handleSubmit } = useForm<RegisterFormState>({
     defaultValues: {
       email: '',
       password: '',
@@ -12,7 +19,7 @@ export const RegisterForm = () => {
     },
   });
 
-  const onSubmit = (data: unknown) => {
+  const onSubmit = (data: RegisterFormState) => {
     console.log(data);
   };
 

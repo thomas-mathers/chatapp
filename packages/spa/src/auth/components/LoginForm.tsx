@@ -2,15 +2,20 @@ import { Button, Link, Stack, TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 
+interface LoginFormState {
+  email: string;
+  password: string;
+}
+
 export const LoginForm = () => {
-  const { control, formState, handleSubmit } = useForm({
+  const { control, formState, handleSubmit } = useForm<LoginFormState>({
     defaultValues: {
       email: '',
       password: '',
     },
   });
 
-  const onSubmit = (data: unknown) => {
+  const onSubmit = (data: LoginFormState) => {
     console.log(data);
   };
 

@@ -2,14 +2,20 @@ import { Button, Link, Stack, TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 
-export const ForgotPasswordForm = () => {
-  const { control, formState, handleSubmit } = useForm({
-    defaultValues: {
-      email: '',
-    },
-  });
+interface ForgotPasswordFormState {
+  email: string;
+}
 
-  const onSubmit = (data: unknown) => {
+export const ForgotPasswordForm = () => {
+  const { control, formState, handleSubmit } = useForm<ForgotPasswordFormState>(
+    {
+      defaultValues: {
+        email: '',
+      },
+    },
+  );
+
+  const onSubmit = (data: ForgotPasswordFormState) => {
     console.log(data);
   };
 
