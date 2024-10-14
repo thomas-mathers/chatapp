@@ -1,12 +1,14 @@
 import {
   EventBus,
   EventName,
+  accountCreatedSchema,
   requestResetPasswordSchema,
 } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
 import { Resend } from 'resend';
 
 import { Config } from './config';
+import { AccountCreatedEventHandler } from './event-handlers/accountCreatedEventHandler';
 import { RequestResetPasswordEventHandler } from './event-handlers/requestResetPasswordEventHandler';
 import { EmailService } from './services/emailService';
 
@@ -24,6 +26,14 @@ export class App {
     const emailService = new EmailService(logger, resend);
 
     const eventHandlers = {
+      [EventName.ACCOUNT_CREATED]: {
+        schema: accountCreatedSchema,
+        eventHandler: new AccountCreatedEventHandler(
+          config,
+          logger,
+          emailService,
+        ),
+      },
       [EventName.REQUEST_RESET_PASSWORD]: {
         schema: requestResetPasswordSchema,
         eventHandler: new RequestResetPasswordEventHandler(
@@ -34,17 +44,17 @@ export class App {
       },
     };
 
-    const eventService = new EventBus(
+    const eventBus = new EventBus(
       logger,
       config.RABBIT_MQ_URL,
       config.RABBIT_MQ_EXCHANGE_NAME,
       eventHandlers,
     );
 
-    await eventService.connect();
-    await eventService.consume();
+    await eventBus.connect();
+    await eventBus.consume();
 
-    return new App(logger, eventService);
+    return new App(logger, eventBus);
   }
 
   async close() {

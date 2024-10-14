@@ -3,6 +3,7 @@ export * from './requests/loginRequest';
 export * from './requests/changePasswordRequest';
 export * from './requests/passwordResetRequest';
 export * from './requests/passwordResetTokenRequest';
+export * from './requests/confirmEmailRequest';
 export * from './responses/accountSummary';
 export * from './responses/loginResponse';
 export * from './responses/passwordResetTokenResponse';

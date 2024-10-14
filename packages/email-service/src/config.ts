@@ -6,6 +6,7 @@ export const configSchema = z.object({
   RABBIT_MQ_URL: z.string(),
   RABBIT_MQ_EXCHANGE_NAME: z.string(),
   ADMIN_EMAIL: z.string(),
+  SPA_URL: z.string(),
 });
 
 export type Config = z.infer<typeof configSchema>;

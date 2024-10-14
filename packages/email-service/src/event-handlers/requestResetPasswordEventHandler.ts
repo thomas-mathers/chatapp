@@ -43,12 +43,13 @@ export class RequestResetPasswordEventHandler
     accountEmail: string,
     token: string,
   ): EmailMessage {
+    const url = `${this.config.SPA_URL}/reset-password?token=${token}`;
     return {
       from: this.config.ADMIN_EMAIL,
       to: accountEmail,
       subject: 'Reset your password',
-      text: `Click here to reset your password: http://localhost:3000/reset-password?token=${token}`,
-      html: `<a href="http://localhost:3000/reset-password?token=${token}">Click here to reset your password</a>`,
+      text: `Click here to reset your password: ${url}`,
+      html: `<a href="${url}">Click here to reset your password</a>`,
     };
   }
 }

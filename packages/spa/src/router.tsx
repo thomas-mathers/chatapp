@@ -8,6 +8,7 @@ import {
   RegisterForm,
   ResetPasswordForm,
 } from './features/auth';
+import { ConfirmEmail } from './features/auth/components/ConfirmEmail';
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
   {
     path: '/reset-password',
     element: <ResetPasswordForm />,
+  },
+  {
+    path: '/confirm-email',
+    element: <ConfirmEmail />,
   },
   {
     element: <ProtectedRoute />,

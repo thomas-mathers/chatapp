@@ -1,3 +1,5 @@
+import { StatusCodes } from 'http-status-codes';
+
 interface ResultSuccess<T> {
   isSuccess: true;
   statusCode: number;
@@ -14,7 +16,7 @@ export type Result<TSuccess> = ResultSuccess<TSuccess> | ResultFailure;
 
 export function success<T>(
   data?: T,
-  statusCode: number = 200,
+  statusCode: number = StatusCodes.NO_CONTENT,
 ): ResultSuccess<T> {
   return { isSuccess: true, statusCode, data };
 }

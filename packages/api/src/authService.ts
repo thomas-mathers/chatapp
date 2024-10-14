@@ -1,5 +1,6 @@
 import {
   ChangePasswordRequest,
+  ConfirmEmailRequest,
   LoginRequest,
   LoginResponse,
   PasswordResetRequest,
@@ -39,6 +40,13 @@ export class AuthService {
   async resetPassword(request: PasswordResetRequest): Promise<void> {
     return await this.apiClient.postJson<void>(
       '/auth/password-resets',
+      request,
+    );
+  }
+
+  async confirmEmail(request: ConfirmEmailRequest): Promise<void> {
+    return await this.apiClient.postJson<void>(
+      `/auth/email-confirmations`,
       request,
     );
   }

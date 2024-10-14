@@ -4,6 +4,7 @@ import {
   PasswordResetRequest,
   PasswordResetTokenRequest,
   changePasswordRequestSchema,
+  confirmEmailRequestSchema,
   loginRequestSchema,
   passwordResetRequestSchema,
   passwordResetTokenRequestSchema,
@@ -146,10 +147,10 @@ export class AuthController {
       handleRequestBodyValidationMiddleware(passwordResetTokenRequestSchema),
       async (req: Request, res: Response) => {
         const body: PasswordResetTokenRequest = req.body;
-        const { statusCode, data } = await authService.resetPasswordRequest(
+        const { statusCode } = await authService.resetPasswordRequest(
           body.email,
         );
-        res.status(statusCode).json(data);
+        res.status(statusCode).end();
       },
     );
 
@@ -188,6 +189,17 @@ export class AuthController {
         const { statusCode, data } = await authService.resetPassword(
           body.token,
           body.newPassword,
+        );
+        res.status(statusCode).json(data);
+      },
+    );
+
+    this._router.post(
+      '/email-confirmations',
+      handleRequestBodyValidationMiddleware(confirmEmailRequestSchema),
+      async (req: Request, res: Response) => {
+        const { statusCode, data } = await authService.confirmEmail(
+          req.body.token,
         );
         res.status(statusCode).json(data);
       },

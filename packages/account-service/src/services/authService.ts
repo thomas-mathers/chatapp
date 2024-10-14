@@ -13,7 +13,7 @@ export class AuthService {
     private readonly config: Config,
     private readonly logger: Logger,
     private readonly accountRepository: AccountRepository,
-    private readonly eventService: EventBus,
+    private readonly eventBus: EventBus,
   ) {}
 
   async login(
@@ -24,6 +24,10 @@ export class AuthService {
 
     if (!account) {
       return failure(StatusCodes.NOT_FOUND);
+    }
+
+    if (!account.emailVerified) {
+      return failure(StatusCodes.UNAUTHORIZED);
     }
 
     const isPasswordCorrect = await verifyHash(password, account.password);
@@ -43,7 +47,7 @@ export class AuthService {
       email: account.email,
     });
 
-    return success({ jwt });
+    return success({ jwt }, StatusCodes.OK);
   }
 
   async changePassword(
@@ -91,7 +95,7 @@ export class AuthService {
       this.config.jwt,
     );
 
-    this.eventService.produce({
+    this.eventBus.produce({
       name: EventName.REQUEST_RESET_PASSWORD,
       accountId: account._id!.toString(),
       accountName: account.username,
@@ -131,6 +135,35 @@ export class AuthService {
     await this.accountRepository.updateAccount({ ...account, password });
 
     this.logger.info('User password reset', {
+      id: account._id,
+      username: account.username,
+      email: account.email,
+    });
+
+    return success();
+  }
+
+  async confirmEmail(token: string): Promise<Result<void>> {
+    const userCredentials = verifyJwt(token, this.config.jwt);
+
+    if (userCredentials === undefined) {
+      return failure(StatusCodes.UNAUTHORIZED);
+    }
+
+    const account = await this.accountRepository.getAccountById(
+      userCredentials.userId,
+    );
+
+    if (!account) {
+      return failure(StatusCodes.NOT_FOUND);
+    }
+
+    await this.accountRepository.updateAccount({
+      ...account,
+      emailVerified: true,
+    });
+
+    this.logger.info('User email confirmed', {
       id: account._id,
       username: account.username,
       email: account.email,

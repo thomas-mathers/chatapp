@@ -69,7 +69,12 @@ export class App {
     await eventBus.connect();
 
     const accountRepository = new AccountRepository(accountsCollection);
-    const accountService = new AccountService(logger, accountRepository);
+    const accountService = new AccountService(
+      config,
+      logger,
+      accountRepository,
+      eventBus,
+    );
     const accountController = new AccountController(config, accountService);
 
     const authService = new AuthService(

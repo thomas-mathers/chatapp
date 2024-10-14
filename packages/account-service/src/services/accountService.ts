@@ -2,19 +2,23 @@ import {
   AccountSummary,
   CreateAccountRequest,
 } from 'chatapp.account-service-contracts';
-import { createHash } from 'chatapp.crypto';
+import { createHash, createJwt } from 'chatapp.crypto';
+import { EventBus, EventName } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
 import { StatusCodes } from 'http-status-codes';
 import { MongoError } from 'mongodb';
 
+import { Config } from '../config';
 import { Account } from '../models/account';
 import { AccountRepository } from '../repositories/accountRepository';
 import { Result, failure, success } from '../statusCodeResult';
 
 export class AccountService {
   constructor(
+    private readonly config: Config,
     private readonly logger: Logger,
     private readonly accountRepository: AccountRepository,
+    private readonly eventBus: EventBus,
   ) {}
 
   async createAccount(
@@ -33,13 +37,26 @@ export class AccountService {
 
       const accountSummary = toAccountSummary(account);
 
+      const jwt = createJwt(
+        { userId: account._id!.toString(), username: account.username },
+        this.config.jwt,
+      );
+
+      this.eventBus.produce({
+        name: EventName.ACCOUNT_CREATED,
+        accountId: account._id!.toString(),
+        accountName: account.username,
+        accountEmail: account.email,
+        token: jwt,
+      });
+
       this.logger.info('Account created', {
         id: account._id,
         username: account.username,
         email: account.email,
       });
 
-      return success(accountSummary, 201);
+      return success(accountSummary, StatusCodes.CREATED);
     } catch (error) {
       if (error instanceof MongoError && error.code === 11000) {
         return failure(StatusCodes.CONFLICT);
@@ -57,7 +74,7 @@ export class AccountService {
 
     const accountSummary = toAccountSummary(account);
 
-    return success(accountSummary);
+    return success(accountSummary, StatusCodes.OK);
   }
 
   async deleteAccount(id: string): Promise<Result<void>> {
