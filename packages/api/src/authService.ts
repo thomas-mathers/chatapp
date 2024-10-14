@@ -12,10 +12,14 @@ export class AuthService {
   constructor(private readonly apiClient: ApiClient) {}
 
   async login(loginRequest: LoginRequest): Promise<LoginResponse> {
-    return await this.apiClient.postJson<LoginResponse>(
+    const response = await this.apiClient.postJson<LoginResponse>(
       '/auth/login',
       loginRequest,
     );
+
+    this.apiClient.setJwt(response.jwt);
+
+    return response;
   }
 
   async changePassword(request: ChangePasswordRequest): Promise<void> {

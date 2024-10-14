@@ -3,7 +3,7 @@ import { Alert, Link, Stack, TextField, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { LoginResponse } from 'chatapp.account-service-contracts';
 import { Controller, useForm } from 'react-hook-form';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 import { useAuthService } from '@app/hooks';
 
@@ -13,6 +13,8 @@ interface LoginFormState {
 }
 
 export const LoginForm = () => {
+  const navigate = useNavigate();
+
   const { control, formState, handleSubmit } = useForm<LoginFormState>({
     defaultValues: {
       username: '',
@@ -28,6 +30,9 @@ export const LoginForm = () => {
     LoginFormState
   >({
     mutationFn: (data) => authService.login(data),
+    onSuccess: () => {
+      navigate('/dashboard');
+    },
   });
 
   const onSubmit = (data: LoginFormState) => {

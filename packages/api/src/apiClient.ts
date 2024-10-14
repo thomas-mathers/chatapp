@@ -1,14 +1,14 @@
 import { ApiError } from './apiError';
-import { JwtTokenService } from './jwtTokenService';
+import { JwtService } from './jwtService';
 
 export class ApiClient {
   constructor(
     private baseUrl: string,
-    private jwtTokenService: JwtTokenService,
+    private jwtTokenService: JwtService,
   ) {}
 
   async getJsonAuthorized<T>(path: string, signal?: AbortSignal): Promise<T> {
-    const jwt = this.jwtTokenService.getJwtToken();
+    const jwt = this.jwtTokenService.getJwt();
 
     if (!jwt) {
       throw new ApiError('No JWT token found');
@@ -63,7 +63,7 @@ export class ApiClient {
     data: unknown,
     signal?: AbortSignal,
   ): Promise<T> {
-    const jwt = this.jwtTokenService.getJwtToken();
+    const jwt = this.jwtTokenService.getJwt();
 
     if (!jwt) {
       throw new ApiError('No JWT token found');
@@ -125,7 +125,7 @@ export class ApiClient {
     data: unknown,
     signal?: AbortSignal,
   ): Promise<T> {
-    const jwt = this.jwtTokenService.getJwtToken();
+    const jwt = this.jwtTokenService.getJwt();
 
     if (!jwt) {
       throw new ApiError('No JWT token found');
@@ -183,7 +183,7 @@ export class ApiClient {
   }
 
   async deleteJsonAuthorized<T>(path: string): Promise<T> {
-    const jwt = this.jwtTokenService.getJwtToken();
+    const jwt = this.jwtTokenService.getJwt();
 
     if (!jwt) {
       throw new ApiError('No JWT token found');
@@ -226,5 +226,9 @@ export class ApiClient {
     const body = await response.json();
 
     return body as T;
+  }
+
+  setJwt(jwt: string): void {
+    this.jwtTokenService.setJwt(jwt);
   }
 }

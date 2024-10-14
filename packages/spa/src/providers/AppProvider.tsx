@@ -6,13 +6,14 @@ import {
   AccountService,
   ApiClient,
   AuthService,
-  JwtTokenService,
+  JwtService,
 } from 'chatapp.api';
 
 import { getConfig } from '@app/config';
 
 import { AccountServiceProvider } from './AccountServiceProvider';
 import { AuthServiceProvider } from './AuthServiceProvider';
+import { JwtServiceProvider } from './JwtServiceProvider';
 
 const config = getConfig();
 
@@ -35,7 +36,7 @@ const theme = createTheme({
 
 const queryClient = new QueryClient();
 
-const jwtTokenService = new JwtTokenService();
+const jwtTokenService = new JwtService();
 
 const accountServiceApiClient = new ApiClient(
   config.VITE_ACCOUNT_SERVICE_BASE_URL,
@@ -57,11 +58,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   return (
     <ThemeProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
-        <AccountServiceProvider value={accountService}>
-          <AuthServiceProvider value={authService}>
-            {children}
-          </AuthServiceProvider>
-        </AccountServiceProvider>
+        <JwtServiceProvider value={jwtTokenService}>
+          <AccountServiceProvider value={accountService}>
+            <AuthServiceProvider value={authService}>
+              {children}
+            </AuthServiceProvider>
+          </AccountServiceProvider>
+        </JwtServiceProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
