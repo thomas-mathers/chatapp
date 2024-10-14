@@ -1,7 +1,7 @@
 import { AuthService } from 'chatapp.api';
 import { useContext } from 'react';
 
-import { AuthServiceContext } from '../contexts/AuthServiceContext';
+import { AuthServiceContext } from '@app/contexts/AuthServiceContext';
 
 export const useAuthService = (): AuthService => {
   const authService = useContext(AuthServiceContext);

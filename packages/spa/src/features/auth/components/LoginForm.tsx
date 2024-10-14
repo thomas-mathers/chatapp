@@ -5,7 +5,7 @@ import { LoginResponse } from 'chatapp.account-service-contracts';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { useAuthService } from '../../../hooks/useAuthService';
+import { useAuthService } from '@app/hooks';
 
 interface LoginFormState {
   username: string;

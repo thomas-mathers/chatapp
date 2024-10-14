@@ -1,6 +1,12 @@
 import { LoadingButton } from '@mui/lab';
-import { Stack, TextField, Typography } from '@mui/material';
+import { Alert, Stack, TextField, Typography } from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
+import { PasswordResetRequest } from 'chatapp.account-service-contracts';
+import { ApiError } from 'chatapp.api';
 import { Controller, useForm } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
+
+import { useAuthService } from '@app/hooks';
 
 interface ResetPasswordFormState {
   newPassword: string;
@@ -8,6 +14,8 @@ interface ResetPasswordFormState {
 }
 
 export const ResetPasswordForm = () => {
+  const { token } = useParams<{ token: string }>();
+
   const { control, formState, handleSubmit } = useForm<ResetPasswordFormState>({
     defaultValues: {
       newPassword: '',
@@ -15,8 +23,18 @@ export const ResetPasswordForm = () => {
     },
   });
 
+  const authService = useAuthService();
+
+  const { mutate, isPending, error } = useMutation<
+    void,
+    ApiError,
+    PasswordResetRequest
+  >({
+    mutationFn: (data) => authService.resetPassword(data),
+  });
+
   const onSubmit = (data: ResetPasswordFormState) => {
-    console.log(data);
+    mutate({ newPassword: data.newPassword, token: token! });
   };
 
   return (
@@ -53,9 +71,10 @@ export const ResetPasswordForm = () => {
             />
           )}
         />
-        <LoadingButton type="submit" variant="contained">
+        <LoadingButton type="submit" variant="contained" loading={isPending}>
           Submit
         </LoadingButton>
+        {error && <Alert severity="error">{error.message}</Alert>}
       </Stack>
     </form>
   );

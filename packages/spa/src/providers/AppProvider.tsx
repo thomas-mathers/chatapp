@@ -9,7 +9,8 @@ import {
   JwtTokenService,
 } from 'chatapp.api';
 
-import { getConfig } from '../config';
+import { getConfig } from '@app/config';
+
 import { AccountServiceProvider } from './AccountServiceProvider';
 import { AuthServiceProvider } from './AuthServiceProvider';
 

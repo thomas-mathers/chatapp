@@ -1,9 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import { ForgotPasswordForm } from './features/auth/components/ForgotPasswordForm';
-import { LoginForm } from './features/auth/components/LoginForm';
-import { RegisterForm } from './features/auth/components/RegisterForm';
-import { ResetPasswordForm } from './features/auth/components/ResetPasswordForm';
+import {
+  ForgotPasswordForm,
+  LoginForm,
+  RegisterForm,
+  ResetPasswordForm,
+} from './features/auth';
 
 export const router = createBrowserRouter([
   {

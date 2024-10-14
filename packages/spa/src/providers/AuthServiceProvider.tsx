@@ -1,3 +1,3 @@
-import { AuthServiceContext } from '../contexts/AuthServiceContext';
+import { AuthServiceContext } from '@app/contexts/AuthServiceContext';
 
 export const AuthServiceProvider = AuthServiceContext.Provider;

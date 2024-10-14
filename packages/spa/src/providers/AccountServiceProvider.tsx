@@ -1,3 +1,3 @@
-import { AccountServiceContext } from '../contexts/AccountServiceContext';
+import { AccountServiceContext } from '@app/contexts/AccountServiceContext';
 
 export const AccountServiceProvider = AccountServiceContext.Provider;

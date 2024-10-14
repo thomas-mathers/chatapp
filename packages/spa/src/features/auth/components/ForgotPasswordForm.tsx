@@ -1,12 +1,12 @@
 import { LoadingButton } from '@mui/lab';
-import { Link, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Link, Stack, TextField, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { PasswordResetTokenRequest } from 'chatapp.account-service-contracts';
+import { ApiError } from 'chatapp.api';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { ApiError } from '../../../../../api/src/apiError';
-import { useAuthService } from '../../../hooks/useAuthService';
+import { useAuthService } from '@app/hooks';
 
 interface ForgotPasswordFormState {
   email: string;
@@ -23,7 +23,7 @@ export const ForgotPasswordForm = () => {
 
   const authService = useAuthService();
 
-  const { mutate, isPending } = useMutation<
+  const { mutate, isPending, error } = useMutation<
     void,
     ApiError,
     PasswordResetTokenRequest
@@ -58,6 +58,7 @@ export const ForgotPasswordForm = () => {
         <LoadingButton type="submit" loading={isPending} variant="contained">
           Submit
         </LoadingButton>
+        {error && <Alert severity="error">{error.message}</Alert>}
         <Typography variant="body2">
           Return to{' '}
           <Link component={RouterLink} to="/">
