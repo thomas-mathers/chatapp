@@ -7,7 +7,7 @@ import {
 } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api';
 import { Controller, useForm } from 'react-hook-form';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 import { useAccountService } from '@app/hooks';
 
@@ -19,6 +19,8 @@ interface RegisterFormState {
 }
 
 export const RegisterForm = () => {
+  const navigate = useNavigate();
+
   const { control, formState, handleSubmit } = useForm<RegisterFormState>({
     defaultValues: {
       email: '',
@@ -36,6 +38,9 @@ export const RegisterForm = () => {
     CreateAccountRequest
   >({
     mutationFn: (data) => accountService.createAccount(data),
+    onSuccess: () => {
+      navigate('/');
+    },
   });
 
   const onSubmit = (data: RegisterFormState) => {

@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { PasswordResetRequest } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api';
 import { Controller, useForm } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useAuthService } from '@app/hooks';
 
@@ -14,7 +14,11 @@ interface ResetPasswordFormState {
 }
 
 export const ResetPasswordForm = () => {
-  const { token } = useParams<{ token: string }>();
+  const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+
+  const token = searchParams.get('token');
 
   const { control, formState, handleSubmit } = useForm<ResetPasswordFormState>({
     defaultValues: {
@@ -31,6 +35,9 @@ export const ResetPasswordForm = () => {
     PasswordResetRequest
   >({
     mutationFn: (data) => authService.resetPassword(data),
+    onSuccess: () => {
+      navigate('/');
+    },
   });
 
   const onSubmit = (data: ResetPasswordFormState) => {
