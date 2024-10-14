@@ -1,6 +1,9 @@
 import { Button, Link, Stack, TextField, Typography } from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
+
+import { useAuthService } from '../../../hooks/useAuthService';
 
 interface ForgotPasswordFormState {
   email: string;
@@ -15,8 +18,14 @@ export const ForgotPasswordForm = () => {
     },
   );
 
+  const authService = useAuthService();
+
+  const { mutate } = useMutation({
+    mutationFn: authService.forgotPassword,
+  });
+
   const onSubmit = (data: ForgotPasswordFormState) => {
-    console.log(data);
+    mutate(data);
   };
 
   return (

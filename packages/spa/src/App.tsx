@@ -1,19 +1,19 @@
-import { Container, CssBaseline, ThemeProvider } from '@mui/material';
+import { Container, CssBaseline } from '@mui/material';
 import { RouterProvider } from 'react-router-dom';
 
+import { AppProvider } from './providers/AppProvider';
 import { router } from './router';
-import { theme } from './theme';
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <AppProvider>
       <>
         <CssBaseline />
         <Container maxWidth="xs" sx={{ paddingTop: 2 }}>
           <RouterProvider router={router} />
         </Container>
       </>
-    </ThemeProvider>
+    </AppProvider>
   );
 }
 

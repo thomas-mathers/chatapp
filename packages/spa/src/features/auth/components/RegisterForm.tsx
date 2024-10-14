@@ -1,6 +1,9 @@
 import { Button, Link, Stack, TextField, Typography } from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
+
+import { useAccountService } from '../../../hooks/useAccountService';
 
 interface RegisterFormState {
   email: string;
@@ -19,8 +22,14 @@ export const RegisterForm = () => {
     },
   });
 
+  const accountService = useAccountService();
+
+  const { mutate } = useMutation({
+    mutationFn: accountService.createAccount,
+  });
+
   const onSubmit = (data: RegisterFormState) => {
-    console.log(data);
+    mutate(data);
   };
 
   return (

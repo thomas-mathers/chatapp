@@ -1,22 +1,37 @@
-import { Button, Link, Stack, TextField, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Alert, Link, Stack, TextField, Typography } from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
+import { LoginResponse } from 'chatapp.account-service-contracts';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 
+import { useAuthService } from '../../../hooks/useAuthService';
+
 interface LoginFormState {
-  email: string;
+  username: string;
   password: string;
 }
 
 export const LoginForm = () => {
   const { control, formState, handleSubmit } = useForm<LoginFormState>({
     defaultValues: {
-      email: '',
+      username: '',
       password: '',
     },
   });
 
+  const authService = useAuthService();
+
+  const { mutate, isPending, error } = useMutation<
+    LoginResponse,
+    Error,
+    LoginFormState
+  >({
+    mutationFn: (data) => authService.login(data),
+  });
+
   const onSubmit = (data: LoginFormState) => {
-    console.log(data);
+    mutate(data);
   };
 
   return (
@@ -26,16 +41,16 @@ export const LoginForm = () => {
           Login
         </Typography>
         <Controller
-          name="email"
+          name="username"
           control={control}
-          rules={{ required: 'Email is required' }}
+          rules={{ required: 'Username is required' }}
           render={({ field }) => (
             <TextField
               {...field}
               type="text"
-              label="Email"
-              helperText={formState.errors.email?.message}
-              error={Boolean(formState.errors.email)}
+              label="Username"
+              helperText={formState.errors.username?.message}
+              error={Boolean(formState.errors.username)}
             />
           )}
         />
@@ -56,9 +71,10 @@ export const LoginForm = () => {
         <Link component={RouterLink} to="/forgot-password">
           <Typography variant="body2">Forgot Password?</Typography>
         </Link>
-        <Button type="submit" variant="contained" color="primary">
+        <LoadingButton type="submit" loading={isPending} variant="contained">
           Login
-        </Button>
+        </LoadingButton>
+        {error && <Alert severity="error">{error.message}</Alert>}
         <Typography variant="body2">
           Don't have an account?{' '}
           <Link component={RouterLink} to="/register">

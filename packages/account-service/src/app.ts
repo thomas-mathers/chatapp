@@ -2,6 +2,7 @@ import bodyParser from 'body-parser';
 import { EventBus } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
 import { handleErrorMiddleware } from 'chatapp.middlewares';
+import cors from 'cors';
 import express from 'express';
 import { Server } from 'http';
 import { Db, MongoClient } from 'mongodb';
@@ -80,6 +81,7 @@ export class App {
     const authController = new AuthController(config, authService);
 
     const httpServer = express()
+      .use(cors())
       .use(bodyParser.json())
       .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
       .use('/accounts', accountController.router)
