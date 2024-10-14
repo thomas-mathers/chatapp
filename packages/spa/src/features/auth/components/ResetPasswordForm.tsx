@@ -1,4 +1,5 @@
-import { Button, Stack, TextField, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Stack, TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 
 interface ResetPasswordFormState {
@@ -52,9 +53,9 @@ export const ResetPasswordForm = () => {
             />
           )}
         />
-        <Button type="submit" variant="contained" color="primary">
+        <LoadingButton type="submit" variant="contained">
           Submit
-        </Button>
+        </LoadingButton>
       </Stack>
     </form>
   );

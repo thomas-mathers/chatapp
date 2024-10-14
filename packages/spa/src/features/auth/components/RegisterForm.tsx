@@ -1,8 +1,14 @@
-import { Button, Link, Stack, TextField, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import { Link, Stack, TextField, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
+import {
+  AccountSummary,
+  CreateAccountRequest,
+} from 'chatapp.account-service-contracts';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 
+import { ApiError } from '../../../../../api/src/apiError';
 import { useAccountService } from '../../../hooks/useAccountService';
 
 interface RegisterFormState {
@@ -24,8 +30,12 @@ export const RegisterForm = () => {
 
   const accountService = useAccountService();
 
-  const { mutate } = useMutation({
-    mutationFn: accountService.createAccount,
+  const { mutate, isPending } = useMutation<
+    AccountSummary,
+    ApiError,
+    CreateAccountRequest
+  >({
+    mutationFn: (data) => accountService.createAccount(data),
   });
 
   const onSubmit = (data: RegisterFormState) => {
@@ -96,9 +106,9 @@ export const RegisterForm = () => {
             />
           )}
         />
-        <Button type="submit" variant="contained" color="primary">
+        <LoadingButton type="submit" loading={isPending} variant="contained">
           Submit
-        </Button>
+        </LoadingButton>
         <Typography variant="body2">
           Already have an account?{' '}
           <Link component={RouterLink} to="/">
