@@ -4,8 +4,14 @@
   "private": true,
   "scripts": {
     "start": "tsx src/index.ts",
-    "lint": "eslint . --config ../../eslint.config.mjs",
-    "format": "prettier --config ../../.prettierrc --write ."
+    "lint": "eslint --config ../../eslint.config.mjs .",
+    "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
+    "format": "prettier --config ../../.prettierrc --check .",
+    "format:fix": "prettier --config ../../.prettierrc --write .",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.mts",
+    "test:watch": "vitest --config vitest.config.mts",
+    "test:coverage": "vitest --config vitest.config.mts --coverage --ws run"
   },
   "dependencies": {
     "chatapp.event-sourcing": "1.0.0",

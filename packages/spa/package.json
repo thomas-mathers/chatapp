@@ -6,8 +6,15 @@
   "scripts": {
     "start": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint --config ../../eslint.config.mjs .",
+    "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
+    "format": "prettier --config ../../.prettierrc --check .",
+    "format:fix": "prettier --config ../../.prettierrc --write .",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.mts",
+    "test:watch": "vitest --config vitest.config.mts",
+    "test:coverage": "vitest --config vitest.config.mts --coverage --ws run"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",

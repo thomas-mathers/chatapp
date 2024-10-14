@@ -3,8 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "lint": "eslint . --config ../../eslint.config.mjs",
-    "format": "prettier --config ../../.prettierrc --write ."
+    "start": "tsx src/index.ts",
+    "lint": "eslint --config ../../eslint.config.mjs .",
+    "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
+    "format": "prettier --config ../../.prettierrc --check .",
+    "format:fix": "prettier --config ../../.prettierrc --write .",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.mts",
+    "test:watch": "vitest --config vitest.config.mts",
+    "test:coverage": "vitest --config vitest.config.mts --coverage --ws run"
   },
   "dependencies": {
     "winston": "^3.15.0"
