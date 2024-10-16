@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import { ProtectedRoute } from './components/ProtectedRoute';
+import { ProtectedRoute } from './components/protectedRoute';
 import {
   ChangePasswordForm,
   ForgotPasswordForm,
@@ -8,7 +8,8 @@ import {
   RegisterForm,
   ResetPasswordForm,
 } from './features/auth';
-import { ConfirmEmail } from './features/auth/components/ConfirmEmail';
+import { ConfirmEmail } from './features/auth/components/confirmEmail';
+import { Dashboard } from './features/dashboard/components/dashboard';
 
 export const router = createBrowserRouter([
   {
@@ -40,7 +41,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/dashboard',
-        element: <div>Dashboard</div>,
+        element: <Dashboard />,
       },
     ],
   },

@@ -1,7 +1,7 @@
-import { Container, CssBaseline } from '@mui/material';
+import { CssBaseline } from '@mui/material';
 import { RouterProvider } from 'react-router-dom';
 
-import { AppProvider } from './providers/AppProvider';
+import { AppProvider } from './providers/appProvider';
 import { router } from './router';
 
 function App() {
@@ -9,9 +9,7 @@ function App() {
     <AppProvider>
       <>
         <CssBaseline />
-        <Container maxWidth="xs" sx={{ paddingTop: 2 }}>
-          <RouterProvider router={router} />
-        </Container>
+        <RouterProvider router={router} />
       </>
     </AppProvider>
   );

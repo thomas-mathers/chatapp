@@ -11,9 +11,9 @@ import {
 
 import { getConfig } from '@app/config';
 
-import { AccountServiceProvider } from './AccountServiceProvider';
-import { AuthServiceProvider } from './AuthServiceProvider';
-import { JwtServiceProvider } from './JwtServiceProvider';
+import { AccountServiceProvider } from './accountServiceProvider';
+import { AuthServiceProvider } from './authServiceProvider';
+import { JwtServiceProvider } from './jwtServiceProvider';
 
 const config = getConfig();
 
@@ -40,15 +40,14 @@ const jwtTokenService = new JwtService();
 
 const accountServiceApiClient = new ApiClient(
   config.VITE_ACCOUNT_SERVICE_BASE_URL,
+);
+const accountService = new AccountService(
+  accountServiceApiClient,
   jwtTokenService,
 );
-const accountService = new AccountService(accountServiceApiClient);
 
-const authServiceApiClient = new ApiClient(
-  config.VITE_AUTH_SERVICE_BASE_URL,
-  jwtTokenService,
-);
-const authService = new AuthService(authServiceApiClient);
+const authServiceApiClient = new ApiClient(config.VITE_AUTH_SERVICE_BASE_URL);
+const authService = new AuthService(authServiceApiClient, jwtTokenService);
 
 interface AppProviderProps {
   children: React.ReactNode;

@@ -1,7 +1,7 @@
 import { JwtService } from 'chatapp.api';
 import { useContext } from 'react';
 
-import { JwtServiceContext } from '@app/contexts/JwtServiceContext';
+import { JwtServiceContext } from '@app/contexts/jwtServiceContext';
 
 export const useJwtService = (): JwtService => {
   const jwtService = useContext(JwtServiceContext);

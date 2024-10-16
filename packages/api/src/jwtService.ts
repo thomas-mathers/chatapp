@@ -6,4 +6,8 @@ export class JwtService {
   setJwt(token: string): void {
     localStorage.setItem('jwt', token);
   }
+
+  clearJwt(): void {
+    localStorage.removeItem('jwt');
+  }
 }

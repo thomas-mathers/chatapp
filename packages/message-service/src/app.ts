@@ -6,12 +6,13 @@ import {
   handleAuthMiddleware,
   handleErrorMiddleware,
 } from 'chatapp.middlewares';
+import cors from 'cors';
 import express from 'express';
 import { IncomingMessage, Server } from 'http';
 import { Db, MongoClient } from 'mongodb';
-import internal from 'stream';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import { parse } from 'url';
 import { WebSocketServer } from 'ws';
 
 import { Config } from './config';
@@ -42,53 +43,39 @@ const swaggerDoc = swaggerJsdoc({
 });
 
 function getAuthorizationToken(request: IncomingMessage): string | undefined {
-  const authorizationSegments = request.headers.authorization?.split(' ') ?? [];
+  const { query } = parse(request.url!, true);
+  const token = query.token;
 
-  if (
-    authorizationSegments.length !== 2 ||
-    authorizationSegments[0] !== 'Bearer'
-  ) {
-    return undefined;
+  if (typeof token === 'string') {
+    return token;
   }
 
-  return authorizationSegments[1];
+  return undefined;
 }
 
-function handleUpgrade(config: Config, webSocketServer: WebSocketServer) {
-  return (request: IncomingMessage, socket: internal.Duplex, head: Buffer) => {
+function launchWebSocketServer(
+  config: Config,
+  logger: Logger,
+  messageService: MessageService,
+): WebSocketServer {
+  const webSocketServer = new WebSocketServer({ port: 3002 });
+
+  webSocketServer.on('connection', (webSocket, request) => {
+    logger.info(`${request.socket.remoteAddress} connected`);
+
     const token = getAuthorizationToken(request);
 
     if (token === undefined) {
-      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-      socket.destroy();
+      webSocket.close();
       return;
     }
 
     const userCredentials = verifyJwt(token, config.jwt);
 
     if (userCredentials === undefined) {
-      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-      socket.destroy();
+      webSocket.close();
       return;
     }
-
-    request.accountId = userCredentials.userId;
-    request.accountUsername = userCredentials.username;
-
-    webSocketServer.handleUpgrade(request, socket, head, (webSocket) => {
-      webSocketServer.emit('connection', webSocket, request);
-    });
-  };
-}
-
-function launchWebSocketServer(
-  logger: Logger,
-  messageService: MessageService,
-): WebSocketServer {
-  const webSocketServer = new WebSocketServer({ noServer: true });
-
-  webSocketServer.on('connection', (webSocket, request) => {
-    logger.info(`${request.accountUsername} connected`);
 
     webSocket.on('message', async (payload) => {
       try {
@@ -97,8 +84,8 @@ function launchWebSocketServer(
         );
 
         const message = await messageService.createMessage(
-          request.accountId,
-          request.accountUsername,
+          userCredentials.userId,
+          userCredentials.username,
           createMessageRequest.content,
         );
 
@@ -107,10 +94,9 @@ function launchWebSocketServer(
         });
       } catch (error) {
         logger.error(
-          `Exception while processing message from ${request.accountId}`,
+          `Exception while processing message from ${userCredentials.userId}`,
           {
-            accountId: request.accountId,
-            accountUsername: request.accountUsername,
+            userCredentials,
             error,
           },
         );
@@ -118,7 +104,7 @@ function launchWebSocketServer(
     });
 
     webSocket.on('close', () => {
-      logger.info(`${request.accountUsername} disconnected`);
+      logger.info(`${userCredentials.username} disconnected`);
     });
   });
 
@@ -152,9 +138,14 @@ export class App {
     const messageService = new MessageService(messageRepository);
     const messageController = new MessageController(messageService);
 
-    const webSocketServer = launchWebSocketServer(logger, messageService);
+    const webSocketServer = launchWebSocketServer(
+      config,
+      logger,
+      messageService,
+    );
 
     const httpServer = express()
+      .use(cors())
       .use(bodyParser.json())
       .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
       .use(handleAuthMiddleware(config.jwt))
@@ -162,8 +153,7 @@ export class App {
       .use(handleErrorMiddleware)
       .listen(config.port, () => {
         logger.info(`Server is running on port ${config.port}`);
-      })
-      .on('upgrade', handleUpgrade(config, webSocketServer));
+      });
 
     return new App(
       logger,

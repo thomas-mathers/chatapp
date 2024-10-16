@@ -8,9 +8,13 @@ import {
 } from 'chatapp.account-service-contracts';
 
 import { ApiClient } from './apiClient';
+import { JwtService } from './jwtService';
 
 export class AuthService {
-  constructor(private readonly apiClient: ApiClient) {}
+  constructor(
+    private readonly apiClient: ApiClient,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async login(loginRequest: LoginRequest): Promise<LoginResponse> {
     const response = await this.apiClient.postJson<LoginResponse>(
@@ -18,16 +22,19 @@ export class AuthService {
       loginRequest,
     );
 
-    this.apiClient.setJwt(response.jwt);
+    this.jwtService.setJwt(response.jwt);
 
     return response;
   }
 
+  async logout(): Promise<void> {
+    this.jwtService.clearJwt();
+  }
+
   async changePassword(request: ChangePasswordRequest): Promise<void> {
-    return await this.apiClient.putJsonAuthorized<void>(
-      '/auth/me/password',
-      request,
-    );
+    return await this.apiClient.putJson<void>('/auth/me/password', request, {
+      Authorization: `Bearer ${this.jwtService.getJwt()}`,
+    });
   }
 
   async forgotPassword(request: PasswordResetTokenRequest): Promise<void> {

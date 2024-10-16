@@ -1,33 +1,13 @@
 import { ApiError } from './apiError';
-import { JwtService } from './jwtService';
 
 export class ApiClient {
-  constructor(
-    private baseUrl: string,
-    private jwtTokenService: JwtService,
-  ) {}
-
-  async getJsonAuthorized<T>(path: string): Promise<T> {
-    const jwt = this.getJwtToken();
-
-    return await this.getJson<T>(path, {
-      Authorization: `Bearer ${jwt}`,
-    });
-  }
+  constructor(private baseUrl: string) {}
 
   async getJson<T>(
     path: string,
     additionalHeaders: Record<string, string> = {},
   ): Promise<T> {
     return await this.request<T>('GET', path, additionalHeaders);
-  }
-
-  async postJsonAuthorized<T>(path: string, data: unknown): Promise<T> {
-    const jwt = this.getJwtToken();
-
-    return await this.postJson<T>(path, data, {
-      Authorization: `Bearer ${jwt}`,
-    });
   }
 
   async postJson<T>(
@@ -38,14 +18,6 @@ export class ApiClient {
     return await this.request<T>('POST', path, additionalHeaders, data);
   }
 
-  async putJsonAuthorized<T>(path: string, data: unknown): Promise<T> {
-    const jwt = this.getJwtToken();
-
-    return await this.putJson<T>(path, data, {
-      Authorization: `Bearer ${jwt}`,
-    });
-  }
-
   async putJson<T>(
     path: string,
     data: unknown,
@@ -54,23 +26,11 @@ export class ApiClient {
     return await this.request<T>('PUT', path, additionalHeaders, data);
   }
 
-  async deleteJsonAuthorized<T>(path: string): Promise<T> {
-    const jwt = this.getJwtToken();
-
-    return await this.deleteJson<T>(path, {
-      Authorization: `Bearer ${jwt}`,
-    });
-  }
-
   async deleteJson<T>(
     path: string,
     additionalHeaders: Record<string, string> = {},
   ): Promise<T> {
     return await this.request<T>('DELETE', path, additionalHeaders);
-  }
-
-  setJwt(jwt: string): void {
-    this.jwtTokenService.setJwt(jwt);
   }
 
   private async request<T>(
@@ -115,15 +75,5 @@ export class ApiClient {
     const responseBody = await response.json();
 
     return responseBody as T;
-  }
-
-  private getJwtToken(): string {
-    const jwt = this.jwtTokenService.getJwt();
-
-    if (!jwt) {
-      throw new ApiError('No JWT token found');
-    }
-
-    return jwt;
   }
 }

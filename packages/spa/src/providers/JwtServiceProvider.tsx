@@ -1,3 +1,3 @@
-import { JwtServiceContext } from '@app/contexts/JwtServiceContext';
+import { JwtServiceContext } from '@app/contexts/jwtServiceContext';
 
 export const JwtServiceProvider = JwtServiceContext.Provider;
