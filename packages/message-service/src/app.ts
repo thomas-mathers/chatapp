@@ -174,7 +174,7 @@ export class App {
     await this.closeMongoClient();
   }
 
-  private async closeHttpServer() {
+  private closeHttpServer(): Promise<void> {
     return new Promise<void>((resolve) => {
       this._httpServer.close(() => {
         this._logger.info('HTTP server closed');

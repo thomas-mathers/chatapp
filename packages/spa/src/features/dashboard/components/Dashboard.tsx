@@ -92,6 +92,7 @@ const Body = () => {
         flexGrow: 1,
         padding: 2,
         gap: 2,
+        overflow: 'hidden',
       }}
     >
       <MessageList />
