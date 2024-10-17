@@ -53,7 +53,7 @@ export const MessageList = () => {
   }, [realtimeMessageService]);
 
   return (
-    <Stack sx={{ flexGrow: 1, gap: 2 }}>
+    <Stack sx={{ flexGrow: 1, gap: 2, overflowY: 'auto' }}>
       {hasNextPage && (
         <Link component="button" onClick={() => fetchNextPage()}>
           Load More
