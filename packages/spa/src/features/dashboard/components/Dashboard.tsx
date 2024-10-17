@@ -1,32 +1,26 @@
 import { AccountCircle } from '@mui/icons-material';
-import SendIcon from '@mui/icons-material/Send';
 import {
   AppBar,
   Box,
-  Button,
   CircularProgress,
   IconButton,
   Menu,
   MenuItem,
   Stack,
-  TextField,
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import {
-  MessageSummary,
-  SortDirection,
-} from 'chatapp.message-service-contracts';
-import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuthService } from '@app/hooks';
 import { useJwtService } from '@app/hooks/useJwtService';
-import { useMessageService } from '@app/hooks/useMessageService';
-import { useRealtimeMessageService } from '@app/hooks/useRealtimeMessageService';
 import { RealtimeMessageServiceProvider } from '@app/providers/realtimeMessageServiceProvider';
 import { RealtimeMessageService } from '@app/services/realtimeMessageService';
+
+import { MessageInput } from './messageInput';
+import { MessageList } from './messageList';
 
 const Header = () => {
   const menuId = 'primary-search-account-menu';
@@ -88,97 +82,6 @@ const Header = () => {
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </Box>
-  );
-};
-
-const Message = ({ message }: { message: MessageSummary }) => {
-  return (
-    <Typography>
-      {message.accountUsername}: {message.content}
-    </Typography>
-  );
-};
-
-const MessageList = () => {
-  const messageService = useMessageService();
-
-  const {
-    data: oldMessagesStream,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-  } = useInfiniteQuery({
-    queryKey: ['messages'],
-    queryFn: async ({ pageParam: page }) => {
-      return await messageService.getMessages({
-        page,
-        pageSize: 10,
-        sortBy: 'dateCreated',
-        sortDirection: SortDirection.Desc,
-      });
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) =>
-      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
-  });
-
-  const oldMessages = useMemo(() => {
-    return oldMessagesStream?.pages.flatMap((page) => page.records) ?? [];
-  }, [oldMessagesStream]);
-
-  const [newMessages, setNewMessages] = useState<MessageSummary[]>([]);
-
-  const realtimeMessageService = useRealtimeMessageService();
-
-  useEffect(() => {
-    const subscription = realtimeMessageService.subscribe((message) => {
-      setNewMessages((prevMessages) => [...prevMessages, message]);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [realtimeMessageService]);
-
-  return (
-    <Stack sx={{ flexGrow: 1, gap: 2 }}>
-      {hasNextPage && (
-        <Button onClick={() => fetchNextPage()}>Load More</Button>
-      )}
-      {isFetching && <CircularProgress />}
-      {oldMessages.map((message, index) => (
-        <Message key={index} message={message} />
-      ))}
-      {newMessages.map((message, index) => (
-        <Message key={index} message={message} />
-      ))}
-    </Stack>
-  );
-};
-
-const MessageInput = () => {
-  const [message, setMessage] = useState('');
-
-  const realtimeMessageService = useRealtimeMessageService();
-
-  const handleSend = () => {
-    realtimeMessageService.send({
-      content: message,
-    });
-    setMessage('');
-  };
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(event.target.value);
-  };
-
-  return (
-    <Stack direction="row" alignItems="center" gap={2}>
-      <TextField sx={{ flexGrow: 1 }} value={message} onChange={handleChange} />
-      <IconButton color="primary" onClick={handleSend}>
-        <SendIcon />
-      </IconButton>
-    </Stack>
   );
 };
 
