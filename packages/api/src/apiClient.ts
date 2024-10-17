@@ -52,7 +52,7 @@ export class ApiClient {
     }
 
     if (!response.ok) {
-      throw new ApiError(response.statusText);
+      throw new ApiError(response.statusText, response.status);
     }
 
     if (response.status === 204) {

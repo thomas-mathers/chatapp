@@ -19,33 +19,28 @@ export class MessageService {
     sortBy,
     sortDirection,
   }: GetMessagesRequest): Promise<Page<MessageSummary>> {
-    try {
-      const queryParameters: Record<string, string> = {};
+    const queryParameters: Record<string, string> = {};
 
-      if (page) {
-        queryParameters['page'] = page.toString();
-      }
-      if (pageSize) {
-        queryParameters['pageSize'] = pageSize.toString();
-      }
-      if (sortBy) {
-        queryParameters['sortBy'] = sortBy;
-      }
-      if (sortDirection) {
-        queryParameters['sortDirection'] = sortDirection;
-      }
-
-      return await this.apiClient.requestJson<Page<MessageSummary>>({
-        method: 'GET',
-        path: '/messages',
-        queryParameters,
-        headers: {
-          Authorization: `Bearer ${this.jwtService.get()}`,
-        },
-      });
-    } catch (error) {
-      console.error(error);
-      throw error;
+    if (page) {
+      queryParameters['page'] = page.toString();
     }
+    if (pageSize) {
+      queryParameters['pageSize'] = pageSize.toString();
+    }
+    if (sortBy) {
+      queryParameters['sortBy'] = sortBy;
+    }
+    if (sortDirection) {
+      queryParameters['sortDirection'] = sortDirection;
+    }
+
+    return await this.apiClient.requestJson<Page<MessageSummary>>({
+      method: 'GET',
+      path: '/messages',
+      queryParameters,
+      headers: {
+        Authorization: `Bearer ${this.jwtService.get()}`,
+      },
+    });
   }
 }
