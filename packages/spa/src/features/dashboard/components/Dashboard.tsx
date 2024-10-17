@@ -113,7 +113,7 @@ const LoadingScreen = () => {
 export const Dashboard = () => {
   const jwtService = useJwtService();
 
-  const token = jwtService.getJwt();
+  const token = jwtService.get();
 
   const { data: realtimeMessageService } = useQuery({
     queryKey: ['realtimeMessageService'],

@@ -6,11 +6,11 @@ import {
   AccountService,
   ApiClient,
   AuthService,
-  JwtService,
   MessageService,
 } from 'chatapp.api';
 
 import { getConfig } from '@app/config';
+import { LocalStorageJwtService } from '@app/services/localStorageJwtService';
 
 import { AccountServiceProvider } from './accountServiceProvider';
 import { AuthServiceProvider } from './authServiceProvider';
@@ -38,7 +38,7 @@ const theme = createTheme({
 
 const queryClient = new QueryClient();
 
-const jwtTokenService = new JwtService();
+const jwtTokenService = new LocalStorageJwtService();
 
 const accountServiceApiClient = new ApiClient(
   config.VITE_ACCOUNT_SERVICE_BASE_URL,

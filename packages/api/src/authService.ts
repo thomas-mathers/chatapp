@@ -23,13 +23,13 @@ export class AuthService {
       body,
     });
 
-    this.jwtService.setJwt(response.jwt);
+    this.jwtService.set(response.jwt);
 
     return response;
   }
 
   async logout(): Promise<void> {
-    this.jwtService.clearJwt();
+    this.jwtService.remove();
   }
 
   async changePassword(body: ChangePasswordRequest): Promise<void> {
@@ -37,7 +37,7 @@ export class AuthService {
       method: 'PUT',
       path: '/auth/me/password',
       headers: {
-        Authorization: `Bearer ${this.jwtService.getJwt()}`,
+        Authorization: `Bearer ${this.jwtService.get()}`,
       },
       body,
     });

@@ -25,7 +25,7 @@ export class AccountService {
       method: 'GET',
       path: '/accounts/me',
       headers: {
-        Authorization: `Bearer ${this.jwtService.getJwt()}`,
+        Authorization: `Bearer ${this.jwtService.get()}`,
       },
     });
   }
@@ -35,7 +35,7 @@ export class AccountService {
       method: 'DELETE',
       path: '/accounts/me',
       headers: {
-        Authorization: `Bearer ${this.jwtService.getJwt()}`,
+        Authorization: `Bearer ${this.jwtService.get()}`,
       },
     });
   }

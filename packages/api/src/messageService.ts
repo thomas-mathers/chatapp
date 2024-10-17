@@ -40,7 +40,7 @@ export class MessageService {
         path: '/messages',
         queryParameters,
         headers: {
-          Authorization: `Bearer ${this.jwtService.getJwt()}`,
+          Authorization: `Bearer ${this.jwtService.get()}`,
         },
       });
     } catch (error) {
