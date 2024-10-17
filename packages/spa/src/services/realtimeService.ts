@@ -3,19 +3,19 @@ import {
   MessageSummary,
 } from 'chatapp.message-service-contracts';
 
-interface RealtimeMessageServiceSubscription {
+interface RealtimeServiceSubscription {
   unsubscribe: () => void;
 }
 
-export class RealtimeMessageService {
+export class RealtimeService {
   private constructor(private readonly socket: WebSocket) {}
 
-  public static create(url: string): Promise<RealtimeMessageService> {
+  public static create(url: string): Promise<RealtimeService> {
     return new Promise((resolve, reject) => {
       const socket = new WebSocket(url);
 
       socket.onopen = () => {
-        resolve(new RealtimeMessageService(socket));
+        resolve(new RealtimeService(socket));
       };
 
       socket.onerror = (error) => {
@@ -30,7 +30,7 @@ export class RealtimeMessageService {
 
   public subscribe(
     onMessageReceived: (message: MessageSummary) => void,
-  ): RealtimeMessageServiceSubscription {
+  ): RealtimeServiceSubscription {
     const handler = (event: MessageEvent) => {
       onMessageReceived(JSON.parse(event.data));
     };

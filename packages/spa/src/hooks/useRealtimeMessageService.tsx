@@ -1,12 +1,12 @@
 import { useContext } from 'react';
 
-import { RealtimeMessageServiceContext } from '@app/contexts/realtimeMessageServiceContext';
-import { RealtimeMessageService } from '@app/services/realtimeMessageService';
+import { RealtimeServiceContext } from '@app/contexts/realtimeServiceContext';
+import { RealtimeService } from '@app/services/realtimeService';
 
-export const useRealtimeMessageService = (): RealtimeMessageService => {
-  const realtimeMessageService = useContext(RealtimeMessageServiceContext);
+export const useRealtimeService = (): RealtimeService => {
+  const realtimeMessageService = useContext(RealtimeServiceContext);
   if (!realtimeMessageService) {
-    throw new Error('AccountService not found');
+    throw new Error('RealtimeService not found');
   }
   return realtimeMessageService;
 };

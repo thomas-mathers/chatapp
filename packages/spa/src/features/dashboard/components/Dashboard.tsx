@@ -16,8 +16,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { useAuthService } from '@app/hooks';
 import { useJwtService } from '@app/hooks/useJwtService';
-import { RealtimeMessageServiceProvider } from '@app/providers/realtimeMessageServiceProvider';
-import { RealtimeMessageService } from '@app/services/realtimeMessageService';
+import { RealtimeServiceProvider } from '@app/providers/realtimeServiceProvider';
+import { RealtimeService } from '@app/services/realtimeService';
 
 import { MessageInput } from './messageInput';
 import { MessageList } from './messageList';
@@ -118,7 +118,7 @@ export const Dashboard = () => {
   const { data: realtimeMessageService } = useQuery({
     queryKey: ['realtimeMessageService'],
     queryFn: () =>
-      RealtimeMessageService.create(
+      RealtimeService.create(
         `${import.meta.env.VITE_REALTIME_MESSAGE_SERVICE_BASE_URL}?token=${token}`,
       ),
     enabled: Boolean(token),
@@ -129,11 +129,11 @@ export const Dashboard = () => {
   }
 
   return (
-    <RealtimeMessageServiceProvider value={realtimeMessageService}>
+    <RealtimeServiceProvider value={realtimeMessageService}>
       <Stack sx={{ height: '100%' }}>
         <Header />
         <Body />
       </Stack>
-    </RealtimeMessageServiceProvider>
+    </RealtimeServiceProvider>
   );
 };

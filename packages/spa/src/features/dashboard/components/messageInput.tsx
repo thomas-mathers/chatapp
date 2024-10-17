@@ -2,12 +2,12 @@ import SendIcon from '@mui/icons-material/Send';
 import { IconButton, Stack, TextField } from '@mui/material';
 import { useState } from 'react';
 
-import { useRealtimeMessageService } from '@app/hooks/useRealtimeMessageService';
+import { useRealtimeService } from '@app/hooks/useRealtimeMessageService';
 
 export const MessageInput = () => {
   const [message, setMessage] = useState('');
 
-  const realtimeMessageService = useRealtimeMessageService();
+  const realtimeMessageService = useRealtimeService();
 
   const handleSend = () => {
     realtimeMessageService.send({

@@ -5,7 +5,7 @@ import { MessageSummary } from 'chatapp.message-service-contracts';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useMessageService } from '@app/hooks/useMessageService';
-import { useRealtimeMessageService } from '@app/hooks/useRealtimeMessageService';
+import { useRealtimeService } from '@app/hooks/useRealtimeMessageService';
 
 import { Message } from './message';
 
@@ -40,7 +40,7 @@ export const MessageList = () => {
 
   const [newMessages, setNewMessages] = useState<MessageSummary[]>([]);
 
-  const realtimeMessageService = useRealtimeMessageService();
+  const realtimeMessageService = useRealtimeService();
 
   useEffect(() => {
     const subscription = realtimeMessageService.subscribe((message) => {
