@@ -5,7 +5,7 @@ import { MessageSummary } from 'chatapp.message-service-contracts';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useMessageService } from '@app/hooks/useMessageService';
-import { useRealtimeService } from '@app/hooks/useRealtimeMessageService';
+import { useRealtimeService } from '@app/hooks/useRealtimeService';
 
 import { Message } from './message';
 
