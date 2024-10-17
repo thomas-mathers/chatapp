@@ -3,6 +3,7 @@ import SendIcon from '@mui/icons-material/Send';
 import {
   AppBar,
   Box,
+  Button,
   CircularProgress,
   IconButton,
   Menu,
@@ -12,13 +13,17 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
-import { MessageSummary } from 'chatapp.message-service-contracts';
-import { useEffect, useState } from 'react';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import {
+  MessageSummary,
+  SortDirection,
+} from 'chatapp.message-service-contracts';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuthService } from '@app/hooks';
 import { useJwtService } from '@app/hooks/useJwtService';
+import { useMessageService } from '@app/hooks/useMessageService';
 import { useRealtimeMessageService } from '@app/hooks/useRealtimeMessageService';
 import { RealtimeMessageServiceProvider } from '@app/providers/realtimeMessageServiceProvider';
 import { RealtimeMessageService } from '@app/services/realtimeMessageService';
@@ -86,14 +91,48 @@ const Header = () => {
   );
 };
 
+const Message = ({ message }: { message: MessageSummary }) => {
+  return (
+    <Typography>
+      {message.accountUsername}: {message.content}
+    </Typography>
+  );
+};
+
 const MessageList = () => {
-  const [messages, setMessages] = useState<MessageSummary[]>([]);
+  const messageService = useMessageService();
+
+  const {
+    data: oldMessagesStream,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+  } = useInfiniteQuery({
+    queryKey: ['messages'],
+    queryFn: async ({ pageParam: page }) => {
+      return await messageService.getMessages({
+        page,
+        pageSize: 10,
+        sortBy: 'dateCreated',
+        sortDirection: SortDirection.Desc,
+      });
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+  });
+
+  const oldMessages = useMemo(() => {
+    return oldMessagesStream?.pages.flatMap((page) => page.records) ?? [];
+  }, [oldMessagesStream]);
+
+  const [newMessages, setNewMessages] = useState<MessageSummary[]>([]);
 
   const realtimeMessageService = useRealtimeMessageService();
 
   useEffect(() => {
     const subscription = realtimeMessageService.subscribe((message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+      setNewMessages((prevMessages) => [...prevMessages, message]);
     });
 
     return () => {
@@ -102,23 +141,18 @@ const MessageList = () => {
   }, [realtimeMessageService]);
 
   return (
-    <TextField
-      multiline
-      fullWidth
-      slotProps={{
-        input: {
-          sx: {
-            height: '100%',
-            alignItems: 'start',
-          },
-          readOnly: true,
-        },
-      }}
-      sx={{ display: 'flex', flexGrow: 1 }}
-      value={messages
-        .map((message) => `${message.accountUsername}: ${message.content}`)
-        .join('\n')}
-    />
+    <Stack sx={{ flexGrow: 1, gap: 2 }}>
+      {hasNextPage && (
+        <Button onClick={() => fetchNextPage()}>Load More</Button>
+      )}
+      {isFetching && <CircularProgress />}
+      {oldMessages.map((message, index) => (
+        <Message key={index} message={message} />
+      ))}
+      {newMessages.map((message, index) => (
+        <Message key={index} message={message} />
+      ))}
+    </Stack>
   );
 };
 
@@ -182,7 +216,7 @@ export const Dashboard = () => {
     queryKey: ['realtimeMessageService'],
     queryFn: () =>
       RealtimeMessageService.create(
-        `${import.meta.env.VITE_MESSAGE_SERVICE_BASE_URL}?token=${token}`,
+        `${import.meta.env.VITE_REALTIME_MESSAGE_SERVICE_BASE_URL}?token=${token}`,
       ),
     enabled: Boolean(token),
   });

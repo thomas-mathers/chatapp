@@ -16,11 +16,12 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(loginRequest: LoginRequest): Promise<LoginResponse> {
-    const response = await this.apiClient.postJson<LoginResponse>(
-      '/auth/login',
-      loginRequest,
-    );
+  async login(body: LoginRequest): Promise<LoginResponse> {
+    const response = await this.apiClient.requestJson<LoginResponse>({
+      method: 'POST',
+      path: '/auth/login',
+      body,
+    });
 
     this.jwtService.setJwt(response.jwt);
 
@@ -31,30 +32,38 @@ export class AuthService {
     this.jwtService.clearJwt();
   }
 
-  async changePassword(request: ChangePasswordRequest): Promise<void> {
-    return await this.apiClient.putJson<void>('/auth/me/password', request, {
-      Authorization: `Bearer ${this.jwtService.getJwt()}`,
+  async changePassword(body: ChangePasswordRequest): Promise<void> {
+    return await this.apiClient.requestJson<void>({
+      method: 'PUT',
+      path: '/auth/me/password',
+      headers: {
+        Authorization: `Bearer ${this.jwtService.getJwt()}`,
+      },
+      body,
     });
   }
 
-  async forgotPassword(request: PasswordResetTokenRequest): Promise<void> {
-    return await this.apiClient.postJson<void>(
-      '/auth/password-reset-requests',
-      request,
-    );
+  async forgotPassword(body: PasswordResetTokenRequest): Promise<void> {
+    return await this.apiClient.requestJson<void>({
+      method: 'POST',
+      path: '/auth/password-reset-requests',
+      body,
+    });
   }
 
-  async resetPassword(request: PasswordResetRequest): Promise<void> {
-    return await this.apiClient.postJson<void>(
-      '/auth/password-resets',
-      request,
-    );
+  async resetPassword(body: PasswordResetRequest): Promise<void> {
+    return await this.apiClient.requestJson<void>({
+      method: 'POST',
+      path: '/auth/password-resets',
+      body,
+    });
   }
 
-  async confirmEmail(request: ConfirmEmailRequest): Promise<void> {
-    return await this.apiClient.postJson<void>(
-      `/auth/email-confirmations`,
-      request,
-    );
+  async confirmEmail(body: ConfirmEmailRequest): Promise<void> {
+    return await this.apiClient.requestJson<void>({
+      method: 'POST',
+      path: `/auth/email-confirmations`,
+      body,
+    });
   }
 }

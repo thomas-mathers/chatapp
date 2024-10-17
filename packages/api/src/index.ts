@@ -3,3 +3,4 @@ export * from './authService';
 export * from './jwtService';
 export * from './accountService';
 export * from './apiError';
+export * from './messageService';

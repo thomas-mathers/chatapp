@@ -12,19 +12,31 @@ export class AccountService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async createAccount(request: CreateAccountRequest): Promise<AccountSummary> {
-    return this.apiClient.postJson<AccountSummary>('/accounts', request);
+  async createAccount(body: CreateAccountRequest): Promise<AccountSummary> {
+    return this.apiClient.requestJson<AccountSummary>({
+      method: 'GET',
+      path: '/accounts',
+      body,
+    });
   }
 
   async getAccount(): Promise<AccountSummary> {
-    return this.apiClient.getJson<AccountSummary>('/accounts/me', {
-      Authorization: `Bearer ${this.jwtService.getJwt()}`,
+    return this.apiClient.requestJson<AccountSummary>({
+      method: 'GET',
+      path: '/accounts/me',
+      headers: {
+        Authorization: `Bearer ${this.jwtService.getJwt()}`,
+      },
     });
   }
 
   async deleteAccount(): Promise<void> {
-    return this.apiClient.deleteJson<void>('/accounts/me', {
-      Authorization: `Bearer ${this.jwtService.getJwt()}`,
+    return this.apiClient.requestJson<void>({
+      method: 'DELETE',
+      path: '/accounts/me',
+      headers: {
+        Authorization: `Bearer ${this.jwtService.getJwt()}`,
+      },
     });
   }
 }

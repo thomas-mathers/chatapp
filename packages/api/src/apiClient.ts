@@ -1,53 +1,40 @@
 import { ApiError } from './apiError';
 
+interface RequestParameters {
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  path: string;
+  headers?: Record<string, string>;
+  queryParameters?: Record<string, string>;
+  body?: unknown;
+}
+
 export class ApiClient {
   constructor(private baseUrl: string) {}
 
-  async getJson<T>(
-    path: string,
-    additionalHeaders: Record<string, string> = {},
-  ): Promise<T> {
-    return await this.request<T>('GET', path, additionalHeaders);
-  }
-
-  async postJson<T>(
-    path: string,
-    data: unknown,
-    additionalHeaders: Record<string, string> = {},
-  ): Promise<T> {
-    return await this.request<T>('POST', path, additionalHeaders, data);
-  }
-
-  async putJson<T>(
-    path: string,
-    data: unknown,
-    additionalHeaders: Record<string, string> = {},
-  ): Promise<T> {
-    return await this.request<T>('PUT', path, additionalHeaders, data);
-  }
-
-  async deleteJson<T>(
-    path: string,
-    additionalHeaders: Record<string, string> = {},
-  ): Promise<T> {
-    return await this.request<T>('DELETE', path, additionalHeaders);
-  }
-
-  private async request<T>(
-    method: string,
-    path: string,
-    additionalHeaders: Record<string, string> = {},
-    body: unknown = undefined,
-  ): Promise<T> {
+  public async requestJson<T>({
+    method,
+    headers,
+    path,
+    queryParameters,
+    body,
+  }: RequestParameters): Promise<T> {
     let response: Response;
 
+    const url = new URL(path, this.baseUrl);
+
+    if (queryParameters) {
+      Object.entries(queryParameters).forEach(([key, value]) => {
+        url.searchParams.append(key, value);
+      });
+    }
+
     try {
-      response = await fetch(`${this.baseUrl}${path}`, {
+      response = await fetch(url.toString(), {
         method,
         body: body ? JSON.stringify(body) : undefined,
         headers: {
           'Content-Type': 'application/json',
-          ...additionalHeaders,
+          ...headers,
         },
       });
     } catch (error) {

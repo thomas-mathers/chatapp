@@ -7,6 +7,7 @@ import {
   ApiClient,
   AuthService,
   JwtService,
+  MessageService,
 } from 'chatapp.api';
 
 import { getConfig } from '@app/config';
@@ -14,6 +15,7 @@ import { getConfig } from '@app/config';
 import { AccountServiceProvider } from './accountServiceProvider';
 import { AuthServiceProvider } from './authServiceProvider';
 import { JwtServiceProvider } from './jwtServiceProvider';
+import { MessageServiceProvider } from './messageServiceProvider';
 
 const config = getConfig();
 
@@ -49,6 +51,14 @@ const accountService = new AccountService(
 const authServiceApiClient = new ApiClient(config.VITE_AUTH_SERVICE_BASE_URL);
 const authService = new AuthService(authServiceApiClient, jwtTokenService);
 
+const messageServiceApiClient = new ApiClient(
+  config.VITE_MESSAGE_SERVICE_BASE_URL,
+);
+const messageService = new MessageService(
+  messageServiceApiClient,
+  jwtTokenService,
+);
+
 interface AppProviderProps {
   children: React.ReactNode;
 }
@@ -60,7 +70,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         <JwtServiceProvider value={jwtTokenService}>
           <AccountServiceProvider value={accountService}>
             <AuthServiceProvider value={authService}>
-              {children}
+              <MessageServiceProvider value={messageService}>
+                {children}
+              </MessageServiceProvider>
             </AuthServiceProvider>
           </AccountServiceProvider>
         </JwtServiceProvider>
