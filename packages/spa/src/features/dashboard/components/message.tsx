@@ -19,7 +19,9 @@ export const Message = ({ message }: { message: MessageSummary }) => {
             {dateCreated}
           </Typography>
         </Box>
-        <Typography variant="body1">{message.content}</Typography>
+        <Typography variant="body1" sx={{ wordBreak: 'break-word' }}>
+          {message.content}
+        </Typography>
       </Box>
     </Stack>
   );

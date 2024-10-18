@@ -27,14 +27,18 @@ export const MessageInput = () => {
   };
 
   return (
-    <Stack direction="row" alignItems="center" gap={2}>
+    <Stack direction="row" alignItems="center" gap={1}>
       <TextField
         sx={{ flexGrow: 1 }}
         value={message}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />
-      <IconButton color="primary" onClick={handleSend}>
+      <IconButton
+        color="primary"
+        onClick={handleSend}
+        disabled={message.length === 0}
+      >
         <SendIcon />
       </IconButton>
     </Stack>

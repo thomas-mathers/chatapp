@@ -64,7 +64,7 @@ export const MessageList = () => {
   }, [newMessages]);
 
   return (
-    <Stack sx={{ flexGrow: 1, gap: 2, overflowY: 'auto' }}>
+    <Stack sx={{ flexGrow: 1, gap: 2, overflowY: 'auto', overflowX: 'hidden' }}>
       <div ref={firstMessageRef} />
       {isFetching && <CircularProgress sx={{ alignSelf: 'center' }} />}
       {hasNextPage && (
