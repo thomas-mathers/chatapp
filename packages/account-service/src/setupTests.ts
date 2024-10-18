@@ -17,7 +17,7 @@ beforeEach(async (context: TestContext) => {
 });
 
 afterEach(async ({ app }) => {
-  await app.dropDatabase();
+  await app.mongoDatabase.dropDatabase();
   await app.close();
 });
 

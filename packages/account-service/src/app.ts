@@ -99,10 +99,6 @@ export class App {
     return new App(logger, httpServer, eventBus, mongoClient, mongoDatabase);
   }
 
-  async dropDatabase() {
-    await this._mongoDatabase.dropDatabase();
-  }
-
   async close() {
     await this.closeHttpServer();
     await this.closeEventBus();
@@ -111,6 +107,10 @@ export class App {
 
   get httpServer() {
     return this._httpServer;
+  }
+
+  get mongoDatabase() {
+    return this._mongoDatabase;
   }
 
   private async closeHttpServer() {

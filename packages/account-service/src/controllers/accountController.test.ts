@@ -1,7 +1,13 @@
 import { faker } from '@faker-js/faker';
 import { CreateAccountRequest } from 'chatapp.account-service-contracts';
 import request from 'supertest';
-import { describe, it } from 'vitest';
+import { beforeEach, describe, it } from 'vitest';
+
+import { Account } from '../models/account';
+
+const username = faker.internet.userName();
+const password = faker.internet.password();
+const email = faker.internet.email();
 
 describe('AccountController', () => {
   describe('POST /accounts', () => {
@@ -115,6 +121,17 @@ describe('AccountController', () => {
   });
 
   describe('GET /accounts/me', () => {
+    beforeEach(async ({ app }) => {
+      await request(app.httpServer).post('/accounts').send({
+        username,
+        password,
+        email,
+      });
+
+      const accounts = app.mongoDatabase.collection<Account>('accounts');
+      await accounts.updateOne({ username }, { $set: { emailVerified: true } });
+    });
+
     it('should return 401 when no token is provided', async ({ app }) => {
       const response = await request(app.httpServer).get('/accounts/me');
 
@@ -132,23 +149,11 @@ describe('AccountController', () => {
     });
 
     it('should return 200 when a valid token is provided', async ({ app }) => {
-      const newAccount: Partial<CreateAccountRequest> = {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      };
-
-      const createdResponse = await request(app.httpServer)
-        .post('/accounts')
-        .send(newAccount);
-
-      expect(createdResponse.status).toBe(201);
-
       const authResponse = await request(app.httpServer)
         .post('/auth/login')
         .send({
-          username: newAccount.username,
-          password: newAccount.password,
+          username,
+          password,
         });
 
       expect(authResponse.status).toBe(200);
@@ -159,12 +164,23 @@ describe('AccountController', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('id');
-      expect(response.body.username).toBe(newAccount.username);
-      expect(response.body.email).toBe(newAccount.email);
+      expect(response.body.username).toBe(username);
+      expect(response.body.email).toBe(email);
     });
   });
 
   describe('DELETE /accounts/me', () => {
+    beforeEach(async ({ app }) => {
+      await request(app.httpServer).post('/accounts').send({
+        username,
+        password,
+        email,
+      });
+
+      const accounts = app.mongoDatabase.collection<Account>('accounts');
+      await accounts.updateOne({ username }, { $set: { emailVerified: true } });
+    });
+
     it('should return 401 when no token is provided', async ({ app }) => {
       const response = await request(app.httpServer).delete('/accounts/me');
 
@@ -182,23 +198,11 @@ describe('AccountController', () => {
     });
 
     it('should return 200 when a valid token is provided', async ({ app }) => {
-      const newAccount: Partial<CreateAccountRequest> = {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-      };
-
-      const createdResponse = await request(app.httpServer)
-        .post('/accounts')
-        .send(newAccount);
-
-      expect(createdResponse.status).toBe(201);
-
       const authResponse = await request(app.httpServer)
         .post('/auth/login')
         .send({
-          username: newAccount.username,
-          password: newAccount.password,
+          username,
+          password,
         });
 
       expect(authResponse.status).toBe(200);
