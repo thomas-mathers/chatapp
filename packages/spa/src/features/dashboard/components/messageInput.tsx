@@ -20,9 +20,20 @@ export const MessageInput = () => {
     setMessage(event.target.value);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleSend();
+    }
+  };
+
   return (
     <Stack direction="row" alignItems="center" gap={2}>
-      <TextField sx={{ flexGrow: 1 }} value={message} onChange={handleChange} />
+      <TextField
+        sx={{ flexGrow: 1 }}
+        value={message}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+      />
       <IconButton color="primary" onClick={handleSend}>
         <SendIcon />
       </IconButton>
