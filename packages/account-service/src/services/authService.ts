@@ -2,11 +2,16 @@ import { LoginResponse } from 'chatapp.account-service-contracts';
 import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
 import { EventBus, EventName } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
-import { StatusCodes } from 'http-status-codes';
+import {
+  ResultCode,
+  notFound,
+  ok,
+  okResult,
+  unauthorized,
+} from 'chatapp.status-code-result';
 
 import { Config } from '../config';
 import { AccountRepository } from '../repositories/accountRepository';
-import { Result, failure, success } from '../statusCodeResult';
 
 export class AuthService {
   constructor(
@@ -19,21 +24,21 @@ export class AuthService {
   async login(
     username: string,
     password: string,
-  ): Promise<Result<LoginResponse>> {
+  ): Promise<ResultCode<LoginResponse>> {
     const account = await this.accountRepository.getAccountByUsername(username);
 
     if (!account) {
-      return failure(StatusCodes.NOT_FOUND);
+      return notFound();
     }
 
     if (!account.emailVerified) {
-      return failure(StatusCodes.UNAUTHORIZED);
+      return unauthorized();
     }
 
     const isPasswordCorrect = await verifyHash(password, account.password);
 
     if (!isPasswordCorrect) {
-      return failure(StatusCodes.UNAUTHORIZED);
+      return unauthorized();
     }
 
     const jwt = createJwt(
@@ -47,18 +52,18 @@ export class AuthService {
       email: account.email,
     });
 
-    return success({ jwt }, StatusCodes.OK);
+    return okResult({ jwt });
   }
 
   async changePassword(
     id: string,
     oldPassword: string,
     newPassword: string,
-  ): Promise<Result<void>> {
+  ): Promise<ResultCode<void>> {
     const account = await this.accountRepository.getAccountById(id);
 
     if (!account) {
-      return failure(StatusCodes.NOT_FOUND);
+      return notFound();
     }
 
     const isOldPasswordCorrect = await verifyHash(
@@ -67,7 +72,7 @@ export class AuthService {
     );
 
     if (!isOldPasswordCorrect) {
-      return failure(StatusCodes.UNAUTHORIZED);
+      return unauthorized();
     }
 
     const password = await createHash(newPassword);
@@ -80,14 +85,14 @@ export class AuthService {
       email: account.email,
     });
 
-    return success();
+    return ok();
   }
 
-  async resetPasswordRequest(email: string): Promise<Result<void>> {
+  async resetPasswordRequest(email: string): Promise<ResultCode<void>> {
     const account = await this.accountRepository.getAccountByEmail(email);
 
     if (!account) {
-      return failure(StatusCodes.NOT_FOUND);
+      return notFound();
     }
 
     const token = createJwt(
@@ -109,17 +114,17 @@ export class AuthService {
       email: account.email,
     });
 
-    return success();
+    return ok();
   }
 
   async resetPassword(
     token: string,
     newPassword: string,
-  ): Promise<Result<void>> {
+  ): Promise<ResultCode<void>> {
     const userCredentials = verifyJwt(token, this.config.jwt);
 
     if (userCredentials === undefined) {
-      return failure(StatusCodes.UNAUTHORIZED);
+      return unauthorized();
     }
 
     const account = await this.accountRepository.getAccountById(
@@ -127,7 +132,7 @@ export class AuthService {
     );
 
     if (!account) {
-      return failure(StatusCodes.NOT_FOUND);
+      return notFound();
     }
 
     const password = await createHash(newPassword);
@@ -140,14 +145,14 @@ export class AuthService {
       email: account.email,
     });
 
-    return success();
+    return ok();
   }
 
-  async confirmEmail(token: string): Promise<Result<void>> {
+  async confirmEmail(token: string): Promise<ResultCode<void>> {
     const userCredentials = verifyJwt(token, this.config.jwt);
 
     if (userCredentials === undefined) {
-      return failure(StatusCodes.UNAUTHORIZED);
+      return unauthorized();
     }
 
     const account = await this.accountRepository.getAccountById(
@@ -155,7 +160,7 @@ export class AuthService {
     );
 
     if (!account) {
-      return failure(StatusCodes.NOT_FOUND);
+      return notFound();
     }
 
     await this.accountRepository.updateAccount({
@@ -169,6 +174,6 @@ export class AuthService {
       email: account.email,
     });
 
-    return success();
+    return ok();
   }
 }

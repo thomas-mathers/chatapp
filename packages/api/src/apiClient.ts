@@ -1,4 +1,9 @@
-import { ApiError } from './apiError';
+import {
+  ResultCode,
+  ok,
+  okResult,
+  resultCode,
+} from 'chatapp.status-code-result';
 
 interface RequestParameters {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -17,9 +22,7 @@ export class ApiClient {
     path,
     queryParameters,
     body,
-  }: RequestParameters): Promise<T> {
-    let response: Response;
-
+  }: RequestParameters): Promise<ResultCode<T>> {
     const url = new URL(path, this.baseUrl);
 
     if (queryParameters) {
@@ -28,39 +31,25 @@ export class ApiClient {
       });
     }
 
-    try {
-      response = await fetch(url.toString(), {
-        method,
-        body: body ? JSON.stringify(body) : undefined,
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers,
-        },
-      });
-    } catch (error) {
-      const isError = error instanceof Error;
-
-      if (!isError) {
-        throw new ApiError('Unknown error', undefined, error);
-      }
-
-      if (error.name === 'AbortError') {
-        throw new ApiError('Request was aborted', undefined, error);
-      }
-
-      throw new ApiError('Failed to connect to the server', undefined, error);
-    }
+    const response = await fetch(url.toString(), {
+      method,
+      body: body ? JSON.stringify(body) : undefined,
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers,
+      },
+    });
 
     if (!response.ok) {
-      throw new ApiError(response.statusText, response.status);
+      return resultCode(response.status);
     }
 
     if (response.status === 204) {
-      return undefined as T;
+      return ok();
     }
 
     const responseBody = await response.json();
 
-    return responseBody as T;
+    return okResult(responseBody as T);
   }
 }

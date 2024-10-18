@@ -34,7 +34,9 @@ export class MessageService {
       queryParameters['sortDirection'] = sortDirection;
     }
 
-    return await this.apiClient.requestJson<Page<MessageSummary>>({
+    const { code, result } = await this.apiClient.requestJson<
+      Page<MessageSummary>
+    >({
       method: 'GET',
       path: '/messages',
       queryParameters,
@@ -42,5 +44,11 @@ export class MessageService {
         Authorization: `Bearer ${this.jwtService.get()}`,
       },
     });
+
+    if (code !== 200) {
+      throw new Error('Failed to get messages');
+    }
+
+    return result;
   }
 }

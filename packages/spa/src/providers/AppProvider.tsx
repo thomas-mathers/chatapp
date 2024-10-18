@@ -1,15 +1,10 @@
 import { ThemeProvider } from '@emotion/react';
 import type {} from '@mui/lab/themeAugmentation';
 import { createTheme } from '@mui/material';
-import {
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   AccountService,
   ApiClient,
-  ApiError,
   AuthService,
   MessageService,
 } from 'chatapp.api';
@@ -62,16 +57,7 @@ const messageService = new MessageService(
   jwtTokenService,
 );
 
-const queryClient = new QueryClient({
-  queryCache: new QueryCache({
-    onError: (error) => {
-      if (error instanceof ApiError && error.status === 401) {
-        authService.logout();
-        window.location.href = '/';
-      }
-    },
-  }),
-});
+const queryClient = new QueryClient();
 
 interface AppProviderProps {
   children: React.ReactNode;

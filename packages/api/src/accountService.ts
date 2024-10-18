@@ -13,30 +13,48 @@ export class AccountService {
   ) {}
 
   async createAccount(body: CreateAccountRequest): Promise<AccountSummary> {
-    return this.apiClient.requestJson<AccountSummary>({
+    const { code, result } = await this.apiClient.requestJson<AccountSummary>({
       method: 'GET',
       path: '/accounts',
       body,
     });
+
+    if (code === 409) {
+      throw new Error('Account already exists');
+    }
+
+    return result;
   }
 
   async getAccount(): Promise<AccountSummary> {
-    return this.apiClient.requestJson<AccountSummary>({
+    const { code, result } = await this.apiClient.requestJson<AccountSummary>({
       method: 'GET',
       path: '/accounts/me',
       headers: {
         Authorization: `Bearer ${this.jwtService.get()}`,
       },
     });
+
+    if (code === 404) {
+      throw new Error('Account not found');
+    }
+
+    return result;
   }
 
   async deleteAccount(): Promise<void> {
-    return this.apiClient.requestJson<void>({
+    const { code, result } = await this.apiClient.requestJson<void>({
       method: 'DELETE',
       path: '/accounts/me',
       headers: {
         Authorization: `Bearer ${this.jwtService.get()}`,
       },
     });
+
+    if (code === 404) {
+      throw new Error('Account not found');
+    }
+
+    return result;
   }
 }

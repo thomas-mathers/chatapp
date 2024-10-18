@@ -65,11 +65,11 @@ export class AuthController {
       handleRequestBodyValidationMiddleware(loginRequestSchema),
       async (req: Request, res: Response) => {
         const body: LoginRequest = req.body;
-        const { statusCode, data } = await authService.login(
+        const { code, result } = await authService.login(
           body.username,
           body.password,
         );
-        res.status(statusCode).json(data);
+        res.status(code).json(result);
       },
     );
 
@@ -108,12 +108,12 @@ export class AuthController {
       handleRequestBodyValidationMiddleware(changePasswordRequestSchema),
       async (req: Request, res: Response) => {
         const body: ChangePasswordRequest = req.body;
-        const { statusCode } = await authService.changePassword(
+        const { code } = await authService.changePassword(
           req.accountId,
           body.oldPassword,
           body.newPassword,
         );
-        res.status(statusCode).json();
+        res.status(code).json();
       },
     );
 
@@ -147,10 +147,8 @@ export class AuthController {
       handleRequestBodyValidationMiddleware(passwordResetTokenRequestSchema),
       async (req: Request, res: Response) => {
         const body: PasswordResetTokenRequest = req.body;
-        const { statusCode } = await authService.resetPasswordRequest(
-          body.email,
-        );
-        res.status(statusCode).end();
+        const { code } = await authService.resetPasswordRequest(body.email);
+        res.status(code).end();
       },
     );
 
@@ -186,11 +184,11 @@ export class AuthController {
       handleRequestBodyValidationMiddleware(passwordResetRequestSchema),
       async (req: Request, res: Response) => {
         const body: PasswordResetRequest = req.body;
-        const { statusCode, data } = await authService.resetPassword(
+        const { code, result } = await authService.resetPassword(
           body.token,
           body.newPassword,
         );
-        res.status(statusCode).json(data);
+        res.status(code).json(result);
       },
     );
 
@@ -198,10 +196,8 @@ export class AuthController {
       '/email-confirmations',
       handleRequestBodyValidationMiddleware(confirmEmailRequestSchema),
       async (req: Request, res: Response) => {
-        const { statusCode, data } = await authService.confirmEmail(
-          req.body.token,
-        );
-        res.status(statusCode).json(data);
+        const { code, result } = await authService.confirmEmail(req.body.token);
+        res.status(code).json(result);
       },
     );
   }

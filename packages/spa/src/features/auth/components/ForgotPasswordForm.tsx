@@ -9,7 +9,6 @@ import {
 } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { PasswordResetTokenRequest } from 'chatapp.account-service-contracts';
-import { ApiError } from 'chatapp.api';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -32,7 +31,7 @@ export const ForgotPasswordForm = () => {
 
   const { mutate, isPending, error } = useMutation<
     void,
-    ApiError,
+    Error,
     PasswordResetTokenRequest
   >({
     mutationFn: (data) => authService.forgotPassword(data),

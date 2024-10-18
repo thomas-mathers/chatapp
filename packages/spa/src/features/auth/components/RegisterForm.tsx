@@ -12,7 +12,6 @@ import {
   AccountSummary,
   CreateAccountRequest,
 } from 'chatapp.account-service-contracts';
-import { ApiError } from 'chatapp.api';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
@@ -42,7 +41,7 @@ export const RegisterForm = () => {
 
   const { mutate, isPending, error } = useMutation<
     AccountSummary,
-    ApiError,
+    Error,
     CreateAccountRequest
   >({
     mutationFn: (data) => accountService.createAccount(data),

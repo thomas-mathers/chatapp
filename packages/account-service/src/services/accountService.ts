@@ -5,13 +5,19 @@ import {
 import { createHash, createJwt } from 'chatapp.crypto';
 import { EventBus, EventName } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
-import { StatusCodes } from 'http-status-codes';
+import {
+  ResultCode,
+  conflict,
+  created,
+  notFound,
+  ok,
+  okResult,
+} from 'chatapp.status-code-result';
 import { MongoError } from 'mongodb';
 
 import { Config } from '../config';
 import { Account } from '../models/account';
 import { AccountRepository } from '../repositories/accountRepository';
-import { Result, failure, success } from '../statusCodeResult';
 
 export class AccountService {
   constructor(
@@ -23,7 +29,7 @@ export class AccountService {
 
   async createAccount(
     request: CreateAccountRequest,
-  ): Promise<Result<AccountSummary>> {
+  ): Promise<ResultCode<AccountSummary>> {
     try {
       const hash = await createHash(request.password);
 
@@ -56,37 +62,37 @@ export class AccountService {
         email: account.email,
       });
 
-      return success(accountSummary, StatusCodes.CREATED);
+      return created(accountSummary);
     } catch (error) {
       if (error instanceof MongoError && error.code === 11000) {
-        return failure(StatusCodes.CONFLICT);
+        return conflict();
       }
       throw error;
     }
   }
 
-  async getAccountById(id: string): Promise<Result<AccountSummary>> {
+  async getAccountById(id: string): Promise<ResultCode<AccountSummary>> {
     const account = await this.accountRepository.getAccountById(id);
 
     if (!account) {
-      return failure(StatusCodes.NOT_FOUND);
+      return notFound();
     }
 
     const accountSummary = toAccountSummary(account);
 
-    return success(accountSummary, StatusCodes.OK);
+    return okResult(accountSummary);
   }
 
-  async deleteAccount(id: string): Promise<Result<void>> {
+  async deleteAccount(id: string): Promise<ResultCode<void>> {
     const numDeleted = await this.accountRepository.deleteAccountById(id);
 
     if (numDeleted === 0) {
-      return failure(StatusCodes.NOT_FOUND);
+      return notFound();
     }
 
     this.logger.info('Account deleted', { id });
 
-    return success();
+    return ok();
   }
 }
 
