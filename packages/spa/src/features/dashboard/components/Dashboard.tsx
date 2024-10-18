@@ -10,8 +10,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuthService } from '@app/hooks';
@@ -116,21 +115,32 @@ export const Dashboard = () => {
 
   const token = jwtService.get();
 
-  const { data: realtimeMessageService } = useQuery({
-    queryKey: ['realtimeMessageService'],
-    queryFn: () =>
-      RealtimeService.create(
-        `${import.meta.env.VITE_REALTIME_MESSAGE_SERVICE_BASE_URL}?token=${token}`,
-      ),
-    enabled: Boolean(token),
-  });
+  const [realtimeService, setRealtimeService] =
+    useState<RealtimeService | null>(null);
 
-  if (!realtimeMessageService) {
+  useEffect(() => {
+    const url = `${import.meta.env.VITE_REALTIME_MESSAGE_SERVICE_BASE_URL}?token=${token}`;
+
+    const createRealtimeServiceTask = RealtimeService.create(url).then(
+      (realtimeService) => {
+        setRealtimeService(realtimeService);
+        return realtimeService;
+      },
+    );
+
+    return () => {
+      createRealtimeServiceTask.then((realtimeService) => {
+        realtimeService.close();
+      });
+    };
+  }, [token]);
+
+  if (!realtimeService) {
     return <LoadingScreen />;
   }
 
   return (
-    <RealtimeServiceProvider value={realtimeMessageService}>
+    <RealtimeServiceProvider value={realtimeService}>
       <Stack sx={{ height: '100%' }}>
         <Header />
         <Body />

@@ -2,7 +2,7 @@ import { CircularProgress, Link, Stack } from '@mui/material';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { SortDirection } from 'chatapp.account-service-contracts';
 import { MessageSummary } from 'chatapp.message-service-contracts';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useMessageService } from '@app/hooks/useMessageService';
 import { useRealtimeService } from '@app/hooks/useRealtimeService';
@@ -55,11 +55,11 @@ export const MessageList = () => {
     };
   }, [realtimeMessageService]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     firstMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [oldMessages]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [newMessages]);
 
