@@ -14,13 +14,13 @@ export class AccountService {
 
   async createAccount(body: CreateAccountRequest): Promise<AccountSummary> {
     const { code, result } = await this.apiClient.requestJson<AccountSummary>({
-      method: 'GET',
+      method: 'POST',
       path: '/accounts',
       body,
     });
 
     if (code === 409) {
-      throw new Error('Account already exists');
+      throw new Error('Username or email already taken');
     }
 
     return result;
