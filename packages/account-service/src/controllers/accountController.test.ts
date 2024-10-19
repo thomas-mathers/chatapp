@@ -70,20 +70,20 @@ describe('AccountController', () => {
     it('should return 409 when username is already taken', async ({ app }) => {
       const existingAccount: Partial<CreateAccountRequest> = {
         username: faker.internet.userName(),
-        email: faker.internet.email(),
         password: faker.internet.password(),
+        email: faker.internet.email(),
       };
 
-      const createdResponse = await request(app.httpServer)
+      const createResponse = await request(app.httpServer)
         .post('/accounts')
         .send(existingAccount);
 
-      expect(createdResponse.status).toBe(201);
+      expect(createResponse.status).toBe(201);
 
       const conflictingAccount: Partial<CreateAccountRequest> = {
         username: existingAccount.username,
-        email: faker.internet.email(),
         password: faker.internet.password(),
+        email: faker.internet.email(),
       };
 
       const conflictResponse = await request(app.httpServer)

@@ -10,6 +10,84 @@ const password = faker.internet.password();
 const email = faker.internet.email();
 
 describe('AuthController', () => {
+  describe('POST /auth/login', () => {
+    it('should return 400 when username is missing', async ({ app }) => {
+      const response = await request(app.httpServer).post('/auth/login').send({
+        password,
+      });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 400 when password is missing', async ({ app }) => {
+      const response = await request(app.httpServer).post('/auth/login').send({
+        username,
+      });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 404 when username is not found', async ({ app }) => {
+      const response = await request(app.httpServer).post('/auth/login').send({
+        username: faker.internet.userName(),
+        password,
+      });
+
+      expect(response.status).toBe(404);
+    });
+
+    it('should return 401 when password is incorrect', async ({ app }) => {
+      await request(app.httpServer).post('/accounts').send({
+        username,
+        password,
+        email,
+      });
+
+      const response = await request(app.httpServer).post('/auth/login').send({
+        username,
+        password: faker.internet.password(),
+      });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('should return 401 when email is not verified', async ({ app }) => {
+      await request(app.httpServer).post('/accounts').send({
+        username,
+        password,
+        email,
+      });
+
+      const response = await request(app.httpServer).post('/auth/login').send({
+        username,
+        password,
+      });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('should return 200 when username and password are correct', async ({
+      app,
+    }) => {
+      await request(app.httpServer).post('/accounts').send({
+        username,
+        password,
+        email,
+      });
+
+      const accounts = app.mongoDatabase.collection<Account>('accounts');
+      await accounts.updateOne({ username }, { $set: { emailVerified: true } });
+
+      const response = await request(app.httpServer).post('/auth/login').send({
+        username,
+        password,
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('jwt');
+    });
+  });
+
   describe('PUT /auth/me/password', () => {
     beforeEach(async ({ app }) => {
       await request(app.httpServer).post('/accounts').send({
