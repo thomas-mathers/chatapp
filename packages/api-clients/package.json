@@ -1,5 +1,5 @@
 {
-  "name": "chatapp.status-code-result",
+  "name": "chatapp.api-clients",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -14,7 +14,9 @@
     "test:coverage": "vitest --config vitest.config.mts --coverage --ws run"
   },
   "dependencies": {
-    "zod": "^3.23.8"
+    "chatapp.account-service-contracts": "^1.0.0",
+    "chatapp.message-service-contracts": "^1.0.0",
+    "chatapp.api-result": "^1.0.0"
   },
   "exports": {
     ".": "./src/index.ts"

@@ -1,4 +1,4 @@
-import { AccountService } from 'chatapp.api';
+import { AccountService } from 'chatapp.api-clients';
 import { useContext } from 'react';
 
 import { AccountServiceContext } from '@app/contexts/accountServiceContext';

@@ -1,14 +1,14 @@
 import { LoginResponse } from 'chatapp.account-service-contracts';
+import {
+  ApiResult,
+  ErrorCode,
+  notFound,
+  ok,
+  unauthorized,
+} from 'chatapp.api-result';
 import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
 import { EventBus, EventName } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
-import {
-  ResultCode,
-  notFound,
-  ok,
-  okResult,
-  unauthorized,
-} from 'chatapp.status-code-result';
 
 import { Config } from '../config';
 import { AccountRepository } from '../repositories/accountRepository';
@@ -24,21 +24,21 @@ export class AuthService {
   async login(
     username: string,
     password: string,
-  ): Promise<ResultCode<LoginResponse>> {
+  ): Promise<ApiResult<LoginResponse>> {
     const account = await this.accountRepository.getAccountByUsername(username);
 
     if (!account) {
-      return notFound();
+      return notFound(ErrorCode.AccountNotFound);
     }
 
     if (!account.emailVerified) {
-      return unauthorized();
+      return unauthorized(ErrorCode.EmailNotVerified);
     }
 
     const isPasswordCorrect = await verifyHash(password, account.password);
 
     if (!isPasswordCorrect) {
-      return unauthorized();
+      return unauthorized(ErrorCode.IncorrectPassword);
     }
 
     const jwt = createJwt(
@@ -52,18 +52,18 @@ export class AuthService {
       email: account.email,
     });
 
-    return okResult({ jwt });
+    return ok({ jwt });
   }
 
   async changePassword(
     id: string,
     oldPassword: string,
     newPassword: string,
-  ): Promise<ResultCode<void>> {
+  ): Promise<ApiResult<void>> {
     const account = await this.accountRepository.getAccountById(id);
 
     if (!account) {
-      return notFound();
+      return notFound(ErrorCode.AccountNotFound);
     }
 
     const isOldPasswordCorrect = await verifyHash(
@@ -72,7 +72,7 @@ export class AuthService {
     );
 
     if (!isOldPasswordCorrect) {
-      return unauthorized();
+      return unauthorized(ErrorCode.IncorrectPassword);
     }
 
     const password = await createHash(newPassword);
@@ -88,11 +88,11 @@ export class AuthService {
     return ok();
   }
 
-  async resetPasswordRequest(email: string): Promise<ResultCode<void>> {
+  async resetPasswordRequest(email: string): Promise<ApiResult<void>> {
     const account = await this.accountRepository.getAccountByEmail(email);
 
     if (!account) {
-      return notFound();
+      return notFound(ErrorCode.AccountNotFound);
     }
 
     const token = createJwt(
@@ -120,11 +120,11 @@ export class AuthService {
   async resetPassword(
     token: string,
     newPassword: string,
-  ): Promise<ResultCode<void>> {
+  ): Promise<ApiResult<void>> {
     const userCredentials = verifyJwt(token, this.config.jwt);
 
     if (userCredentials === undefined) {
-      return unauthorized();
+      return unauthorized(ErrorCode.InvalidToken);
     }
 
     const account = await this.accountRepository.getAccountById(
@@ -132,7 +132,7 @@ export class AuthService {
     );
 
     if (!account) {
-      return notFound();
+      return notFound(ErrorCode.AccountNotFound);
     }
 
     const password = await createHash(newPassword);
@@ -148,11 +148,11 @@ export class AuthService {
     return ok();
   }
 
-  async confirmEmail(token: string): Promise<ResultCode<void>> {
+  async confirmEmail(token: string): Promise<ApiResult<void>> {
     const userCredentials = verifyJwt(token, this.config.jwt);
 
     if (userCredentials === undefined) {
-      return unauthorized();
+      return unauthorized(ErrorCode.InvalidToken);
     }
 
     const account = await this.accountRepository.getAccountById(
@@ -160,7 +160,7 @@ export class AuthService {
     );
 
     if (!account) {
-      return notFound();
+      return notFound(ErrorCode.AccountNotFound);
     }
 
     await this.accountRepository.updateAccount({

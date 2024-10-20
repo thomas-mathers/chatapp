@@ -1,4 +1,4 @@
-import { JwtService } from 'chatapp.api';
+import { JwtService } from 'chatapp.api-clients';
 
 export class LocalStorageJwtService implements JwtService {
   get(): string | null {

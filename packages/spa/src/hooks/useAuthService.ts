@@ -1,4 +1,4 @@
-import { AuthService } from 'chatapp.api';
+import { AuthService } from 'chatapp.api-clients';
 import { useContext } from 'react';
 
 import { AuthServiceContext } from '@app/contexts/authServiceContext';

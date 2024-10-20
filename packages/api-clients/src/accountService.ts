@@ -13,21 +13,21 @@ export class AccountService {
   ) {}
 
   async createAccount(body: CreateAccountRequest): Promise<AccountSummary> {
-    const { code, result } = await this.apiClient.requestJson<AccountSummary>({
+    const result = await this.apiClient.requestJson<AccountSummary>({
       method: 'POST',
       path: '/accounts',
       body,
     });
 
-    if (code === 409) {
-      throw new Error('Username or email already taken');
+    if (result.status === 'error') {
+      throw result.error;
     }
 
-    return result;
+    return result.data!;
   }
 
   async getAccount(): Promise<AccountSummary> {
-    const { code, result } = await this.apiClient.requestJson<AccountSummary>({
+    const result = await this.apiClient.requestJson<AccountSummary>({
       method: 'GET',
       path: '/accounts/me',
       headers: {
@@ -35,15 +35,15 @@ export class AccountService {
       },
     });
 
-    if (code === 404) {
-      throw new Error('Account not found');
+    if (result.status === 'error') {
+      throw result.error;
     }
 
-    return result;
+    return result.data!;
   }
 
   async deleteAccount(): Promise<void> {
-    const { code, result } = await this.apiClient.requestJson<void>({
+    const result = await this.apiClient.requestJson<void>({
       method: 'DELETE',
       path: '/accounts/me',
       headers: {
@@ -51,10 +51,8 @@ export class AccountService {
       },
     });
 
-    if (code === 404) {
-      throw new Error('Account not found');
+    if (result.status === 'error') {
+      throw result.error;
     }
-
-    return result;
   }
 }

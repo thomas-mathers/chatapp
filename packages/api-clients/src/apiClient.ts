@@ -1,9 +1,4 @@
-import {
-  ResultCode,
-  ok,
-  okResult,
-  resultCode,
-} from 'chatapp.status-code-result';
+import { ApiResult } from 'chatapp.api-result';
 
 interface RequestParameters {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -22,7 +17,7 @@ export class ApiClient {
     path,
     queryParameters,
     body,
-  }: RequestParameters): Promise<ResultCode<T>> {
+  }: RequestParameters): Promise<ApiResult<T>> {
     const url = new URL(path, this.baseUrl);
 
     if (queryParameters) {
@@ -40,16 +35,8 @@ export class ApiClient {
       },
     });
 
-    if (!response.ok) {
-      return resultCode(response.status);
-    }
-
-    if (response.status === 204) {
-      return ok();
-    }
-
     const responseBody = await response.json();
 
-    return okResult(responseBody as T);
+    return responseBody as ApiResult<T>;
   }
 }

@@ -2,17 +2,17 @@ import {
   AccountSummary,
   CreateAccountRequest,
 } from 'chatapp.account-service-contracts';
-import { createHash, createJwt } from 'chatapp.crypto';
-import { EventBus, EventName } from 'chatapp.event-sourcing';
-import { Logger } from 'chatapp.logging';
 import {
-  ResultCode,
+  ApiResult,
+  ErrorCode,
   conflict,
   created,
   notFound,
   ok,
-  okResult,
-} from 'chatapp.status-code-result';
+} from 'chatapp.api-result';
+import { createHash, createJwt } from 'chatapp.crypto';
+import { EventBus, EventName } from 'chatapp.event-sourcing';
+import { Logger } from 'chatapp.logging';
 import { MongoError } from 'mongodb';
 
 import { Config } from '../config';
@@ -29,7 +29,7 @@ export class AccountService {
 
   async createAccount(
     request: CreateAccountRequest,
-  ): Promise<ResultCode<AccountSummary>> {
+  ): Promise<ApiResult<AccountSummary>> {
     try {
       const hash = await createHash(request.password);
 
@@ -65,29 +65,29 @@ export class AccountService {
       return created(accountSummary);
     } catch (error) {
       if (error instanceof MongoError && error.code === 11000) {
-        return conflict();
+        return conflict(ErrorCode.UsernameOrEmailAlreadyExists);
       }
       throw error;
     }
   }
 
-  async getAccountById(id: string): Promise<ResultCode<AccountSummary>> {
+  async getAccountById(id: string): Promise<ApiResult<AccountSummary>> {
     const account = await this.accountRepository.getAccountById(id);
 
     if (!account) {
-      return notFound();
+      return notFound(ErrorCode.AccountNotFound);
     }
 
     const accountSummary = toAccountSummary(account);
 
-    return okResult(accountSummary);
+    return ok(accountSummary);
   }
 
-  async deleteAccount(id: string): Promise<ResultCode<void>> {
+  async deleteAccount(id: string): Promise<ApiResult<void>> {
     const numDeleted = await this.accountRepository.deleteAccountById(id);
 
     if (numDeleted === 0) {
-      return notFound();
+      return notFound(ErrorCode.AccountNotFound);
     }
 
     this.logger.info('Account deleted', { id });

@@ -73,8 +73,8 @@ export class AccountController {
       '/',
       handleRequestBodyValidationMiddleware(createAccountRequestSchema),
       async (req: Request, res: Response) => {
-        const { code, result } = await accountService.createAccount(req.body);
-        res.status(code).json(result);
+        const result = await accountService.createAccount(req.body);
+        res.status(result.statusCode).json(result);
       },
     );
 
@@ -123,10 +123,8 @@ export class AccountController {
       '/me',
       handleAuthMiddleware(config.jwt),
       async (req: Request, res: Response) => {
-        const { code, result } = await accountService.getAccountById(
-          req.accountId,
-        );
-        res.status(code).json(result);
+        const result = await accountService.getAccountById(req.accountId);
+        res.status(result.statusCode).json(result);
       },
     );
 
@@ -160,8 +158,8 @@ export class AccountController {
       '/me',
       handleAuthMiddleware(config.jwt),
       async (req: Request, res: Response) => {
-        const { code } = await accountService.deleteAccount(req.accountId);
-        res.status(code).json();
+        const result = await accountService.deleteAccount(req.accountId);
+        res.status(result.statusCode).json(result);
       },
     );
   }

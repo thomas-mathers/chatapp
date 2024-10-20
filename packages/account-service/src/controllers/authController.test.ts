@@ -84,7 +84,7 @@ describe('AuthController', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('jwt');
+      expect(response.body.data).toHaveProperty('jwt');
     });
   });
 
@@ -137,7 +137,7 @@ describe('AuthController', () => {
 
       const response = await request(app.httpServer)
         .put('/auth/me/password')
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`)
+        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`)
         .send({
           newPassword: faker.internet.password(),
         });
@@ -157,7 +157,7 @@ describe('AuthController', () => {
 
       const response = await request(app.httpServer)
         .put('/auth/me/password')
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`)
+        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`)
         .send({
           oldPassword: password,
         });
@@ -177,7 +177,7 @@ describe('AuthController', () => {
 
       const response = await request(app.httpServer)
         .put('/auth/me/password')
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`)
+        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`)
         .send({
           oldPassword: faker.internet.password(),
           newPassword: faker.internet.password(),
@@ -198,7 +198,7 @@ describe('AuthController', () => {
 
       const response = await request(app.httpServer)
         .put('/auth/me/password')
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`)
+        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`)
         .send({
           oldPassword: password,
           newPassword: faker.internet.password(),

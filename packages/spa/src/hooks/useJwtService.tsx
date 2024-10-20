@@ -1,4 +1,4 @@
-import { JwtService } from 'chatapp.api';
+import { JwtService } from 'chatapp.api-clients';
 import { useContext } from 'react';
 
 import { JwtServiceContext } from '@app/contexts/jwtServiceContext';

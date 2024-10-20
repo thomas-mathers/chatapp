@@ -1,4 +1,4 @@
-import { MessageService } from 'chatapp.api';
+import { MessageService } from 'chatapp.api-clients';
 import { useContext } from 'react';
 
 import { MessageServiceContext } from '@app/contexts/messageServiceContext';

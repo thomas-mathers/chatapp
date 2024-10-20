@@ -7,7 +7,7 @@ import {
   ApiClient,
   AuthService,
   MessageService,
-} from 'chatapp.api';
+} from 'chatapp.api-clients';
 
 import { getConfig } from '@app/config';
 import { LocalStorageJwtService } from '@app/services/localStorageJwtService';

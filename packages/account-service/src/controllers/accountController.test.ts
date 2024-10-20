@@ -23,9 +23,9 @@ describe('AccountController', () => {
         .send(newAccount);
 
       expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('id');
-      expect(response.body.username).toBe(newAccount.username);
-      expect(response.body.email).toBe(newAccount.email);
+      expect(response.body.data).toHaveProperty('id');
+      expect(response.body.data.username).toBe(newAccount.username);
+      expect(response.body.data.email).toBe(newAccount.email);
     });
 
     it('should return 400 when username is missing', async ({ app }) => {
@@ -160,12 +160,12 @@ describe('AccountController', () => {
 
       const response = await request(app.httpServer)
         .get('/accounts/me')
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('id');
-      expect(response.body.username).toBe(username);
-      expect(response.body.email).toBe(email);
+      expect(response.body.data).toHaveProperty('id');
+      expect(response.body.data.username).toBe(username);
+      expect(response.body.data.email).toBe(email);
     });
   });
 
@@ -209,7 +209,7 @@ describe('AccountController', () => {
 
       const response = await request(app.httpServer)
         .delete('/accounts/me')
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
 
       expect(response.status).toBe(200);
     });

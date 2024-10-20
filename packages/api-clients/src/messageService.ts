@@ -34,9 +34,7 @@ export class MessageService {
       queryParameters['sortDirection'] = sortDirection;
     }
 
-    const { code, result } = await this.apiClient.requestJson<
-      Page<MessageSummary>
-    >({
+    const result = await this.apiClient.requestJson<Page<MessageSummary>>({
       method: 'GET',
       path: '/messages',
       queryParameters,
@@ -45,10 +43,10 @@ export class MessageService {
       },
     });
 
-    if (code !== 200) {
-      throw new Error('Failed to get messages');
+    if (result.status === 'error') {
+      throw result.error;
     }
 
-    return result;
+    return result.data!;
   }
 }
