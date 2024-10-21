@@ -23,12 +23,14 @@ export const MessageList = () => {
   } = useInfiniteQuery({
     queryKey: ['messages'],
     queryFn: async ({ pageParam: page }) => {
-      return await messageService.getMessages({
+      const answer = await messageService.getMessages({
         page,
         pageSize: 10,
         sortBy: 'dateCreated',
         sortDirection: SortDirection.Desc,
       });
+      console.log(answer);
+      return answer;
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>

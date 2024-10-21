@@ -83,14 +83,18 @@ function launchWebSocketServer(
           JSON.parse(payload.toString()),
         );
 
-        const message = await messageService.createMessage(
+        const result = await messageService.createMessage(
           userCredentials.userId,
           userCredentials.username,
           createMessageRequest.content,
         );
 
+        if (result.status === 'error') {
+          return;
+        }
+
         webSocketServer.clients.forEach((client) => {
-          client.send(JSON.stringify(message));
+          client.send(JSON.stringify(result.data));
         });
       } catch (error) {
         logger.error(

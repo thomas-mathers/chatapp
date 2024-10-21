@@ -27,6 +27,8 @@ export class AuthService {
       throw result.error;
     }
 
+    this.jwtService.set(result.data!.jwt);
+
     return result.data!;
   }
 

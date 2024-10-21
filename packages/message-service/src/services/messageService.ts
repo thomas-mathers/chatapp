@@ -1,3 +1,4 @@
+import { ApiResult, ok } from 'chatapp.api-result';
 import {
   GetMessagesRequest,
   MessageSummary,
@@ -14,7 +15,7 @@ export class MessageService {
     accountId: string,
     accountUsername: string,
     content: string,
-  ): Promise<MessageSummary> {
+  ): Promise<ApiResult<MessageSummary>> {
     const message = await this.messageRepository.createMessage({
       accountId,
       accountUsername,
@@ -22,15 +23,17 @@ export class MessageService {
       dateCreated: new Date(),
     });
 
-    return toMessageSummary(message);
+    return ok(toMessageSummary(message));
   }
 
-  async getMessages(req: GetMessagesRequest): Promise<Page<MessageSummary>> {
+  async getMessages(
+    req: GetMessagesRequest,
+  ): Promise<ApiResult<Page<MessageSummary>>> {
     const page = await this.messageRepository.getMessages(req);
-    return {
+    return ok({
       ...page,
       records: page.records.map(toMessageSummary),
-    };
+    });
   }
 }
 

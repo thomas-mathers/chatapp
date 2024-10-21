@@ -94,8 +94,8 @@ export class MessageController {
       handleRequestQueryValidationMiddleware(getMessagesRequestSchema),
       async (req: Request, res: Response) => {
         const getMessagesRequest = getMessagesRequestSchema.parse(req.query);
-        const page = await messageService.getMessages(getMessagesRequest);
-        res.json(page);
+        const result = await messageService.getMessages(getMessagesRequest);
+        res.status(result.statusCode).json(result);
       },
     );
 
@@ -146,12 +146,12 @@ export class MessageController {
      */
     this._router.post('/', async (req: Request, res: Response) => {
       const body: CreateMessageRequest = req.body;
-      const message = await messageService.createMessage(
+      const result = await messageService.createMessage(
         req.accountId,
         req.accountUsername,
         body.content,
       );
-      res.status(201).json(message);
+      res.status(result.statusCode).json(result);
     });
   }
 
