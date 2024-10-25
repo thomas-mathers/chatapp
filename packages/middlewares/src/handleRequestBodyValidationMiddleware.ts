@@ -1,5 +1,5 @@
+import { ErrorCode, badRequest } from 'chatapp.api-result';
 import { NextFunction, Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
 import { UnknownKeysParam, ZodRawShape, z } from 'zod';
 
 import { convertZodErrorToResponse } from './utils/convertZodErrorToResponse';
@@ -11,9 +11,12 @@ export function handleRequestBodyValidationMiddleware(
     const result = schema.safeParse(req.body);
 
     if (!result.success) {
-      res
-        .status(StatusCodes.BAD_REQUEST)
-        .json(convertZodErrorToResponse(result.error));
+      const badRequestResult = badRequest(
+        ErrorCode.InvalidRequest,
+        convertZodErrorToResponse(result.error),
+      );
+
+      res.status(badRequestResult.statusCode).json(badRequestResult);
 
       return;
     }

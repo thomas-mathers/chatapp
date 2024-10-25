@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -7,35 +8,35 @@ import { toMessageSummary } from '../services/messageService';
 
 const messages: Message[] = [
   {
-    _id: faker.string.uuid(),
+    _id: new ObjectId(),
     accountId: faker.string.uuid(),
     accountUsername: faker.internet.userName(),
     content: faker.lorem.sentence(),
     dateCreated: new Date('2024-01-01T00:00:00.000Z'),
   },
   {
-    _id: faker.string.uuid(),
+    _id: new ObjectId(),
     accountId: faker.string.uuid(),
     accountUsername: faker.internet.userName(),
     content: faker.lorem.sentence(),
     dateCreated: new Date('2024-01-01T00:00:00.000Z'),
   },
   {
-    _id: faker.string.uuid(),
+    _id: new ObjectId(),
     accountId: faker.string.uuid(),
     accountUsername: faker.internet.userName(),
     content: faker.lorem.sentence(),
     dateCreated: new Date('2024-01-01T00:00:00.000Z'),
   },
   {
-    _id: faker.string.uuid(),
+    _id: new ObjectId(),
     accountId: faker.string.uuid(),
     accountUsername: faker.internet.userName(),
     content: faker.lorem.sentence(),
     dateCreated: new Date('2024-01-01T00:00:00.000Z'),
   },
   {
-    _id: faker.string.uuid(),
+    _id: new ObjectId(),
     accountId: faker.string.uuid(),
     accountUsername: faker.internet.userName(),
     content: faker.lorem.sentence(),

@@ -5,5 +5,5 @@ export function convertZodErrorToResponse(error: ZodError) {
     message: `${issue.path.join('.')}: ${issue.message}`,
   }));
 
-  return { error: 'Invalid data', details: errorMessages };
+  return errorMessages;
 }

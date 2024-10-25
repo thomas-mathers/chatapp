@@ -159,6 +159,8 @@ export class AuthService {
       userCredentials.userId,
     );
 
+    console.log('account', account);
+
     if (!account) {
       return notFound(ErrorCode.AccountNotFound);
     }

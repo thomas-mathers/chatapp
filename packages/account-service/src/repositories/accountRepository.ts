@@ -3,7 +3,7 @@ import {
   Page,
   SortDirection,
 } from 'chatapp.account-service-contracts';
-import { Collection, Sort } from 'mongodb';
+import { Collection, ObjectId, Sort } from 'mongodb';
 
 import { Account } from '../models/account';
 
@@ -21,7 +21,7 @@ export class AccountRepository {
   }
 
   async getAccountById(id: string): Promise<Account | null> {
-    return await this.accountCollection.findOne({ _id: id });
+    return await this.accountCollection.findOne({ _id: new ObjectId(id) });
   }
 
   async getAccountByUsername(username: string): Promise<Account | null> {
@@ -39,7 +39,9 @@ export class AccountRepository {
     sortBy = 'username',
     sortDirection = SortDirection.Asc,
   }: GetAccountsRequest): Promise<Page<Account>> {
-    const filter = accountIds ? { _id: { $in: accountIds } } : {};
+    const filter = accountIds
+      ? { _id: { $in: accountIds.map((t) => new ObjectId(t)) } }
+      : {};
 
     const totalRecords = await this.accountCollection.countDocuments(filter);
 
@@ -68,7 +70,7 @@ export class AccountRepository {
 
   async deleteAccountById(id: string): Promise<number> {
     const { deletedCount } = await this.accountCollection.deleteOne(
-      { _id: id },
+      { _id: new ObjectId(id) },
       {},
     );
     return deletedCount;

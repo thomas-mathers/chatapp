@@ -12,6 +12,7 @@ export interface ApiResultSuccess<T> {
 export interface ApiError {
   code: ErrorCode;
   message: string;
+  details?: unknown;
 }
 
 export interface ApiResultError {
@@ -41,13 +42,14 @@ export function created<T>(data?: T): ApiResultSuccess<T> {
   };
 }
 
-export function badRequest(code: ErrorCode): ApiResultError {
+export function badRequest(code: ErrorCode, details?: unknown): ApiResultError {
   return {
     status: 'error',
     statusCode: StatusCodes.BAD_REQUEST,
     error: {
       code,
       message: ErrorCodeMessages[code],
+      details,
     },
     dateTime: new Date(),
   };

@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { CreateAccountRequest } from 'chatapp.account-service-contracts';
 import { createHashSync } from 'chatapp.crypto';
+import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { beforeEach, describe, it } from 'vitest';
 
@@ -13,7 +14,7 @@ const myEmail = faker.internet.email();
 
 const accounts: Account[] = [
   {
-    _id: faker.string.uuid(),
+    _id: new ObjectId(),
     username: myUsername,
     password: createHashSync(myPassword),
     email: myEmail,
@@ -21,7 +22,7 @@ const accounts: Account[] = [
     dateCreated: new Date('2023-01-01T00:00:00.000Z'),
   },
   {
-    _id: faker.string.uuid(),
+    _id: new ObjectId(),
     username: faker.internet.userName(),
     password: createHashSync(faker.internet.password()),
     email: faker.internet.email(),
@@ -29,7 +30,7 @@ const accounts: Account[] = [
     dateCreated: new Date('2024-01-02T00:00:00.000Z'),
   },
   {
-    _id: faker.string.uuid(),
+    _id: new ObjectId(),
     username: faker.internet.userName(),
     password: createHashSync(faker.internet.password()),
     email: faker.internet.email(),
@@ -37,7 +38,7 @@ const accounts: Account[] = [
     dateCreated: new Date('2024-01-03T00:00:00.000Z'),
   },
   {
-    _id: faker.string.uuid(),
+    _id: new ObjectId(),
     username: faker.internet.userName(),
     password: createHashSync(faker.internet.password()),
     email: faker.internet.email(),
@@ -219,7 +220,7 @@ describe('AccountController', () => {
 
       const response = await request(app.httpServer)
         .get('/accounts')
-        .query({ accountIds: accounts[0]._id })
+        .query({ accountIds: accounts[0]._id?.toHexString() })
         .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
 
       expect(response.status).toBe(200);

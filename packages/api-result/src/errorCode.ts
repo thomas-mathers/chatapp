@@ -4,6 +4,7 @@ export enum ErrorCode {
   EmailNotVerified = 'EmailNotVerified',
   IncorrectPassword = 'IncorrectPassword',
   InvalidToken = 'InvalidToken',
+  InvalidRequest = 'InvalidRequest',
 }
 
 export const ErrorCodeMessages: Record<ErrorCode, string> = {
@@ -12,4 +13,5 @@ export const ErrorCodeMessages: Record<ErrorCode, string> = {
   [ErrorCode.EmailNotVerified]: 'Email not verified',
   [ErrorCode.IncorrectPassword]: 'Incorrect password',
   [ErrorCode.InvalidToken]: 'Invalid token',
+  [ErrorCode.InvalidRequest]: 'Invalid request',
 };

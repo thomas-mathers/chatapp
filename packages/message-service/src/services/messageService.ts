@@ -40,7 +40,7 @@ export class MessageService {
 export function toMessageSummary(message: Message): MessageSummary {
   const { _id, accountId, accountUsername, content, dateCreated } = message;
   return {
-    id: _id!,
+    id: _id!.toHexString(),
     accountId,
     accountUsername,
     content,

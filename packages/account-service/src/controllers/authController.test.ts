@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { CreateAccountRequest } from 'chatapp.account-service-contracts';
 import { createHashSync } from 'chatapp.crypto';
+import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { beforeEach, describe, it } from 'vitest';
 
@@ -15,7 +16,7 @@ const myUnverifiedEmail = faker.internet.email();
 
 const accounts: Account[] = [
   {
-    _id: faker.string.uuid(),
+    _id: new ObjectId(),
     username: myUsername,
     password: createHashSync(myPassword),
     email: myEmail,
@@ -23,7 +24,7 @@ const accounts: Account[] = [
     dateCreated: new Date('2023-01-01T00:00:00.000Z'),
   },
   {
-    _id: faker.string.uuid(),
+    _id: new ObjectId(),
     username: myUnverifiedEmailUsername,
     password: createHashSync(myUnverifiedEmailPassword),
     email: myUnverifiedEmail,
