@@ -1,7 +1,11 @@
-import { createAccountRequestSchema } from 'chatapp.account-service-contracts';
+import {
+  createAccountRequestSchema,
+  getAccountsRequestSchema,
+} from 'chatapp.account-service-contracts';
 import {
   handleAuthMiddleware,
   handleRequestBodyValidationMiddleware,
+  handleRequestQueryValidationMiddleware,
 } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 
@@ -15,6 +19,17 @@ export class AccountController {
     readonly config: Config,
     readonly accountService: AccountService,
   ) {
+    this._router.get(
+      '/',
+      handleAuthMiddleware(config.jwt),
+      handleRequestQueryValidationMiddleware(getAccountsRequestSchema),
+      async (req: Request, res: Response) => {
+        const getAccountsRequest = getAccountsRequestSchema.parse(req.query);
+        const result = await accountService.getAccounts(getAccountsRequest);
+        res.status(result.statusCode).json(result);
+      },
+    );
+
     /**
      * @swagger
      * /accounts:

@@ -1,19 +1,47 @@
 import { faker } from '@faker-js/faker';
 import { CreateAccountRequest } from 'chatapp.account-service-contracts';
+import { createHashSync } from 'chatapp.crypto';
 import request from 'supertest';
 import { beforeEach, describe, it } from 'vitest';
 
 import { Account } from '../models/account';
 
-const username = faker.internet.userName();
-const password = faker.internet.password();
-const email = faker.internet.email();
+const myUsername = faker.internet.userName();
+const myPassword = faker.internet.password();
+const myEmail = faker.internet.email();
+const myUnverifiedEmailUsername = faker.internet.userName();
+const myUnverifiedEmailPassword = faker.internet.password();
+const myUnverifiedEmail = faker.internet.email();
+
+const accounts: Account[] = [
+  {
+    _id: faker.string.uuid(),
+    username: myUsername,
+    password: createHashSync(myPassword),
+    email: myEmail,
+    emailVerified: true,
+    dateCreated: new Date('2023-01-01T00:00:00.000Z'),
+  },
+  {
+    _id: faker.string.uuid(),
+    username: myUnverifiedEmailUsername,
+    password: createHashSync(myUnverifiedEmailPassword),
+    email: myUnverifiedEmail,
+    emailVerified: false,
+    dateCreated: new Date('2023-01-01T00:00:00.000Z'),
+  },
+];
 
 describe('AuthController', () => {
+  beforeEach(async ({ app }) => {
+    const accountCollection = app.mongoDatabase.collection<Account>('accounts');
+    await accountCollection.insertMany(accounts);
+  });
+
   describe('POST /auth/login', () => {
     it('should return 400 when username is missing', async ({ app }) => {
       const response = await request(app.httpServer).post('/auth/login').send({
-        password,
+        password: myPassword,
       });
 
       expect(response.status).toBe(400);
@@ -21,7 +49,7 @@ describe('AuthController', () => {
 
     it('should return 400 when password is missing', async ({ app }) => {
       const response = await request(app.httpServer).post('/auth/login').send({
-        username,
+        username: myUsername,
       });
 
       expect(response.status).toBe(400);
@@ -30,21 +58,15 @@ describe('AuthController', () => {
     it('should return 404 when username is not found', async ({ app }) => {
       const response = await request(app.httpServer).post('/auth/login').send({
         username: faker.internet.userName(),
-        password,
+        password: myPassword,
       });
 
       expect(response.status).toBe(404);
     });
 
     it('should return 401 when password is incorrect', async ({ app }) => {
-      await request(app.httpServer).post('/accounts').send({
-        username,
-        password,
-        email,
-      });
-
       const response = await request(app.httpServer).post('/auth/login').send({
-        username,
+        username: myUsername,
         password: faker.internet.password(),
       });
 
@@ -52,15 +74,9 @@ describe('AuthController', () => {
     });
 
     it('should return 401 when email is not verified', async ({ app }) => {
-      await request(app.httpServer).post('/accounts').send({
-        username,
-        password,
-        email,
-      });
-
       const response = await request(app.httpServer).post('/auth/login').send({
-        username,
-        password,
+        username: myUnverifiedEmailUsername,
+        password: myUnverifiedEmailPassword,
       });
 
       expect(response.status).toBe(401);
@@ -69,18 +85,9 @@ describe('AuthController', () => {
     it('should return 200 when username and password are correct', async ({
       app,
     }) => {
-      await request(app.httpServer).post('/accounts').send({
-        username,
-        password,
-        email,
-      });
-
-      const accounts = app.mongoDatabase.collection<Account>('accounts');
-      await accounts.updateOne({ username }, { $set: { emailVerified: true } });
-
       const response = await request(app.httpServer).post('/auth/login').send({
-        username,
-        password,
+        username: myUsername,
+        password: myPassword,
       });
 
       expect(response.status).toBe(200);
@@ -89,17 +96,6 @@ describe('AuthController', () => {
   });
 
   describe('PUT /auth/me/password', () => {
-    beforeEach(async ({ app }) => {
-      await request(app.httpServer).post('/accounts').send({
-        username,
-        password,
-        email,
-      });
-
-      const accounts = app.mongoDatabase.collection<Account>('accounts');
-      await accounts.updateOne({ username }, { $set: { emailVerified: true } });
-    });
-
     it('should return 401 when no token is provided', async ({ app }) => {
       const response = await request(app.httpServer)
         .put('/auth/me/password')
@@ -129,8 +125,8 @@ describe('AuthController', () => {
       const authResponse = await request(app.httpServer)
         .post('/auth/login')
         .send({
-          username,
-          password,
+          username: myUsername,
+          password: myPassword,
         });
 
       expect(authResponse.status).toBe(200);
@@ -149,8 +145,8 @@ describe('AuthController', () => {
       const authResponse = await request(app.httpServer)
         .post('/auth/login')
         .send({
-          username,
-          password,
+          username: myUsername,
+          password: myPassword,
         });
 
       expect(authResponse.status).toBe(200);
@@ -159,7 +155,7 @@ describe('AuthController', () => {
         .put('/auth/me/password')
         .set('Authorization', `Bearer ${authResponse.body.data.jwt}`)
         .send({
-          oldPassword: password,
+          oldPassword: myPassword,
         });
 
       expect(response.status).toBe(400);
@@ -169,8 +165,8 @@ describe('AuthController', () => {
       const authResponse = await request(app.httpServer)
         .post('/auth/login')
         .send({
-          username,
-          password,
+          username: myUsername,
+          password: myPassword,
         });
 
       expect(authResponse.status).toBe(200);
@@ -190,8 +186,8 @@ describe('AuthController', () => {
       const authResponse = await request(app.httpServer)
         .post('/auth/login')
         .send({
-          username,
-          password,
+          username: myUsername,
+          password: myPassword,
         });
 
       expect(authResponse.status).toBe(200);
@@ -200,7 +196,7 @@ describe('AuthController', () => {
         .put('/auth/me/password')
         .set('Authorization', `Bearer ${authResponse.body.data.jwt}`)
         .send({
-          oldPassword: password,
+          oldPassword: myPassword,
           newPassword: faker.internet.password(),
         });
 

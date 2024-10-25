@@ -1,22 +1,20 @@
 import bodyParser from 'body-parser';
-import { verifyJwt } from 'chatapp.crypto';
 import { Logger } from 'chatapp.logging';
-import { createMessageRequestSchema } from 'chatapp.message-service-contracts';
 import {
   handleAuthMiddleware,
   handleErrorMiddleware,
 } from 'chatapp.middlewares';
 import cors from 'cors';
 import express from 'express';
-import { IncomingMessage, Server } from 'http';
+import { Server } from 'http';
 import { Db, MongoClient } from 'mongodb';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { parse } from 'url';
-import { WebSocketServer } from 'ws';
 
+import { ChatServer } from './chatServer';
 import { Config } from './config';
 import { MessageController } from './controllers/messageController';
+import { UserController } from './controllers/userController';
 import { Message } from './models/message';
 import { MessageRepository } from './repositories/messageRepository';
 import { MessageService } from './services/messageService';
@@ -42,86 +40,13 @@ const swaggerDoc = swaggerJsdoc({
   apis: ['**/controllers/*.{ts,js}'],
 });
 
-function getAuthorizationToken(request: IncomingMessage): string | undefined {
-  const { query } = parse(request.url!, true);
-  const token = query.token;
-
-  if (typeof token === 'string') {
-    return token;
-  }
-
-  return undefined;
-}
-
-function launchWebSocketServer(
-  config: Config,
-  logger: Logger,
-  messageService: MessageService,
-): WebSocketServer {
-  const webSocketServer = new WebSocketServer({ port: 3002 });
-
-  webSocketServer.on('connection', (webSocket, request) => {
-    logger.info(`${request.socket.remoteAddress} connected`);
-
-    const token = getAuthorizationToken(request);
-
-    if (token === undefined) {
-      webSocket.close();
-      return;
-    }
-
-    const userCredentials = verifyJwt(token, config.jwt);
-
-    if (userCredentials === undefined) {
-      webSocket.close();
-      return;
-    }
-
-    webSocket.on('message', async (payload) => {
-      try {
-        const createMessageRequest = createMessageRequestSchema.parse(
-          JSON.parse(payload.toString()),
-        );
-
-        const result = await messageService.createMessage(
-          userCredentials.userId,
-          userCredentials.username,
-          createMessageRequest.content,
-        );
-
-        if (result.status === 'error') {
-          return;
-        }
-
-        webSocketServer.clients.forEach((client) => {
-          client.send(JSON.stringify(result.data));
-        });
-      } catch (error) {
-        logger.error(
-          `Exception while processing message from ${userCredentials.userId}`,
-          {
-            userCredentials,
-            error,
-          },
-        );
-      }
-    });
-
-    webSocket.on('close', () => {
-      logger.info(`${userCredentials.username} disconnected`);
-    });
-  });
-
-  return webSocketServer;
-}
-
 export class App {
   private constructor(
     private readonly _logger: Logger,
     private readonly _httpServer: Server,
     private readonly _mongoClient: MongoClient,
     private readonly _mongoDatabase: Db,
-    private readonly _webSocketServer: WebSocketServer,
+    private readonly _chatServer: ChatServer,
   ) {}
 
   static async launch(config: Config): Promise<App> {
@@ -142,11 +67,9 @@ export class App {
     const messageService = new MessageService(messageRepository);
     const messageController = new MessageController(messageService);
 
-    const webSocketServer = launchWebSocketServer(
-      config,
-      logger,
-      messageService,
-    );
+    const chatServer = new ChatServer(config, logger, messageService);
+
+    const userController = new UserController(chatServer);
 
     const httpServer = express()
       .use(cors())
@@ -154,18 +77,13 @@ export class App {
       .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
       .use(handleAuthMiddleware(config.jwt))
       .use('/messages', messageController.router)
+      .use('/users', userController.router)
       .use(handleErrorMiddleware)
       .listen(config.port, () => {
         logger.info(`Server is running on port ${config.port}`);
       });
 
-    return new App(
-      logger,
-      httpServer,
-      mongoClient,
-      mongoDatabase,
-      webSocketServer,
-    );
+    return new App(logger, httpServer, mongoClient, mongoDatabase, chatServer);
   }
 
   async dropDatabase() {
@@ -174,7 +92,7 @@ export class App {
 
   async close() {
     await this.closeHttpServer();
-    await this.closeWebSocketServer();
+    await this.closeChatServer();
     await this.closeMongoClient();
   }
 
@@ -187,13 +105,8 @@ export class App {
     });
   }
 
-  private closeWebSocketServer(): Promise<void> {
-    return new Promise<void>((resolve) => {
-      this._webSocketServer.close(() => {
-        this._logger.info('WebSocket server closed');
-        resolve();
-      });
-    });
+  private async closeChatServer(): Promise<void> {
+    await this._chatServer.close();
   }
 
   private async closeMongoClient(): Promise<void> {

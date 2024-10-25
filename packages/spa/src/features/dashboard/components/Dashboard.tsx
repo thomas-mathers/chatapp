@@ -1,8 +1,10 @@
 import { AccountCircle } from '@mui/icons-material';
+import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
   Box,
   CircularProgress,
+  Drawer,
   IconButton,
   Menu,
   MenuItem,
@@ -20,13 +22,16 @@ import { RealtimeService } from '@app/services/realtimeService';
 
 import { MessageInput } from './messageInput';
 import { MessageList } from './messageList';
+import { UserList } from './userList';
 
 const Header = () => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   const menuId = 'primary-search-account-menu';
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const isMenuOpen = Boolean(anchorEl);
+  const isAccountMenuOpen = Boolean(anchorEl);
 
   const authService = useAuthService();
   const navigate = useNavigate();
@@ -49,6 +54,16 @@ const Header = () => {
     <Box>
       <AppBar position="static">
         <Toolbar>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+            onClick={() => setIsDrawerOpen(true)}
+          >
+            <MenuIcon />
+          </IconButton>
           <Typography
             variant="h6"
             noWrap
@@ -71,11 +86,16 @@ const Header = () => {
           </IconButton>
         </Toolbar>
       </AppBar>
+      <Drawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
+        <Box sx={{ width: 250, padding: 2 }}>
+          <UserList />
+        </Box>
+      </Drawer>
       <Menu
         id={menuId}
         anchorEl={anchorEl}
         keepMounted
-        open={isMenuOpen}
+        open={isAccountMenuOpen}
         onClose={handleMenuClose}
       >
         <MenuItem onClick={handleLogout}>Logout</MenuItem>

@@ -1,10 +1,8 @@
-import { ObjectId } from 'mongodb';
-
 export interface Account {
-  _id?: ObjectId;
+  _id?: string;
   username: string;
   password: string;
   email: string;
   emailVerified: boolean;
-  createdAt: Date;
+  dateCreated: Date;
 }

@@ -15,21 +15,15 @@ export const MessageList = () => {
 
   const messageService = useMessageService();
 
-  const {
-    data: oldMessagesStream,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-  } = useInfiniteQuery({
+  const { data, fetchNextPage, hasNextPage, isFetching } = useInfiniteQuery({
     queryKey: ['messages'],
     queryFn: async ({ pageParam: page }) => {
       const answer = await messageService.getMessages({
         page,
-        pageSize: 10,
+        pageSize: 50,
         sortBy: 'dateCreated',
         sortDirection: SortDirection.Desc,
       });
-      console.log(answer);
       return answer;
     },
     initialPageParam: 1,
@@ -37,10 +31,11 @@ export const MessageList = () => {
       lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
   });
 
+  const numPagesFetched = data?.pages.length;
+
   const oldMessages = useMemo(
-    () =>
-      oldMessagesStream?.pages.flatMap((page) => page.records).reverse() ?? [],
-    [oldMessagesStream],
+    () => data?.pages.flatMap((page) => page.records).reverse() ?? [],
+    [data],
   );
 
   const [newMessages, setNewMessages] = useState<MessageSummary[]>([]);
@@ -58,8 +53,12 @@ export const MessageList = () => {
   }, [realtimeMessageService]);
 
   useLayoutEffect(() => {
-    firstMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [oldMessages]);
+    if (numPagesFetched === 1) {
+      lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      firstMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [oldMessages, numPagesFetched]);
 
   useLayoutEffect(() => {
     lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });

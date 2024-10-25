@@ -144,7 +144,7 @@ describe('MessageController', () => {
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({
+      expect(response.body.data).toEqual({
         records: [],
         page: 1,
         pageSize: 10,
@@ -171,7 +171,7 @@ describe('MessageController', () => {
           .query({ sortBy: 'accountId' });
 
         expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
+        expect(response.body.data).toMatchObject({
           records: messages.toSorted(compareByAccountId).map(toMessageSummary),
           page: 1,
           pageSize: 10,
@@ -190,7 +190,7 @@ describe('MessageController', () => {
           .query({ sortBy: 'accountId', sortDirection: 'desc' });
 
         expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
+        expect(response.body.data).toMatchObject({
           records: messages
             .toSorted(compareByAccountId)
             .reverse()
@@ -212,7 +212,7 @@ describe('MessageController', () => {
           .query({ sortBy: 'accountUsername' });
 
         expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
+        expect(response.body.data).toMatchObject({
           records: messages
             .toSorted(compareByAccountUsername)
             .map(toMessageSummary),
@@ -233,7 +233,7 @@ describe('MessageController', () => {
           .query({ sortBy: 'accountUsername', sortDirection: 'desc' });
 
         expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
+        expect(response.body.data).toMatchObject({
           records: messages
             .toSorted(compareByAccountUsername)
             .reverse()
@@ -255,7 +255,7 @@ describe('MessageController', () => {
           .query({ sortBy: 'content' });
 
         expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
+        expect(response.body.data).toMatchObject({
           records: messages.toSorted(compareByContent).map(toMessageSummary),
           page: 1,
           pageSize: 10,
@@ -274,7 +274,7 @@ describe('MessageController', () => {
           .query({ sortBy: 'content', sortDirection: 'desc' });
 
         expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
+        expect(response.body.data).toMatchObject({
           records: messages
             .toSorted(compareByContent)
             .reverse()
@@ -295,7 +295,7 @@ describe('MessageController', () => {
           .set('Authorization', `Bearer ${token}`);
 
         expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
+        expect(response.body.data).toMatchObject({
           records: messages
             .toSorted(compareByDateCreated)
             .map(toMessageSummary),
@@ -316,7 +316,7 @@ describe('MessageController', () => {
           .query({ sortDirection: 'desc' });
 
         expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
+        expect(response.body.data).toMatchObject({
           records: messages
             .toSorted(compareByDateCreated)
             .reverse()
@@ -335,7 +335,7 @@ describe('MessageController', () => {
           .query({ page: 1, pageSize: 3 });
 
         expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
+        expect(response.body.data).toMatchObject({
           records: messages
             .toSorted(compareByDateCreated)
             .slice(0, 3)
@@ -357,7 +357,7 @@ describe('MessageController', () => {
           .query({ page: 2, pageSize: 3 });
 
         expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
+        expect(response.body.data).toMatchObject({
           records: messages
             .toSorted(compareByDateCreated)
             .slice(3, 5)
@@ -379,7 +379,7 @@ describe('MessageController', () => {
           .query({ page: 3, pageSize: 3 });
 
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({
+        expect(response.body.data).toEqual({
           records: [],
           page: 3,
           pageSize: 3,
@@ -398,7 +398,7 @@ describe('MessageController', () => {
           .query({ pageSize: 10 });
 
         expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
+        expect(response.body.data).toMatchObject({
           records: messages
             .toSorted(compareByDateCreated)
             .map(toMessageSummary),

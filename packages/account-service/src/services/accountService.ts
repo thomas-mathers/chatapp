@@ -1,6 +1,8 @@
 import {
   AccountSummary,
   CreateAccountRequest,
+  GetAccountsRequest,
+  Page,
 } from 'chatapp.account-service-contracts';
 import {
   ApiResult,
@@ -38,7 +40,7 @@ export class AccountService {
         password: hash,
         email: request.email,
         emailVerified: false,
-        createdAt: new Date(),
+        dateCreated: new Date(),
       });
 
       const accountSummary = toAccountSummary(account);
@@ -83,6 +85,17 @@ export class AccountService {
     return ok(accountSummary);
   }
 
+  async getAccounts(
+    request: GetAccountsRequest,
+  ): Promise<ApiResult<Page<AccountSummary>>> {
+    const page = await this.accountRepository.getAccounts(request);
+
+    return ok({
+      ...page,
+      records: page.records.map(toAccountSummary),
+    });
+  }
+
   async deleteAccount(id: string): Promise<ApiResult<void>> {
     const numDeleted = await this.accountRepository.deleteAccountById(id);
 
@@ -96,12 +109,12 @@ export class AccountService {
   }
 }
 
-function toAccountSummary(account: Account): AccountSummary {
-  const { _id, username, email, createdAt } = account;
+export function toAccountSummary(account: Account): AccountSummary {
+  const { _id, username, email, dateCreated } = account;
   return {
     id: _id!.toString(),
     username,
     email,
-    createdAt,
+    dateCreated: dateCreated.toISOString(),
   };
 }
