@@ -2,10 +2,10 @@ import { LoadingButton } from '@mui/lab';
 import { Alert, Container, Stack, TextField, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { ChangePasswordRequest } from 'chatapp.account-service-contracts';
-import { ApiError } from 'chatapp.api-result';
 import { Controller, useForm } from 'react-hook-form';
 
 import { useAuthService } from '@app/hooks';
+import { ApiError } from '@app/types/apiError';
 
 interface ChangePasswordFormState {
   oldPassword: string;

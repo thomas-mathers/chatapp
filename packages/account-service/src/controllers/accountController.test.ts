@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { CreateAccountRequest } from 'chatapp.account-service-contracts';
+import { AccountRegistrationRequest } from 'chatapp.account-service-contracts';
 import { createHashSync } from 'chatapp.crypto';
 import { ObjectId } from 'mongodb';
 import request from 'supertest';
@@ -55,7 +55,7 @@ describe('AccountController', () => {
 
   describe('POST /accounts', () => {
     it('should create a new account and return 201', async ({ app }) => {
-      const newAccount: Partial<CreateAccountRequest> = {
+      const newAccount: Partial<AccountRegistrationRequest> = {
         username: faker.internet.userName(),
         email: faker.internet.email(),
         password: faker.internet.password(),
@@ -66,13 +66,13 @@ describe('AccountController', () => {
         .send(newAccount);
 
       expect(response.status).toBe(201);
-      expect(response.body.data).toHaveProperty('id');
-      expect(response.body.data.username).toBe(newAccount.username);
-      expect(response.body.data.email).toBe(newAccount.email);
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.username).toBe(newAccount.username);
+      expect(response.body.email).toBe(newAccount.email);
     });
 
     it('should return 400 when username is missing', async ({ app }) => {
-      const newAccount: Partial<CreateAccountRequest> = {
+      const newAccount: Partial<AccountRegistrationRequest> = {
         email: faker.internet.email(),
         password: faker.internet.password(),
       };
@@ -85,7 +85,7 @@ describe('AccountController', () => {
     });
 
     it('should return 400 when email is missing', async ({ app }) => {
-      const newAccount: Partial<CreateAccountRequest> = {
+      const newAccount: Partial<AccountRegistrationRequest> = {
         username: faker.internet.userName(),
         password: faker.internet.password(),
       };
@@ -98,7 +98,7 @@ describe('AccountController', () => {
     });
 
     it('should return 400 when password is missing', async ({ app }) => {
-      const newAccount: Partial<CreateAccountRequest> = {
+      const newAccount: Partial<AccountRegistrationRequest> = {
         username: faker.internet.userName(),
         email: faker.internet.email(),
       };
@@ -111,7 +111,7 @@ describe('AccountController', () => {
     });
 
     it('should return 409 when username is already taken', async ({ app }) => {
-      const existingAccount: Partial<CreateAccountRequest> = {
+      const existingAccount: Partial<AccountRegistrationRequest> = {
         username: faker.internet.userName(),
         password: faker.internet.password(),
         email: faker.internet.email(),
@@ -123,7 +123,7 @@ describe('AccountController', () => {
 
       expect(createResponse.status).toBe(201);
 
-      const conflictingAccount: Partial<CreateAccountRequest> = {
+      const conflictingAccount: Partial<AccountRegistrationRequest> = {
         username: existingAccount.username,
         password: faker.internet.password(),
         email: faker.internet.email(),
@@ -137,7 +137,7 @@ describe('AccountController', () => {
     });
 
     it('should return 409 when email is already taken', async ({ app }) => {
-      const existingAccount: Partial<CreateAccountRequest> = {
+      const existingAccount: Partial<AccountRegistrationRequest> = {
         username: faker.internet.userName(),
         email: faker.internet.email(),
         password: faker.internet.password(),
@@ -149,7 +149,7 @@ describe('AccountController', () => {
 
       expect(createdResponse.status).toBe(201);
 
-      const conflictingAccount: Partial<CreateAccountRequest> = {
+      const conflictingAccount: Partial<AccountRegistrationRequest> = {
         username: faker.internet.userName(),
         email: existingAccount.email,
         password: faker.internet.password(),
@@ -192,10 +192,10 @@ describe('AccountController', () => {
 
       const response = await request(app.httpServer)
         .get('/accounts')
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: accounts
           .toSorted((a, b) => a.username.localeCompare(b.username))
           .map(toAccountSummary),
@@ -221,10 +221,10 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ accountIds: accounts[0]._id?.toHexString() })
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: [toAccountSummary(accounts[0])],
         page: 1,
         pageSize: 10,
@@ -246,10 +246,10 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'username', sortDirection: 'asc' })
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: accounts
           .toSorted((a, b) => a.username.localeCompare(b.username))
           .map(toAccountSummary),
@@ -273,10 +273,10 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'username', sortDirection: 'desc' })
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: accounts
           .toSorted((a, b) => a.username.localeCompare(b.username))
           .reverse()
@@ -301,10 +301,10 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'email', sortDirection: 'asc' })
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: accounts
           .toSorted((a, b) => a.email.localeCompare(b.email))
           .map(toAccountSummary),
@@ -328,10 +328,10 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'email', sortDirection: 'desc' })
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: accounts
           .toSorted((a, b) => a.email.localeCompare(b.email))
           .reverse()
@@ -356,10 +356,10 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'dateCreated', sortDirection: 'asc' })
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: accounts
           .toSorted((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime())
           .map(toAccountSummary),
@@ -383,10 +383,10 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'dateCreated', sortDirection: 'desc' })
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: accounts
           .toSorted((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime())
           .reverse()
@@ -411,10 +411,10 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ page: 1, pageSize: 2 })
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: accounts
           .toSorted((a, b) => a.username.localeCompare(b.username))
           .slice(0, 2)
@@ -439,10 +439,10 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ page: 2, pageSize: 2 })
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: accounts
           .toSorted((a, b) => a.username.localeCompare(b.username))
           .slice(2, 4)
@@ -469,10 +469,10 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ page: 3, pageSize: 2 })
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: [],
         page: 3,
         pageSize: 2,
@@ -496,10 +496,10 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ page: 1, pageSize: 10 })
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toMatchObject({
+      expect(response.body).toMatchObject({
         records: accounts
           .toSorted((a, b) => a.username.localeCompare(b.username))
           .map(toAccountSummary),
@@ -540,12 +540,12 @@ describe('AccountController', () => {
 
       const response = await request(app.httpServer)
         .get('/accounts/me')
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toHaveProperty('id');
-      expect(response.body.data.username).toBe(myUsername);
-      expect(response.body.data.email).toBe(myEmail);
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.username).toBe(myUsername);
+      expect(response.body.email).toBe(myEmail);
     });
   });
 
@@ -578,7 +578,7 @@ describe('AccountController', () => {
 
       const response = await request(app.httpServer)
         .delete('/accounts/me')
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
 
       expect(response.status).toBe(200);
     });

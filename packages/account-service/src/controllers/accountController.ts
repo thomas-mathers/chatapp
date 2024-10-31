@@ -1,5 +1,7 @@
 import {
-  createAccountRequestSchema,
+  AccountServiceErrorCode,
+  accountRegistrationRequest,
+  createAccountServiceError,
   getAccountsRequestSchema,
 } from 'chatapp.account-service-contracts';
 import {
@@ -8,6 +10,8 @@ import {
   handleRequestQueryValidationMiddleware,
 } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { Result } from 'typescript-result';
 
 import { Config } from '../config';
 import { AccountService } from '../services/accountService';
@@ -26,7 +30,7 @@ export class AccountController {
       async (req: Request, res: Response) => {
         const getAccountsRequest = getAccountsRequestSchema.parse(req.query);
         const result = await accountService.getAccounts(getAccountsRequest);
-        res.status(result.statusCode).json(result);
+        res.status(StatusCodes.OK).json(result);
       },
     );
 
@@ -86,10 +90,39 @@ export class AccountController {
      */
     this._router.post(
       '/',
-      handleRequestBodyValidationMiddleware(createAccountRequestSchema),
+      handleRequestBodyValidationMiddleware(accountRegistrationRequest),
       async (req: Request, res: Response) => {
-        const result = await accountService.createAccount(req.body);
-        res.status(result.statusCode).json(result);
+        Result.fromAsync(accountService.register(req.body)).fold(
+          (result) => res.status(201).json(result),
+          (error) => {
+            switch (error) {
+              case AccountServiceErrorCode.UsernameExists:
+                res
+                  .status(StatusCodes.CONFLICT)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.UsernameExists,
+                    ),
+                  );
+                break;
+              case AccountServiceErrorCode.EmailExists:
+                res
+                  .status(StatusCodes.CONFLICT)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.EmailExists,
+                    ),
+                  );
+                break;
+              default:
+                res
+                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
+                  .json(
+                    createAccountServiceError(AccountServiceErrorCode.Unknown),
+                  );
+            }
+          },
+        );
       },
     );
 
@@ -138,8 +171,28 @@ export class AccountController {
       '/me',
       handleAuthMiddleware(config.jwt),
       async (req: Request, res: Response) => {
-        const result = await accountService.getAccountById(req.accountId);
-        res.status(result.statusCode).json(result);
+        Result.fromAsync(accountService.getAccountById(req.accountId)).fold(
+          (result) => res.status(StatusCodes.OK).json(result),
+          (error) => {
+            switch (error) {
+              case AccountServiceErrorCode.AccountNotFound:
+                res
+                  .status(StatusCodes.NOT_FOUND)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.AccountNotFound,
+                    ),
+                  );
+                break;
+              default:
+                res
+                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
+                  .json(
+                    createAccountServiceError(AccountServiceErrorCode.Unknown),
+                  );
+            }
+          },
+        );
       },
     );
 
@@ -173,8 +226,28 @@ export class AccountController {
       '/me',
       handleAuthMiddleware(config.jwt),
       async (req: Request, res: Response) => {
-        const result = await accountService.deleteAccount(req.accountId);
-        res.status(result.statusCode).json(result);
+        Result.fromAsync(accountService.deleteAccount(req.accountId)).fold(
+          (result) => res.status(StatusCodes.OK).json(result),
+          (error) => {
+            switch (error) {
+              case AccountServiceErrorCode.AccountNotFound:
+                res
+                  .status(StatusCodes.NOT_FOUND)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.AccountNotFound,
+                    ),
+                  );
+                break;
+              default:
+                res
+                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
+                  .json(
+                    createAccountServiceError(AccountServiceErrorCode.Unknown),
+                  );
+            }
+          },
+        );
       },
     );
   }

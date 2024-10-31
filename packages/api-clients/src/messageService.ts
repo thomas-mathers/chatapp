@@ -43,10 +43,6 @@ export class MessageService {
       },
     });
 
-    if (result.status === 'error') {
-      throw result.error;
-    }
-
-    return result.data!;
+    return result;
   }
 }

@@ -1,5 +1,3 @@
-import { ApiResult } from 'chatapp.api-result';
-
 interface RequestParameters {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   path: string;
@@ -17,7 +15,7 @@ export class ApiClient {
     path,
     queryParameters,
     body,
-  }: RequestParameters): Promise<ApiResult<T>> {
+  }: RequestParameters): Promise<T> {
     const url = new URL(path, this.baseUrl);
 
     if (queryParameters) {
@@ -37,6 +35,10 @@ export class ApiClient {
 
     const responseBody = await response.json();
 
-    return responseBody as ApiResult<T>;
+    if (!response.ok) {
+      throw responseBody;
+    }
+
+    return responseBody as T;
   }
 }

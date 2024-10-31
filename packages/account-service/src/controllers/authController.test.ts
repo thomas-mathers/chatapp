@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { CreateAccountRequest } from 'chatapp.account-service-contracts';
+import { AccountRegistrationRequest } from 'chatapp.account-service-contracts';
 import { createHashSync } from 'chatapp.crypto';
 import { ObjectId } from 'mongodb';
 import request from 'supertest';
@@ -92,7 +92,7 @@ describe('AuthController', () => {
       });
 
       expect(response.status).toBe(200);
-      expect(response.body.data).toHaveProperty('jwt');
+      expect(response.body).toHaveProperty('jwt');
     });
   });
 
@@ -134,7 +134,7 @@ describe('AuthController', () => {
 
       const response = await request(app.httpServer)
         .put('/auth/me/password')
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`)
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`)
         .send({
           newPassword: faker.internet.password(),
         });
@@ -154,7 +154,7 @@ describe('AuthController', () => {
 
       const response = await request(app.httpServer)
         .put('/auth/me/password')
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`)
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`)
         .send({
           oldPassword: myPassword,
         });
@@ -174,7 +174,7 @@ describe('AuthController', () => {
 
       const response = await request(app.httpServer)
         .put('/auth/me/password')
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`)
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`)
         .send({
           oldPassword: faker.internet.password(),
           newPassword: faker.internet.password(),
@@ -195,7 +195,7 @@ describe('AuthController', () => {
 
       const response = await request(app.httpServer)
         .put('/auth/me/password')
-        .set('Authorization', `Bearer ${authResponse.body.data.jwt}`)
+        .set('Authorization', `Bearer ${authResponse.body.jwt}`)
         .send({
           oldPassword: myPassword,
           newPassword: faker.internet.password(),
@@ -223,7 +223,7 @@ describe('AuthController', () => {
     });
 
     it('should return 200 when email is found', async ({ app }) => {
-      const newAccount: Partial<CreateAccountRequest> = {
+      const newAccount: Partial<AccountRegistrationRequest> = {
         username: faker.internet.userName(),
         email: faker.internet.email(),
         password: faker.internet.password(),

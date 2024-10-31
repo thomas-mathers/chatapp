@@ -4,6 +4,7 @@ import {
 } from 'chatapp.message-service-contracts';
 import { handleRequestQueryValidationMiddleware } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 import { MessageService } from '../services/messageService';
 
@@ -95,7 +96,7 @@ export class MessageController {
       async (req: Request, res: Response) => {
         const getMessagesRequest = getMessagesRequestSchema.parse(req.query);
         const result = await messageService.getMessages(getMessagesRequest);
-        res.status(result.statusCode).json(result);
+        res.status(StatusCodes.OK).json(result);
       },
     );
 
@@ -151,7 +152,7 @@ export class MessageController {
         req.accountUsername,
         body.content,
       );
-      res.status(result.statusCode).json(result);
+      res.status(StatusCodes.OK).json(result);
     });
   }
 

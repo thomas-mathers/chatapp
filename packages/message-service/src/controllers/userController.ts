@@ -1,5 +1,5 @@
-import { ok } from 'chatapp.api-result';
 import { Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 import { ChatServer } from '../chatServer';
 
@@ -8,8 +8,7 @@ export class UserController {
 
   constructor(chatServer: ChatServer) {
     this._router.get('/', (req, res) => {
-      const usersResult = ok(chatServer.users);
-      res.status(usersResult.statusCode).json(usersResult);
+      res.status(StatusCodes.OK).json(chatServer.users);
     });
   }
 

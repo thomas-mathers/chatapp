@@ -15,8 +15,13 @@ export class AccountRepository {
     return account;
   }
 
-  async containsAccount(username: string): Promise<boolean> {
-    const document = this.getAccountByUsername(username);
+  async containsUsername(username: string): Promise<boolean> {
+    const document = await this.getAccountByUsername(username);
+    return document !== null;
+  }
+
+  async containsEmail(email: string): Promise<boolean> {
+    const document = await this.getAccountByEmail(email);
     return document !== null;
   }
 

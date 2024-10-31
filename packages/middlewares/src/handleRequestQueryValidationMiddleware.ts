@@ -1,8 +1,9 @@
-import { ErrorCode, badRequest } from 'chatapp.api-result';
+import { ApiError } from 'chatapp.api-error';
 import { NextFunction, Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import { UnknownKeysParam, ZodRawShape, z } from 'zod';
 
-import { convertZodErrorToResponse } from './utils/convertZodErrorToResponse';
+import { getErrorDetails } from './utils/getErrorDetails';
 
 export function handleRequestQueryValidationMiddleware(
   schema: z.ZodObject<ZodRawShape, UnknownKeysParam>,
@@ -11,12 +12,13 @@ export function handleRequestQueryValidationMiddleware(
     const result = schema.safeParse(req.query);
 
     if (!result.success) {
-      const badRequestResult = badRequest(
-        ErrorCode.InvalidRequest,
-        convertZodErrorToResponse(result.error),
-      );
+      const error: ApiError<void> = {
+        code: undefined,
+        message: 'Invalid request body',
+        details: getErrorDetails(result.error),
+      };
 
-      res.status(badRequestResult.statusCode).json(badRequestResult);
+      res.status(StatusCodes.BAD_REQUEST).json(error);
 
       return;
     }

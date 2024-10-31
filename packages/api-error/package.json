@@ -1,5 +1,5 @@
 {
-  "name": "chatapp.api-result",
+  "name": "chatapp.api-error",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -12,9 +12,6 @@
     "test": "vitest run --config vitest.config.mts",
     "test:watch": "vitest --config vitest.config.mts",
     "test:coverage": "vitest --config vitest.config.mts --coverage --ws run"
-  },
-  "dependencies": {
-    "zod": "^3.23.8"
   },
   "exports": {
     ".": "./src/index.ts"

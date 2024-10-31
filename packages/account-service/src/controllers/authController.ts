@@ -1,10 +1,12 @@
 import {
+  AccountServiceErrorCode,
   ChangePasswordRequest,
   LoginRequest,
   PasswordResetRequest,
   PasswordResetTokenRequest,
   changePasswordRequestSchema,
   confirmEmailRequestSchema,
+  createAccountServiceError,
   loginRequestSchema,
   passwordResetRequestSchema,
   passwordResetTokenRequestSchema,
@@ -14,6 +16,8 @@ import {
   handleRequestBodyValidationMiddleware,
 } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { Result } from 'typescript-result';
 
 import { Config } from '../config';
 import { AuthService } from '../services/authService';
@@ -65,8 +69,46 @@ export class AuthController {
       handleRequestBodyValidationMiddleware(loginRequestSchema),
       async (req: Request, res: Response) => {
         const body: LoginRequest = req.body;
-        const result = await authService.login(body.username, body.password);
-        res.status(result.statusCode).json(result);
+        Result.fromAsync(authService.login(body.username, body.password)).fold(
+          (result) => res.status(StatusCodes.OK).json(result),
+          (error) => {
+            switch (error) {
+              case AccountServiceErrorCode.IncorrectPassword:
+                res
+                  .status(StatusCodes.UNAUTHORIZED)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.IncorrectPassword,
+                    ),
+                  );
+                break;
+              case AccountServiceErrorCode.EmailNotVerified:
+                res
+                  .status(StatusCodes.UNAUTHORIZED)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.EmailNotVerified,
+                    ),
+                  );
+                break;
+              case AccountServiceErrorCode.AccountNotFound:
+                res
+                  .status(StatusCodes.NOT_FOUND)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.AccountNotFound,
+                    ),
+                  );
+                break;
+              default:
+                res
+                  .status(500)
+                  .json(
+                    createAccountServiceError(AccountServiceErrorCode.Unknown),
+                  );
+            }
+          },
+        );
       },
     );
 
@@ -105,12 +147,43 @@ export class AuthController {
       handleRequestBodyValidationMiddleware(changePasswordRequestSchema),
       async (req: Request, res: Response) => {
         const body: ChangePasswordRequest = req.body;
-        const result = await authService.changePassword(
-          req.accountId,
-          body.oldPassword,
-          body.newPassword,
+        Result.fromAsync(
+          authService.changePassword(
+            req.accountId,
+            body.oldPassword,
+            body.newPassword,
+          ),
+        ).fold(
+          (result) => res.status(StatusCodes.OK).json(result),
+          (error) => {
+            switch (error) {
+              case AccountServiceErrorCode.IncorrectPassword:
+                res
+                  .status(StatusCodes.UNAUTHORIZED)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.IncorrectPassword,
+                    ),
+                  );
+                break;
+              case AccountServiceErrorCode.AccountNotFound:
+                res
+                  .status(StatusCodes.NOT_FOUND)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.AccountNotFound,
+                    ),
+                  );
+                break;
+              default:
+                res
+                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
+                  .json(
+                    createAccountServiceError(AccountServiceErrorCode.Unknown),
+                  );
+            }
+          },
         );
-        res.status(result.statusCode).json(result);
       },
     );
 
@@ -144,8 +217,28 @@ export class AuthController {
       handleRequestBodyValidationMiddleware(passwordResetTokenRequestSchema),
       async (req: Request, res: Response) => {
         const body: PasswordResetTokenRequest = req.body;
-        const result = await authService.resetPasswordRequest(body.email);
-        res.status(result.statusCode).json(result);
+        Result.fromAsync(authService.resetPasswordRequest(body.email)).fold(
+          (result) => res.status(StatusCodes.OK).json(result),
+          (error) => {
+            switch (error) {
+              case AccountServiceErrorCode.AccountNotFound:
+                res
+                  .status(StatusCodes.NOT_FOUND)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.AccountNotFound,
+                    ),
+                  );
+                break;
+              default:
+                res
+                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
+                  .json(
+                    createAccountServiceError(AccountServiceErrorCode.Unknown),
+                  );
+            }
+          },
+        );
       },
     );
 
@@ -181,11 +274,39 @@ export class AuthController {
       handleRequestBodyValidationMiddleware(passwordResetRequestSchema),
       async (req: Request, res: Response) => {
         const body: PasswordResetRequest = req.body;
-        const result = await authService.resetPassword(
-          body.token,
-          body.newPassword,
+        Result.fromAsync(
+          authService.resetPassword(body.token, body.newPassword),
+        ).fold(
+          (result) => res.status(StatusCodes.OK).json(result),
+          (error) => {
+            switch (error) {
+              case AccountServiceErrorCode.InvalidToken:
+                res
+                  .status(StatusCodes.FORBIDDEN)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.InvalidToken,
+                    ),
+                  );
+                break;
+              case AccountServiceErrorCode.AccountNotFound:
+                res
+                  .status(StatusCodes.NOT_FOUND)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.AccountNotFound,
+                    ),
+                  );
+                break;
+              default:
+                res
+                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
+                  .json(
+                    createAccountServiceError(AccountServiceErrorCode.Unknown),
+                  );
+            }
+          },
         );
-        res.status(result.statusCode).json(result);
       },
     );
 
@@ -193,8 +314,37 @@ export class AuthController {
       '/email-confirmations',
       handleRequestBodyValidationMiddleware(confirmEmailRequestSchema),
       async (req: Request, res: Response) => {
-        const result = await authService.confirmEmail(req.body.token);
-        res.status(result.statusCode).json(result);
+        Result.fromAsync(authService.confirmEmail(req.body.token)).fold(
+          (result) => res.status(StatusCodes.OK).json(result),
+          (error) => {
+            switch (error) {
+              case AccountServiceErrorCode.InvalidToken:
+                res
+                  .status(StatusCodes.FORBIDDEN)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.InvalidToken,
+                    ),
+                  );
+                break;
+              case AccountServiceErrorCode.AccountNotFound:
+                res
+                  .status(StatusCodes.NOT_FOUND)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.AccountNotFound,
+                    ),
+                  );
+                break;
+              default:
+                res
+                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
+                  .json(
+                    createAccountServiceError(AccountServiceErrorCode.Unknown),
+                  );
+            }
+          },
+        );
       },
     );
   }

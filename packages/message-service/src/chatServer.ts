@@ -55,18 +55,14 @@ export class ChatServer {
             JSON.parse(payload.toString()),
           );
 
-          const result = await messageService.createMessage(
+          const message = await messageService.createMessage(
             userCredentials.userId,
             userCredentials.username,
             createMessageRequest.content,
           );
 
-          if (result.status === 'error') {
-            return;
-          }
-
           this.webSocketServer.clients.forEach((client) => {
-            client.send(JSON.stringify(result.data));
+            client.send(JSON.stringify(message));
           });
         } catch (error) {
           logger.error(
