@@ -22,7 +22,7 @@ export class AuthService {
     username: string,
     password: string,
   ): Promise<Result<LoginResponse, AccountServiceErrorCode>> {
-    const account = await this.accountRepository.getAccountByUsername(username);
+    const account = await this.accountRepository.getByUsername(username);
 
     if (!account) {
       return Result.error(AccountServiceErrorCode.AccountNotFound);
@@ -52,12 +52,39 @@ export class AuthService {
     return Result.ok({ jwt });
   }
 
+  async socialLogin(
+    id: string,
+  ): Promise<Result<LoginResponse, AccountServiceErrorCode>> {
+    const account = await this.accountRepository.getById(id);
+
+    if (!account) {
+      return Result.error(AccountServiceErrorCode.AccountNotFound);
+    }
+
+    if (!account.emailVerified) {
+      return Result.error(AccountServiceErrorCode.EmailNotVerified);
+    }
+
+    const jwt = createJwt(
+      { userId: account._id!.toString(), username: account.username },
+      this.config.jwt,
+    );
+
+    this.logger.info('User logged in', {
+      id: account._id,
+      username: account.username,
+      email: account.email,
+    });
+
+    return Result.ok({ jwt });
+  }
+
   async changePassword(
     id: string,
     oldPassword: string,
     newPassword: string,
   ): Promise<Result<void, AccountServiceErrorCode>> {
-    const account = await this.accountRepository.getAccountById(id);
+    const account = await this.accountRepository.getById(id);
 
     if (!account) {
       return Result.error(AccountServiceErrorCode.AccountNotFound);
@@ -74,7 +101,7 @@ export class AuthService {
 
     const password = await createHash(newPassword);
 
-    await this.accountRepository.updateAccount({ ...account, password });
+    await this.accountRepository.update({ ...account, password });
 
     this.logger.info('User password changed', {
       id: account._id,
@@ -88,7 +115,7 @@ export class AuthService {
   async resetPasswordRequest(
     email: string,
   ): Promise<Result<void, AccountServiceErrorCode>> {
-    const account = await this.accountRepository.getAccountByEmail(email);
+    const account = await this.accountRepository.getByEmail(email);
 
     if (!account) {
       return Result.error(AccountServiceErrorCode.AccountNotFound);
@@ -126,7 +153,7 @@ export class AuthService {
       return Result.error(AccountServiceErrorCode.InvalidToken);
     }
 
-    const account = await this.accountRepository.getAccountById(
+    const account = await this.accountRepository.getById(
       userCredentials.userId,
     );
 
@@ -136,7 +163,7 @@ export class AuthService {
 
     const password = await createHash(newPassword);
 
-    await this.accountRepository.updateAccount({ ...account, password });
+    await this.accountRepository.update({ ...account, password });
 
     this.logger.info('User password reset', {
       id: account._id,
@@ -156,7 +183,7 @@ export class AuthService {
       return Result.error(AccountServiceErrorCode.InvalidToken);
     }
 
-    const account = await this.accountRepository.getAccountById(
+    const account = await this.accountRepository.getById(
       userCredentials.userId,
     );
 
@@ -164,7 +191,7 @@ export class AuthService {
       return Result.error(AccountServiceErrorCode.AccountNotFound);
     }
 
-    await this.accountRepository.updateAccount({
+    await this.accountRepository.update({
       ...account,
       emailVerified: true,
     });

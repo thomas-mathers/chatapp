@@ -29,7 +29,7 @@ export class AccountController {
       handleRequestQueryValidationMiddleware(getAccountsRequestSchema),
       async (req: Request, res: Response) => {
         const getAccountsRequest = getAccountsRequestSchema.parse(req.query);
-        const result = await accountService.getAccounts(getAccountsRequest);
+        const result = await accountService.getPage(getAccountsRequest);
         res.status(StatusCodes.OK).json(result);
       },
     );
@@ -171,7 +171,7 @@ export class AccountController {
       '/me',
       handleAuthMiddleware(config.jwt),
       async (req: Request, res: Response) => {
-        Result.fromAsync(accountService.getAccountById(req.accountId)).fold(
+        Result.fromAsync(accountService.getById(req.accountId)).fold(
           (result) => res.status(StatusCodes.OK).json(result),
           (error) => {
             switch (error) {
@@ -226,7 +226,7 @@ export class AccountController {
       '/me',
       handleAuthMiddleware(config.jwt),
       async (req: Request, res: Response) => {
-        Result.fromAsync(accountService.deleteAccount(req.accountId)).fold(
+        Result.fromAsync(accountService.deleteById(req.accountId)).fold(
           (result) => res.status(StatusCodes.OK).json(result),
           (error) => {
             switch (error) {

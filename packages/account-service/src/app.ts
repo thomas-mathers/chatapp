@@ -12,10 +12,14 @@ import swaggerUi from 'swagger-ui-express';
 import { Config } from './config';
 import { AccountController } from './controllers/accountController';
 import { AuthController } from './controllers/authController';
+import { FederatedCredentialsController } from './controllers/federatedCredentialsController';
 import { Account } from './models/account';
+import { FederatedCredentials } from './models/federatedCredentials';
 import { AccountRepository } from './repositories/accountRepository';
+import { FederatedCredentialsRepository } from './repositories/federatedCredentialsRepository';
 import { AccountService } from './services/accountService';
 import { AuthService } from './services/authService';
+import { FederatedCredentialsService } from './services/federatedCredentialsService';
 
 const swaggerDoc = swaggerJsdoc({
   swaggerDefinition: {
@@ -60,6 +64,14 @@ export class App {
     await accountsCollection.createIndex({ username: 1 }, { unique: true });
     await accountsCollection.createIndex({ email: 1 }, { unique: true });
 
+    const federatedCredentialsCollection =
+      mongoDatabase.collection<FederatedCredentials>('federatedCredentials');
+
+    await federatedCredentialsCollection.createIndex(
+      { provider: 1, providerAccountId: 1 },
+      { unique: true },
+    );
+
     const eventBus = new EventBus(
       logger,
       config.rabbitMq.url,
@@ -85,12 +97,26 @@ export class App {
     );
     const authController = new AuthController(config, authService);
 
+    const federatedCredentialsRepository = new FederatedCredentialsRepository(
+      federatedCredentialsCollection,
+    );
+    const federatedCredentialsService = new FederatedCredentialsService(
+      federatedCredentialsRepository,
+    );
+    const federatedCredentialsController = new FederatedCredentialsController(
+      config,
+      federatedCredentialsService,
+      accountService,
+      authService,
+    );
+
     const httpServer = express()
       .use(cors())
       .use(bodyParser.json())
       .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
       .use('/accounts', accountController.router)
       .use('/auth', authController.router)
+      .use('/oauth2', federatedCredentialsController.router)
       .use(handleErrorMiddleware)
       .listen(config.port, () => {
         logger.info(`Server is running on port ${config.port}`);

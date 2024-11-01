@@ -10,34 +10,34 @@ import { Account } from '../models/account';
 export class AccountRepository {
   constructor(private readonly accountCollection: Collection<Account>) {}
 
-  async createAccount(account: Account): Promise<Account> {
+  async insert(account: Account): Promise<Account> {
     await this.accountCollection.insertOne(account);
     return account;
   }
 
   async containsUsername(username: string): Promise<boolean> {
-    const document = await this.getAccountByUsername(username);
+    const document = await this.getByUsername(username);
     return document !== null;
   }
 
   async containsEmail(email: string): Promise<boolean> {
-    const document = await this.getAccountByEmail(email);
+    const document = await this.getByEmail(email);
     return document !== null;
   }
 
-  async getAccountById(id: string): Promise<Account | null> {
+  async getById(id: string): Promise<Account | null> {
     return await this.accountCollection.findOne({ _id: new ObjectId(id) });
   }
 
-  async getAccountByUsername(username: string): Promise<Account | null> {
+  async getByUsername(username: string): Promise<Account | null> {
     return await this.accountCollection.findOne({ username });
   }
 
-  async getAccountByEmail(email: string): Promise<Account | null> {
+  async getByEmail(email: string): Promise<Account | null> {
     return await this.accountCollection.findOne({ email });
   }
 
-  async getAccounts({
+  async getPage({
     accountIds,
     page = 1,
     pageSize = 10,
@@ -67,13 +67,13 @@ export class AccountRepository {
     };
   }
 
-  async updateAccount(replacement: Account): Promise<Account> {
+  async update(replacement: Account): Promise<Account> {
     const { username } = replacement;
     await this.accountCollection.replaceOne({ username }, replacement);
     return replacement;
   }
 
-  async deleteAccountById(id: string): Promise<number> {
+  async deleteById(id: string): Promise<number> {
     const { deletedCount } = await this.accountCollection.deleteOne(
       { _id: new ObjectId(id) },
       {},

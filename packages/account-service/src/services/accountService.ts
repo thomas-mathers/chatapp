@@ -11,7 +11,7 @@ import { Logger } from 'chatapp.logging';
 import { Result } from 'typescript-result';
 
 import { Config } from '../config';
-import { Account } from '../models/account';
+import { toAccountSummary } from '../mappers/toAccountSummary';
 import { AccountRepository } from '../repositories/accountRepository';
 
 export class AccountService {
@@ -35,7 +35,7 @@ export class AccountService {
 
     const hash = await createHash(request.password);
 
-    const account = await this.accountRepository.createAccount({
+    const account = await this.accountRepository.insert({
       username: request.username,
       password: hash,
       email: request.email,
@@ -67,10 +67,36 @@ export class AccountService {
     return Result.ok(accountSummary);
   }
 
-  async getAccountById(
+  async socialRegister(
+    email: string,
+  ): Promise<Result<AccountSummary, AccountServiceErrorCode>> {
+    if (await this.accountRepository.containsEmail(email)) {
+      return Result.error(AccountServiceErrorCode.EmailExists);
+    }
+
+    const account = await this.accountRepository.insert({
+      username: email,
+      password: '',
+      email,
+      emailVerified: true,
+      dateCreated: new Date(),
+    });
+
+    const accountSummary = toAccountSummary(account);
+
+    this.logger.info('Account created', {
+      id: account._id,
+      username: account.username,
+      email: account.email,
+    });
+
+    return Result.ok(accountSummary);
+  }
+
+  async getById(
     id: string,
   ): Promise<Result<AccountSummary, AccountServiceErrorCode>> {
-    const account = await this.accountRepository.getAccountById(id);
+    const account = await this.accountRepository.getById(id);
 
     if (!account) {
       return Result.error(AccountServiceErrorCode.AccountNotFound);
@@ -81,10 +107,22 @@ export class AccountService {
     return Result.ok(accountSummary);
   }
 
-  async getAccounts(
-    request: GetAccountsRequest,
-  ): Promise<Page<AccountSummary>> {
-    const page = await this.accountRepository.getAccounts(request);
+  async getByEmail(
+    email: string,
+  ): Promise<Result<AccountSummary, AccountServiceErrorCode>> {
+    const account = await this.accountRepository.getByEmail(email);
+
+    if (!account) {
+      return Result.error(AccountServiceErrorCode.AccountNotFound);
+    }
+
+    const accountSummary = toAccountSummary(account);
+
+    return Result.ok(accountSummary);
+  }
+
+  async getPage(request: GetAccountsRequest): Promise<Page<AccountSummary>> {
+    const page = await this.accountRepository.getPage(request);
 
     return {
       ...page,
@@ -92,10 +130,8 @@ export class AccountService {
     };
   }
 
-  async deleteAccount(
-    id: string,
-  ): Promise<Result<void, AccountServiceErrorCode>> {
-    const numDeleted = await this.accountRepository.deleteAccountById(id);
+  async deleteById(id: string): Promise<Result<void, AccountServiceErrorCode>> {
+    const numDeleted = await this.accountRepository.deleteById(id);
 
     if (numDeleted === 0) {
       return Result.error(AccountServiceErrorCode.AccountNotFound);
@@ -105,14 +141,4 @@ export class AccountService {
 
     return Result.ok();
   }
-}
-
-export function toAccountSummary(account: Account): AccountSummary {
-  const { _id, username, email, dateCreated } = account;
-  return {
-    id: _id!.toString(),
-    username,
-    email,
-    dateCreated: dateCreated.toISOString(),
-  };
 }
