@@ -12,14 +12,14 @@ import swaggerUi from 'swagger-ui-express';
 import { Config } from './config';
 import { AccountController } from './controllers/accountController';
 import { AuthController } from './controllers/authController';
-import { FederatedCredentialsController } from './controllers/federatedCredentialsController';
+import { ExternalAccountController } from './controllers/externalAccountController';
 import { Account } from './models/account';
-import { FederatedCredentials } from './models/federatedCredentials';
+import { ExternalAccount } from './models/externalAccount';
 import { AccountRepository } from './repositories/accountRepository';
-import { FederatedCredentialsRepository } from './repositories/federatedCredentialsRepository';
+import { ExternalAccountRepository } from './repositories/externalAccountRepository';
 import { AccountService } from './services/accountService';
 import { AuthService } from './services/authService';
-import { FederatedCredentialsService } from './services/federatedCredentialsService';
+import { ExternalAccountService } from './services/externalAccountService';
 
 const swaggerDoc = swaggerJsdoc({
   swaggerDefinition: {
@@ -64,10 +64,10 @@ export class App {
     await accountsCollection.createIndex({ username: 1 }, { unique: true });
     await accountsCollection.createIndex({ email: 1 }, { unique: true });
 
-    const federatedCredentialsCollection =
-      mongoDatabase.collection<FederatedCredentials>('federatedCredentials');
+    const externalAccountsCollection =
+      mongoDatabase.collection<ExternalAccount>('externalAccounts');
 
-    await federatedCredentialsCollection.createIndex(
+    await externalAccountsCollection.createIndex(
       { provider: 1, providerAccountId: 1 },
       { unique: true },
     );
@@ -97,15 +97,15 @@ export class App {
     );
     const authController = new AuthController(config, authService);
 
-    const federatedCredentialsRepository = new FederatedCredentialsRepository(
-      federatedCredentialsCollection,
+    const externalAccountRepository = new ExternalAccountRepository(
+      externalAccountsCollection,
     );
-    const federatedCredentialsService = new FederatedCredentialsService(
-      federatedCredentialsRepository,
+    const externalAccountService = new ExternalAccountService(
+      externalAccountRepository,
     );
-    const federatedCredentialsController = new FederatedCredentialsController(
+    const externalAccountController = new ExternalAccountController(
       config,
-      federatedCredentialsService,
+      externalAccountService,
       accountService,
       authService,
     );
@@ -116,7 +116,7 @@ export class App {
       .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
       .use('/accounts', accountController.router)
       .use('/auth', authController.router)
-      .use('/oauth2', federatedCredentialsController.router)
+      .use('/oauth2', externalAccountController.router)
       .use(handleErrorMiddleware)
       .listen(config.port, () => {
         logger.info(`Server is running on port ${config.port}`);

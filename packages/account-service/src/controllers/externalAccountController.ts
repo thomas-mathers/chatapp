@@ -7,14 +7,14 @@ import { Result } from 'typescript-result';
 import { Config } from '../config';
 import { AccountService } from '../services/accountService';
 import { AuthService } from '../services/authService';
-import { FederatedCredentialsService } from '../services/federatedCredentialsService';
+import { ExternalAccountService } from '../services/externalAccountService';
 
-export class FederatedCredentialsController {
+export class ExternalAccountController {
   private readonly _router = Router();
 
   constructor(
     private readonly config: Config,
-    private readonly federatedCredentialsService: FederatedCredentialsService,
+    private readonly externalAccountService: ExternalAccountService,
     private readonly accountService: AccountService,
     private readonly authService: AuthService,
   ) {
@@ -29,11 +29,10 @@ export class FederatedCredentialsController {
         },
         async (accessToken, refreshToken, profile, done) => {
           try {
-            const credentials =
-              await this.federatedCredentialsService.getByProvider(
-                'google',
-                profile.id,
-              );
+            const credentials = await this.externalAccountService.getByProvider(
+              'google',
+              profile.id,
+            );
 
             if (credentials) {
               return await Result.fromAsync(
@@ -52,7 +51,7 @@ export class FederatedCredentialsController {
             ).getOrNull();
 
             if (existingAccount !== null) {
-              await this.federatedCredentialsService.insert({
+              await this.externalAccountService.insert({
                 accountId: existingAccount.id,
                 provider: 'google',
                 providerAccountId: profile.id,
@@ -67,7 +66,7 @@ export class FederatedCredentialsController {
               this.accountService.socialRegister(email),
             ).getOrThrow();
 
-            await this.federatedCredentialsService.insert({
+            await this.externalAccountService.insert({
               accountId: account.id,
               provider: 'google',
               providerAccountId: profile.id,

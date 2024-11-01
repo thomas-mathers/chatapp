@@ -1,4 +1,4 @@
-export interface FederatedCredentialsSummary {
+export interface ExternalAccountSummary {
   id: string;
   accountId: string;
   provider: string;

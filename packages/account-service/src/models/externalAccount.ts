@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-export interface FederatedCredentials {
+export interface ExternalAccount {
   _id?: ObjectId;
   accountId: ObjectId;
   provider: string;
