@@ -5,6 +5,7 @@ export * from './requests/passwordResetRequest';
 export * from './requests/passwordResetTokenRequest';
 export * from './requests/confirmEmailRequest';
 export * from './requests/getAccountsRequest';
+export * from './requests/exchangeAuthCodeRequest';
 export * from './responses/accountSummary';
 export * from './responses/loginResponse';
 export * from './responses/passwordResetTokenResponse';

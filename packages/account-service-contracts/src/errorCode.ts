@@ -5,6 +5,7 @@ export enum AccountServiceErrorCode {
   EmailExists = 'EmailExists',
   EmailNotVerified = 'EmailNotVerified',
   IncorrectPassword = 'IncorrectPassword',
+  InvalidAuthCode = 'InvalidAuthCode',
   InvalidToken = 'InvalidToken',
   Unknown = 'Unknown',
   UsernameExists = 'UsernameExists',
@@ -20,6 +21,8 @@ function getErrorCodeMessage(errorCode: AccountServiceErrorCode): string {
       return 'Email not verified';
     case AccountServiceErrorCode.IncorrectPassword:
       return 'Incorrect password';
+    case AccountServiceErrorCode.InvalidAuthCode:
+      return 'Invalid auth code';
     case AccountServiceErrorCode.InvalidToken:
       return 'Invalid token';
     case AccountServiceErrorCode.Unknown:

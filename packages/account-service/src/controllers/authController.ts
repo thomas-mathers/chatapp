@@ -1,12 +1,14 @@
 import {
   AccountServiceErrorCode,
   ChangePasswordRequest,
+  ExchangeAuthCodeRequest,
   LoginRequest,
   PasswordResetRequest,
   PasswordResetTokenRequest,
   changePasswordRequestSchema,
   confirmEmailRequestSchema,
   createAccountServiceError,
+  exchangeAuthCodeRequestSchema,
   loginRequestSchema,
   passwordResetRequestSchema,
   passwordResetTokenRequestSchema,
@@ -333,6 +335,38 @@ export class AuthController {
                   .json(
                     createAccountServiceError(
                       AccountServiceErrorCode.AccountNotFound,
+                    ),
+                  );
+                break;
+              default:
+                res
+                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
+                  .json(
+                    createAccountServiceError(AccountServiceErrorCode.Unknown),
+                  );
+            }
+          },
+        );
+      },
+    );
+
+    this._router.post(
+      '/auth-codes',
+      handleRequestBodyValidationMiddleware(exchangeAuthCodeRequestSchema),
+      async (req: Request, res: Response) => {
+        const exchangeAuthCodeRequest = req.body as ExchangeAuthCodeRequest;
+        Result.fromAsync(
+          authService.exchangeAuthCodeForToken(exchangeAuthCodeRequest.code),
+        ).fold(
+          (result) => res.status(StatusCodes.OK).json(result),
+          (error) => {
+            switch (error) {
+              case AccountServiceErrorCode.InvalidAuthCode:
+                res
+                  .status(StatusCodes.FORBIDDEN)
+                  .json(
+                    createAccountServiceError(
+                      AccountServiceErrorCode.InvalidAuthCode,
                     ),
                   );
                 break;

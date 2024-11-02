@@ -1,14 +1,17 @@
 import {
   AccountServiceErrorCode,
+  AccountSummary,
   LoginResponse,
 } from 'chatapp.account-service-contracts';
 import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
 import { EventBus, EventName } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
 import { Result } from 'typescript-result';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Config } from '../config';
 import { AccountRepository } from '../repositories/accountRepository';
+import { AuthCodeRepository } from '../repositories/authCodeRepository';
 
 export class AuthService {
   constructor(
@@ -16,6 +19,7 @@ export class AuthService {
     private readonly logger: Logger,
     private readonly accountRepository: AccountRepository,
     private readonly eventBus: EventBus,
+    private readonly authCodeRepository: AuthCodeRepository,
   ) {}
 
   async login(
@@ -38,7 +42,7 @@ export class AuthService {
       return Result.error(AccountServiceErrorCode.IncorrectPassword);
     }
 
-    const jwt = createJwt(
+    const accessToken = createJwt(
       { userId: account._id!.toString(), username: account.username },
       this.config.jwt,
     );
@@ -49,34 +53,37 @@ export class AuthService {
       email: account.email,
     });
 
-    return Result.ok({ jwt });
+    return Result.ok({ accessToken });
   }
 
-  async socialLogin(
-    id: string,
-  ): Promise<Result<LoginResponse, AccountServiceErrorCode>> {
-    const account = await this.accountRepository.getById(id);
+  async getAuthCode({ id, username, email }: AccountSummary): Promise<string> {
+    const jwt = createJwt({ userId: id, username }, this.config.jwt);
 
-    if (!account) {
-      return Result.error(AccountServiceErrorCode.AccountNotFound);
-    }
+    const authCode = uuidv4();
 
-    if (!account.emailVerified) {
-      return Result.error(AccountServiceErrorCode.EmailNotVerified);
-    }
+    await this.authCodeRepository.insert(authCode, jwt);
 
-    const jwt = createJwt(
-      { userId: account._id!.toString(), username: account.username },
-      this.config.jwt,
-    );
-
-    this.logger.info('User logged in', {
-      id: account._id,
-      username: account.username,
-      email: account.email,
+    this.logger.info('Auth code generated', {
+      id,
+      username,
+      email,
     });
 
-    return Result.ok({ jwt });
+    return authCode;
+  }
+
+  async exchangeAuthCodeForToken(
+    authCode: string,
+  ): Promise<Result<LoginResponse, AccountServiceErrorCode>> {
+    const accessToken = await this.authCodeRepository.get(authCode);
+
+    if (!accessToken) {
+      return Result.error(AccountServiceErrorCode.InvalidAuthCode);
+    }
+
+    await this.authCodeRepository.delete(authCode);
+
+    return Result.ok({ accessToken });
   }
 
   async changePassword(

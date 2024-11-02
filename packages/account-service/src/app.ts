@@ -6,6 +6,7 @@ import cors from 'cors';
 import express from 'express';
 import { Server } from 'http';
 import { Db, MongoClient } from 'mongodb';
+import { RedisClientType, createClient } from 'redis';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
@@ -16,6 +17,7 @@ import { OAuth2Controller } from './controllers/oauth2Controller';
 import { Account } from './models/account';
 import { ExternalAccount } from './models/externalAccount';
 import { AccountRepository } from './repositories/accountRepository';
+import { AuthCodeRepository } from './repositories/authCodeRepository';
 import { ExternalAccountRepository } from './repositories/externalAccountRepository';
 import { AccountService } from './services/accountService';
 import { AuthService } from './services/authService';
@@ -80,6 +82,11 @@ export class App {
 
     await eventBus.connect();
 
+    const redisClient: RedisClientType = createClient({
+      url: config.redis.url,
+    });
+    await redisClient.connect();
+
     const accountRepository = new AccountRepository(accountsCollection);
     const accountService = new AccountService(
       config,
@@ -89,11 +96,14 @@ export class App {
     );
     const accountController = new AccountController(config, accountService);
 
+    const authCodeRepository = new AuthCodeRepository(redisClient);
+
     const authService = new AuthService(
       config,
       logger,
       accountRepository,
       eventBus,
+      authCodeRepository,
     );
     const authController = new AuthController(config, authService);
 

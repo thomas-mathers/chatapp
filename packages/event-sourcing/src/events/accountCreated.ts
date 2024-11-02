@@ -8,6 +8,7 @@ export const accountCreatedSchema = z.object({
   accountName: z.string(),
   accountEmail: z.string(),
   token: z.string(),
+  emailVerified: z.boolean(),
 });
 
 export type AccountCreated = z.infer<typeof accountCreatedSchema>;

@@ -1,4 +1,4 @@
-import { LoginResponse } from 'chatapp.account-service-contracts';
+import { AccountSummary } from 'chatapp.account-service-contracts';
 import { Router } from 'express';
 import passport, { Profile } from 'passport';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
@@ -71,10 +71,12 @@ export class OAuth2Controller {
     this._router.get(
       `/${provider}/callback`,
       passport.authenticate(provider, { session: false }),
-      (req, res) => {
-        const user: LoginResponse = req.user as LoginResponse;
-        const { jwt } = user;
-        res.redirect(`${this.config.frontEndUrl}#jwt=${jwt}`);
+      async (req, res) => {
+        const code = await this.authService.getAuthCode(
+          req.user as AccountSummary,
+        );
+
+        res.redirect(`${this.config.frontEndUrl}?code=${code}`);
       },
     );
   }
@@ -82,7 +84,10 @@ export class OAuth2Controller {
   private async verify(
     provider: string,
     { id: providerAccountId, emails }: Profile,
-    done: (error: Error | null | unknown, user?: LoginResponse | false) => void,
+    done: (
+      error: Error | null | unknown,
+      user?: AccountSummary | false,
+    ) => void,
   ) {
     try {
       const credentials = await this.externalAccountService.getByProvider(
@@ -92,7 +97,7 @@ export class OAuth2Controller {
 
       if (credentials) {
         return await Result.fromAsync(
-          this.authService.socialLogin(credentials.accountId),
+          this.accountService.getById(credentials.accountId),
         ).fold((t) => done(null, t), done);
       }
 
@@ -113,13 +118,11 @@ export class OAuth2Controller {
           providerAccountId,
         });
 
-        return await Result.fromAsync(
-          this.authService.socialLogin(existingAccount.id),
-        ).fold((t) => done(null, t), done);
+        return done(null, existingAccount);
       }
 
       const account = await Result.fromAsync(
-        this.accountService.socialRegister(email),
+        this.accountService.register(email, '', email, true),
       ).getOrThrow();
 
       await this.externalAccountService.insert({
@@ -128,9 +131,7 @@ export class OAuth2Controller {
         providerAccountId,
       });
 
-      return await Result.fromAsync(
-        this.authService.socialLogin(account.id),
-      ).fold((t) => done(null, t), done);
+      done(null, account);
     } catch (error) {
       done(error);
     }

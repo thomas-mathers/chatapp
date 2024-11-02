@@ -1,4 +1,5 @@
 import {
+  AccountRegistrationRequest,
   AccountServiceErrorCode,
   accountRegistrationRequest,
   createAccountServiceError,
@@ -92,7 +93,11 @@ export class AccountController {
       '/',
       handleRequestBodyValidationMiddleware(accountRegistrationRequest),
       async (req: Request, res: Response) => {
-        Result.fromAsync(accountService.register(req.body)).fold(
+        const { username, password, email }: AccountRegistrationRequest =
+          req.body;
+        Result.fromAsync(
+          accountService.register(username, password, email, false),
+        ).fold(
           (result) => res.status(201).json(result),
           (error) => {
             switch (error) {

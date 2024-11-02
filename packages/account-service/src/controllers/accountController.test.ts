@@ -192,7 +192,7 @@ describe('AccountController', () => {
 
       const response = await request(app.httpServer)
         .get('/accounts')
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -221,7 +221,7 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ accountIds: accounts[0]._id?.toHexString() })
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -246,7 +246,7 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'username', sortDirection: 'asc' })
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -273,7 +273,7 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'username', sortDirection: 'desc' })
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -301,7 +301,7 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'email', sortDirection: 'asc' })
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -328,7 +328,7 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'email', sortDirection: 'desc' })
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -356,7 +356,7 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'dateCreated', sortDirection: 'asc' })
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -383,7 +383,7 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ sortBy: 'dateCreated', sortDirection: 'desc' })
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -411,7 +411,7 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ page: 1, pageSize: 2 })
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -439,7 +439,7 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ page: 2, pageSize: 2 })
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -469,7 +469,7 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ page: 3, pageSize: 2 })
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -496,7 +496,7 @@ describe('AccountController', () => {
       const response = await request(app.httpServer)
         .get('/accounts')
         .query({ page: 1, pageSize: 10 })
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({
@@ -540,7 +540,7 @@ describe('AccountController', () => {
 
       const response = await request(app.httpServer)
         .get('/accounts/me')
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('id');
@@ -578,7 +578,7 @@ describe('AccountController', () => {
 
       const response = await request(app.httpServer)
         .delete('/accounts/me')
-        .set('Authorization', `Bearer ${authResponse.body.jwt}`);
+        .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
       expect(response.status).toBe(200);
     });

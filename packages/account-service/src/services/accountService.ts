@@ -1,5 +1,4 @@
 import {
-  AccountRegistrationRequest,
   AccountServiceErrorCode,
   AccountSummary,
   GetAccountsRequest,
@@ -23,23 +22,26 @@ export class AccountService {
   ) {}
 
   async register(
-    request: AccountRegistrationRequest,
+    username: string,
+    password: string,
+    email: string,
+    emailVerified: boolean,
   ): Promise<Result<AccountSummary, AccountServiceErrorCode>> {
-    if (await this.accountRepository.containsUsername(request.username)) {
+    if (await this.accountRepository.containsUsername(username)) {
       return Result.error(AccountServiceErrorCode.UsernameExists);
     }
 
-    if (await this.accountRepository.containsEmail(request.email)) {
+    if (await this.accountRepository.containsEmail(email)) {
       return Result.error(AccountServiceErrorCode.EmailExists);
     }
 
-    const hash = await createHash(request.password);
+    const passwordHash = await createHash(password);
 
     const account = await this.accountRepository.insert({
-      username: request.username,
-      password: hash,
-      email: request.email,
-      emailVerified: false,
+      username,
+      password: passwordHash,
+      email,
+      emailVerified,
       dateCreated: new Date(),
     });
 
@@ -56,33 +58,8 @@ export class AccountService {
       accountName: account.username,
       accountEmail: account.email,
       token: jwt,
+      emailVerified: account.emailVerified,
     });
-
-    this.logger.info('Account created', {
-      id: account._id,
-      username: account.username,
-      email: account.email,
-    });
-
-    return Result.ok(accountSummary);
-  }
-
-  async socialRegister(
-    email: string,
-  ): Promise<Result<AccountSummary, AccountServiceErrorCode>> {
-    if (await this.accountRepository.containsEmail(email)) {
-      return Result.error(AccountServiceErrorCode.EmailExists);
-    }
-
-    const account = await this.accountRepository.insert({
-      username: email,
-      password: '',
-      email,
-      emailVerified: true,
-      dateCreated: new Date(),
-    });
-
-    const accountSummary = toAccountSummary(account);
 
     this.logger.info('Account created', {
       id: account._id,

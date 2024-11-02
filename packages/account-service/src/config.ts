@@ -13,6 +13,7 @@ export const configSchema = z
     MONGO_DATABASE_NAME: z.string().optional(),
     RABBIT_MQ_URL: z.string(),
     RABBIT_MQ_EXCHANGE_NAME: z.string(),
+    REDIS_URL: z.string(),
     LOG_LEVEL: z.enum([
       'error',
       'warn',
@@ -39,6 +40,7 @@ export const configSchema = z
       MONGO_DATABASE_NAME,
       RABBIT_MQ_URL,
       RABBIT_MQ_EXCHANGE_NAME,
+      REDIS_URL,
       LOG_LEVEL,
       GOOGLE_CLIENT_ID,
       GOOGLE_CLIENT_SECRET,
@@ -60,6 +62,9 @@ export const configSchema = z
       rabbitMq: {
         url: RABBIT_MQ_URL,
         exchangeName: RABBIT_MQ_EXCHANGE_NAME,
+      },
+      redis: {
+        url: REDIS_URL,
       },
       logging: {
         level: LOG_LEVEL as LogLevel,

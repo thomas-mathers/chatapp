@@ -13,6 +13,10 @@ export class AccountCreatedEventHandler {
   ) {}
 
   async handle(event: AccountCreated): Promise<void> {
+    if (event.emailVerified) {
+      return;
+    }
+
     this.logger.info('Sending welcome email', {
       accountEmail: event.accountEmail,
       accountName: event.accountName,
