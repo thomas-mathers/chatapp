@@ -13,9 +13,19 @@ export const configSchema = z
     MONGO_DATABASE_NAME: z.string().optional(),
     RABBIT_MQ_URL: z.string(),
     RABBIT_MQ_EXCHANGE_NAME: z.string(),
-    LOG_LEVEL: z.enum(['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly']),
+    LOG_LEVEL: z.enum([
+      'error',
+      'warn',
+      'info',
+      'http',
+      'verbose',
+      'debug',
+      'silly',
+    ]),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
+    FACEBOOK_CLIENT_ID: z.string(),
+    FACEBOOK_CLIENT_SECRET: z.string(),
     FRONT_END_URL: z.string(),
   })
   .transform(
@@ -32,6 +42,8 @@ export const configSchema = z
       LOG_LEVEL,
       GOOGLE_CLIENT_ID,
       GOOGLE_CLIENT_SECRET,
+      FACEBOOK_CLIENT_ID,
+      FACEBOOK_CLIENT_SECRET,
       FRONT_END_URL,
     }) => ({
       port: PORT,
@@ -55,6 +67,10 @@ export const configSchema = z
       google: {
         clientId: GOOGLE_CLIENT_ID,
         clientSecret: GOOGLE_CLIENT_SECRET,
+      },
+      facebook: {
+        clientId: FACEBOOK_CLIENT_ID,
+        clientSecret: FACEBOOK_CLIENT_SECRET,
       },
       frontEndUrl: FRONT_END_URL,
     }),
