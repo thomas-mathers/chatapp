@@ -5,8 +5,8 @@ import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { beforeEach, describe, it } from 'vitest';
 
+import { toAccountSummary } from '../mappers/toAccountSummary';
 import { Account } from '../models/account';
-import { toAccountSummary } from '../services/accountService';
 
 const myUsername = faker.internet.userName();
 const myPassword = faker.internet.password();

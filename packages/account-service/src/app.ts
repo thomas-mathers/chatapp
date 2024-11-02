@@ -12,7 +12,7 @@ import swaggerUi from 'swagger-ui-express';
 import { Config } from './config';
 import { AccountController } from './controllers/accountController';
 import { AuthController } from './controllers/authController';
-import { ExternalAccountController } from './controllers/externalAccountController';
+import { OAuth2Controller } from './controllers/oauth2Controller';
 import { Account } from './models/account';
 import { ExternalAccount } from './models/externalAccount';
 import { AccountRepository } from './repositories/accountRepository';
@@ -103,7 +103,7 @@ export class App {
     const externalAccountService = new ExternalAccountService(
       externalAccountRepository,
     );
-    const externalAccountController = new ExternalAccountController(
+    const oauth2Controller = new OAuth2Controller(
       config,
       externalAccountService,
       accountService,
@@ -116,7 +116,7 @@ export class App {
       .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
       .use('/accounts', accountController.router)
       .use('/auth', authController.router)
-      .use('/oauth2', externalAccountController.router)
+      .use('/oauth2', oauth2Controller.router)
       .use(handleErrorMiddleware)
       .listen(config.port, () => {
         logger.info(`Server is running on port ${config.port}`);

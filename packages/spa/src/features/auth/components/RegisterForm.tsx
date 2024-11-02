@@ -9,10 +9,11 @@ import {
 } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import {
+  AccountRegistrationRequest,
+  AccountServiceErrorCode,
   AccountSummary,
-  CreateAccountRequest,
 } from 'chatapp.account-service-contracts';
-import { ApiError } from 'chatapp.api-result';
+import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
@@ -42,8 +43,8 @@ export const RegisterForm = () => {
 
   const { mutate, isPending, error } = useMutation<
     AccountSummary,
-    ApiError,
-    CreateAccountRequest
+    ApiError<AccountServiceErrorCode>,
+    AccountRegistrationRequest
   >({
     mutationFn: (data) => accountService.createAccount(data),
     onSuccess: () => {
