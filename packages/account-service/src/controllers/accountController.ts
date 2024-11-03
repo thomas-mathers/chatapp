@@ -94,7 +94,7 @@ export class AccountController {
         const { username, password, email }: AccountRegistrationRequest =
           req.body;
         Result.fromAsync(
-          accountService.register(username, password, email, false),
+          accountService.create(username, password, email, false),
         ).fold(
           (result) => res.status(201).json(result),
           (error) => res.status(error.statusCode).json(error),

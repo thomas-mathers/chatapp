@@ -46,21 +46,53 @@ const swaggerDoc = swaggerJsdoc({
 
 export class App {
   private constructor(
+    private readonly _config: Config,
     private readonly _logger: Logger,
     private readonly _httpServer: Server,
     private readonly _eventBus: EventBus,
     private readonly _mongoClient: MongoClient,
-    private readonly _mongoDatabase: Db,
+    private readonly _redisClient: RedisClientType,
   ) {}
 
   static async launch(config: Config): Promise<App> {
     const logger = new Logger({ level: config.logging.level });
 
+    const [mongoClient, eventBus, redisClient] = await Promise.all([
+      this.setupMongoClient(config),
+      this.setupEventBus(config, logger),
+      this.setupRedisClient(config),
+    ]);
+
+    const httpServer = await this.setupHttpServer(
+      config,
+      logger,
+      mongoClient,
+      eventBus,
+      redisClient,
+    );
+
+    return new App(
+      config,
+      logger,
+      httpServer,
+      eventBus,
+      mongoClient,
+      redisClient,
+    );
+  }
+
+  private static async setupMongoClient(config: Config): Promise<MongoClient> {
     const mongoClient = new MongoClient(config.mongo.uri);
     await mongoClient.connect();
 
     const mongoDatabase = mongoClient.db(config.mongo.databaseName);
 
+    await this.setupMongoIndexes(mongoDatabase);
+
+    return mongoClient;
+  }
+
+  private static async setupMongoIndexes(mongoDatabase: Db): Promise<void> {
     const accountsCollection = mongoDatabase.collection<Account>('accounts');
 
     await accountsCollection.createIndex({ username: 1 }, { unique: true });
@@ -73,7 +105,12 @@ export class App {
       { provider: 1, providerAccountId: 1 },
       { unique: true },
     );
+  }
 
+  private static async setupEventBus(
+    config: Config,
+    logger: Logger,
+  ): Promise<EventBus> {
     const eventBus = new EventBus(
       logger,
       config.rabbitMq.url,
@@ -82,12 +119,32 @@ export class App {
 
     await eventBus.connect();
 
+    return eventBus;
+  }
+
+  private static async setupRedisClient(
+    config: Config,
+  ): Promise<RedisClientType> {
     const redisClient: RedisClientType = createClient({
       url: config.redis.url,
     });
+
     await redisClient.connect();
 
-    const accountRepository = new AccountRepository(accountsCollection);
+    return redisClient;
+  }
+
+  private static async setupHttpServer(
+    config: Config,
+    logger: Logger,
+    mongoClient: MongoClient,
+    eventBus: EventBus,
+    redisClient: RedisClientType,
+  ): Promise<Server> {
+    const mongoDatabase = mongoClient.db(config.mongo.databaseName);
+
+    const accountCollection = mongoDatabase.collection<Account>('accounts');
+    const accountRepository = new AccountRepository(accountCollection);
     const accountService = new AccountService(
       config,
       logger,
@@ -107,16 +164,18 @@ export class App {
     );
     const authController = new AuthController(config, authService);
 
+    const externalAccountCollection =
+      mongoDatabase.collection<ExternalAccount>('externalAccounts');
     const externalAccountRepository = new ExternalAccountRepository(
-      externalAccountsCollection,
+      externalAccountCollection,
     );
     const externalAccountService = new ExternalAccountService(
       externalAccountRepository,
+      accountService,
     );
     const oauth2Controller = new OAuth2Controller(
       config,
       externalAccountService,
-      accountService,
       authService,
     );
 
@@ -132,13 +191,14 @@ export class App {
         logger.info(`Server is running on port ${config.port}`);
       });
 
-    return new App(logger, httpServer, eventBus, mongoClient, mongoDatabase);
+    return httpServer;
   }
 
   async close() {
     await this.closeHttpServer();
     await this.closeEventBus();
     await this.closeMongoClient();
+    await this.closeRedisClient();
   }
 
   get httpServer() {
@@ -146,7 +206,7 @@ export class App {
   }
 
   get mongoDatabase() {
-    return this._mongoDatabase;
+    return this._mongoClient.db(this._config.mongo.databaseName);
   }
 
   private async closeHttpServer() {
@@ -166,5 +226,10 @@ export class App {
   private async closeMongoClient(): Promise<void> {
     await this._mongoClient.close();
     this._logger.info('Mongo client closed');
+  }
+
+  private async closeRedisClient(): Promise<void> {
+    await this._redisClient.quit();
+    this._logger.info('Redis client closed');
   }
 }

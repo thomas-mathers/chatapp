@@ -1,8 +1,13 @@
 import { ObjectId } from 'mongodb';
+import { Profile } from 'passport';
+import { Result } from 'typescript-result';
 
+import { ApiError } from '../../../api-error/src/apiError';
+import { ApiErrorCode } from '../../../api-error/src/apiErrorCode';
 import { toExternalAccountSummary } from '../mappers/toExternalAccountSummary';
 import { ExternalAccountSummary } from '../models/externalAccountSummary';
 import { ExternalAccountRepository } from '../repositories/externalAccountRepository';
+import { AccountService } from './accountService';
 
 interface CreateExternalAccountRequest {
   accountId: string;
@@ -13,9 +18,38 @@ interface CreateExternalAccountRequest {
 export class ExternalAccountService {
   constructor(
     private readonly externalAccountRepository: ExternalAccountRepository,
+    private readonly accountService: AccountService,
   ) {}
 
-  async insert({
+  async getOrCreateByExternalProfile(provider: string, profile: Profile) {
+    const externalAccount = await this.getByProvider(provider, profile.id);
+
+    if (externalAccount) {
+      return await Result.fromAsync(
+        this.accountService.getById(externalAccount.accountId),
+      ).getOrThrow();
+    }
+
+    const email = profile.emails?.[0].value;
+
+    if (!email) {
+      throw ApiError.fromErrorCode(ApiErrorCode.EmailMissing);
+    }
+
+    const account = await Result.fromAsync(
+      this.accountService.getOrCreateByEmail(email),
+    ).getOrThrow();
+
+    await this.insert({
+      accountId: account.id,
+      provider,
+      providerAccountId: profile.id,
+    });
+
+    return account;
+  }
+
+  private async insert({
     accountId,
     provider,
     providerAccountId,
@@ -29,7 +63,7 @@ export class ExternalAccountService {
     return toExternalAccountSummary(externalAccount);
   }
 
-  async getByProvider(
+  private async getByProvider(
     provider: string,
     providerAccountId: string,
   ): Promise<ExternalAccountSummary | null> {

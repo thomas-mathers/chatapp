@@ -7,10 +7,10 @@ import { beforeEach, describe, it } from 'vitest';
 
 import { Account } from '../models/account';
 
-const myUsername = faker.internet.userName();
+const myUsername = faker.internet.username();
 const myPassword = faker.internet.password();
 const myEmail = faker.internet.email();
-const myUnverifiedEmailUsername = faker.internet.userName();
+const myUnverifiedEmailUsername = faker.internet.username();
 const myUnverifiedEmailPassword = faker.internet.password();
 const myUnverifiedEmail = faker.internet.email();
 
@@ -58,7 +58,7 @@ describe('AuthController', () => {
 
     it('should return 404 when username is not found', async ({ app }) => {
       const response = await request(app.httpServer).post('/auth/login').send({
-        username: faker.internet.userName(),
+        username: faker.internet.username(),
         password: myPassword,
       });
 
@@ -224,7 +224,7 @@ describe('AuthController', () => {
 
     it('should return 200 when email is found', async ({ app }) => {
       const newAccount: Partial<AccountRegistrationRequest> = {
-        username: faker.internet.userName(),
+        username: faker.internet.username(),
         email: faker.internet.email(),
         password: faker.internet.password(),
       };

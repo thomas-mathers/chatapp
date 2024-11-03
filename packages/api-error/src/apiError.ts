@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { ApiErrorCode } from './apiErrorCode';
 
-export class ApiError {
+export class ApiError extends Error {
   private readonly _statusCode: number;
   private readonly _code: ApiErrorCode;
   private readonly _message: string;
@@ -14,6 +14,8 @@ export class ApiError {
     message: string,
     details: Record<string, unknown> = {},
   ) {
+    super(message);
+
     this._statusCode = statusCode;
     this._code = code;
     this._message = message;
@@ -38,6 +40,8 @@ export class ApiError {
         return 'Account not found';
       case ApiErrorCode.EmailExists:
         return 'Email already exists';
+      case ApiErrorCode.EmailMissing:
+        return 'Email missing';
       case ApiErrorCode.EmailNotVerified:
         return 'Email not verified';
       case ApiErrorCode.IncorrectPassword:
@@ -63,6 +67,8 @@ export class ApiError {
         return StatusCodes.NOT_FOUND;
       case ApiErrorCode.EmailExists:
         return StatusCodes.CONFLICT;
+      case ApiErrorCode.EmailMissing:
+        return StatusCodes.BAD_REQUEST;
       case ApiErrorCode.EmailNotVerified:
         return StatusCodes.UNAUTHORIZED;
       case ApiErrorCode.IncorrectPassword:

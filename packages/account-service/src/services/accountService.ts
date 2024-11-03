@@ -3,13 +3,12 @@ import {
   GetAccountsRequest,
   Page,
 } from 'chatapp.account-service-contracts';
-import { ApiErrorCode } from 'chatapp.api-error';
+import { ApiError, ApiErrorCode } from 'chatapp.api-error';
 import { createHash, createJwt } from 'chatapp.crypto';
 import { EventBus, EventName } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
 import { Result } from 'typescript-result';
 
-import { ApiError } from '../../../api-error/src/apiError';
 import { Config } from '../config';
 import { toAccountSummary } from '../mappers/toAccountSummary';
 import { AccountRepository } from '../repositories/accountRepository';
@@ -22,7 +21,7 @@ export class AccountService {
     private readonly eventBus: EventBus,
   ) {}
 
-  async register(
+  async create(
     username: string,
     password: string,
     email: string,
@@ -69,6 +68,16 @@ export class AccountService {
     });
 
     return Result.ok(accountSummary);
+  }
+
+  async getOrCreateByEmail(
+    email: string,
+  ): Promise<Result<AccountSummary, ApiError>> {
+    const account = await this.accountRepository.getByEmail(email);
+
+    return account
+      ? Result.ok(toAccountSummary(account))
+      : this.create(email, '', email, true);
   }
 
   async getById(id: string): Promise<Result<AccountSummary, ApiError>> {

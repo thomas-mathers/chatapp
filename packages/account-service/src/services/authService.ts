@@ -2,14 +2,13 @@ import {
   AccountSummary,
   LoginResponse,
 } from 'chatapp.account-service-contracts';
-import { ApiErrorCode } from 'chatapp.api-error';
+import { ApiError, ApiErrorCode } from 'chatapp.api-error';
 import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
 import { EventBus, EventName } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
 import { Result } from 'typescript-result';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ApiError } from '../../../api-error/src/apiError';
 import { Config } from '../config';
 import { AccountRepository } from '../repositories/accountRepository';
 import { AuthCodeRepository } from '../repositories/authCodeRepository';

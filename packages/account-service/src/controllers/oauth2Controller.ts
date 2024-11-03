@@ -3,10 +3,8 @@ import { Router } from 'express';
 import passport, { Profile } from 'passport';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { Result } from 'typescript-result';
 
 import { Config } from '../config';
-import { AccountService } from '../services/accountService';
 import { AuthService } from '../services/authService';
 import { ExternalAccountService } from '../services/externalAccountService';
 
@@ -16,7 +14,6 @@ export class OAuth2Controller {
   constructor(
     private readonly config: Config,
     private readonly externalAccountService: ExternalAccountService,
-    private readonly accountService: AccountService,
     private readonly authService: AuthService,
   ) {
     this.configureStrategies();
@@ -38,7 +35,7 @@ export class OAuth2Controller {
           profileFields: ['id', 'emails', 'name', 'photos'],
         },
         async (_accessToken, _refreshToken, profile, done) => {
-          await this.verify('facebook', profile, done);
+          await this.verifyCallback('facebook', profile, done);
         },
       ),
     );
@@ -52,7 +49,7 @@ export class OAuth2Controller {
           scope: ['profile', 'email'],
         },
         async (_accessToken, _refreshToken, profile, done) => {
-          await this.verify('google', profile, done);
+          await this.verifyCallback('google', profile, done);
         },
       ),
     );
@@ -82,56 +79,17 @@ export class OAuth2Controller {
     );
   }
 
-  private async verify(
+  private async verifyCallback(
     provider: string,
-    { id: providerAccountId, emails }: Profile,
-    done: (
-      error: Error | null | unknown,
-      user?: AccountSummary | false,
-    ) => void,
+    profile: Profile,
+    done: (error: Error | null | unknown, account?: AccountSummary) => void,
   ) {
     try {
-      const credentials = await this.externalAccountService.getByProvider(
-        provider,
-        providerAccountId,
-      );
-
-      if (credentials) {
-        return await Result.fromAsync(
-          this.accountService.getById(credentials.accountId),
-        ).fold((t) => done(null, t), done);
-      }
-
-      const email = emails?.[0].value;
-
-      if (!email) {
-        return done(null, false);
-      }
-
-      const existingAccount = await Result.fromAsync(
-        this.accountService.getByEmail(email),
-      ).getOrNull();
-
-      if (existingAccount !== null) {
-        await this.externalAccountService.insert({
-          accountId: existingAccount.id,
+      const account =
+        await this.externalAccountService.getOrCreateByExternalProfile(
           provider,
-          providerAccountId,
-        });
-
-        return done(null, existingAccount);
-      }
-
-      const account = await Result.fromAsync(
-        this.accountService.register(email, '', email, true),
-      ).getOrThrow();
-
-      await this.externalAccountService.insert({
-        accountId: account.id,
-        provider,
-        providerAccountId,
-      });
-
+          profile,
+        );
       done(null, account);
     } catch (error) {
       done(error);

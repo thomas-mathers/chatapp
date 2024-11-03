@@ -8,7 +8,7 @@ import { beforeEach, describe, it } from 'vitest';
 import { toAccountSummary } from '../mappers/toAccountSummary';
 import { Account } from '../models/account';
 
-const myUsername = faker.internet.userName();
+const myUsername = faker.internet.username();
 const myPassword = faker.internet.password();
 const myEmail = faker.internet.email();
 
@@ -23,7 +23,7 @@ const accounts: Account[] = [
   },
   {
     _id: new ObjectId(),
-    username: faker.internet.userName(),
+    username: faker.internet.username(),
     password: createHashSync(faker.internet.password()),
     email: faker.internet.email(),
     emailVerified: true,
@@ -31,7 +31,7 @@ const accounts: Account[] = [
   },
   {
     _id: new ObjectId(),
-    username: faker.internet.userName(),
+    username: faker.internet.username(),
     password: createHashSync(faker.internet.password()),
     email: faker.internet.email(),
     emailVerified: true,
@@ -39,7 +39,7 @@ const accounts: Account[] = [
   },
   {
     _id: new ObjectId(),
-    username: faker.internet.userName(),
+    username: faker.internet.username(),
     password: createHashSync(faker.internet.password()),
     email: faker.internet.email(),
     emailVerified: true,
@@ -56,7 +56,7 @@ describe('AccountController', () => {
   describe('POST /accounts', () => {
     it('should create a new account and return 201', async ({ app }) => {
       const newAccount: Partial<AccountRegistrationRequest> = {
-        username: faker.internet.userName(),
+        username: faker.internet.username(),
         email: faker.internet.email(),
         password: faker.internet.password(),
       };
@@ -86,7 +86,7 @@ describe('AccountController', () => {
 
     it('should return 400 when email is missing', async ({ app }) => {
       const newAccount: Partial<AccountRegistrationRequest> = {
-        username: faker.internet.userName(),
+        username: faker.internet.username(),
         password: faker.internet.password(),
       };
 
@@ -99,7 +99,7 @@ describe('AccountController', () => {
 
     it('should return 400 when password is missing', async ({ app }) => {
       const newAccount: Partial<AccountRegistrationRequest> = {
-        username: faker.internet.userName(),
+        username: faker.internet.username(),
         email: faker.internet.email(),
       };
 
@@ -112,7 +112,7 @@ describe('AccountController', () => {
 
     it('should return 409 when username is already taken', async ({ app }) => {
       const existingAccount: Partial<AccountRegistrationRequest> = {
-        username: faker.internet.userName(),
+        username: faker.internet.username(),
         password: faker.internet.password(),
         email: faker.internet.email(),
       };
@@ -138,7 +138,7 @@ describe('AccountController', () => {
 
     it('should return 409 when email is already taken', async ({ app }) => {
       const existingAccount: Partial<AccountRegistrationRequest> = {
-        username: faker.internet.userName(),
+        username: faker.internet.username(),
         email: faker.internet.email(),
         password: faker.internet.password(),
       };
@@ -150,7 +150,7 @@ describe('AccountController', () => {
       expect(createdResponse.status).toBe(201);
 
       const conflictingAccount: Partial<AccountRegistrationRequest> = {
-        username: faker.internet.userName(),
+        username: faker.internet.username(),
         email: existingAccount.email,
         password: faker.internet.password(),
       };

@@ -11,7 +11,7 @@ beforeEach(async (context: TestContext) => {
   context.token = createJwt(
     {
       userId: faker.string.uuid(),
-      username: faker.internet.userName(),
+      username: faker.internet.username(),
     },
     config.jwt,
   );
