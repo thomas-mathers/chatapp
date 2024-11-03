@@ -23,7 +23,19 @@ export class AuthService {
       body,
     });
 
-    this.jwtService.set(result.jwt);
+    this.jwtService.set(result.accessToken);
+
+    return result;
+  }
+
+  async exchangeAuthCodeForToken(code: string): Promise<LoginResponse> {
+    const result = await this.apiClient.requestJson<LoginResponse>({
+      method: 'POST',
+      path: '/auth/auth-codes',
+      body: { code },
+    });
+
+    this.jwtService.set(result.accessToken);
 
     return result;
   }

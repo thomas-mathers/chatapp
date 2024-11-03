@@ -1,7 +1,9 @@
 import { LoadingButton } from '@mui/lab';
 import {
   Alert,
+  Button,
   Container,
+  Divider,
   Link,
   Stack,
   TextField,
@@ -13,8 +15,13 @@ import {
   LoginResponse,
 } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import {
+  Link as RouterLink,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 
 import { PasswordField } from '@app/components/passwordField';
 import { useAuthService } from '@app/hooks';
@@ -25,6 +32,7 @@ interface LoginFormState {
 }
 
 export const LoginForm = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const { control, formState, handleSubmit } = useForm<LoginFormState>({
@@ -50,6 +58,18 @@ export const LoginForm = () => {
   const onSubmit = (data: LoginFormState) => {
     mutate(data);
   };
+
+  useEffect(() => {
+    const code = searchParams.get('code');
+    if (!code) {
+      return;
+    }
+    searchParams.delete('code');
+    setSearchParams(searchParams);
+    authService.exchangeAuthCodeForToken(code).then(() => {
+      navigate('/dashboard');
+    });
+  }, [searchParams, setSearchParams, authService, navigate]);
 
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>
@@ -98,6 +118,23 @@ export const LoginForm = () => {
               Register
             </Link>
           </Typography>
+          <Divider>OR</Divider>
+          <Button
+            href="http://localhost:3000/oauth2/google/login"
+            variant="contained"
+            color="primary"
+            fullWidth
+          >
+            Continue with Google
+          </Button>
+          <Button
+            href="http://localhost:3000/oauth2/facebook/login"
+            variant="contained"
+            color="primary"
+            fullWidth
+          >
+            Continue with Facebook
+          </Button>
         </Stack>
       </form>
     </Container>

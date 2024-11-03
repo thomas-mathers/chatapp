@@ -49,6 +49,7 @@ export class OAuth2Controller {
           clientID: this.config.google.clientId,
           clientSecret: this.config.google.clientSecret,
           callbackURL: '/oauth2/google/callback',
+          scope: ['profile', 'email'],
         },
         async (_accessToken, _refreshToken, profile, done) => {
           await this.verify('google', profile, done);
