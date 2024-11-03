@@ -1,8 +1,6 @@
 import {
   AccountRegistrationRequest,
-  AccountServiceErrorCode,
   accountRegistrationRequest,
-  createAccountServiceError,
   getAccountsRequestSchema,
 } from 'chatapp.account-service-contracts';
 import {
@@ -99,34 +97,7 @@ export class AccountController {
           accountService.register(username, password, email, false),
         ).fold(
           (result) => res.status(201).json(result),
-          (error) => {
-            switch (error) {
-              case AccountServiceErrorCode.UsernameExists:
-                res
-                  .status(StatusCodes.CONFLICT)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.UsernameExists,
-                    ),
-                  );
-                break;
-              case AccountServiceErrorCode.EmailExists:
-                res
-                  .status(StatusCodes.CONFLICT)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.EmailExists,
-                    ),
-                  );
-                break;
-              default:
-                res
-                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
-                  .json(
-                    createAccountServiceError(AccountServiceErrorCode.Unknown),
-                  );
-            }
-          },
+          (error) => res.status(error.statusCode).json(error),
         );
       },
     );
@@ -178,25 +149,7 @@ export class AccountController {
       async (req: Request, res: Response) => {
         Result.fromAsync(accountService.getById(req.accountId)).fold(
           (result) => res.status(StatusCodes.OK).json(result),
-          (error) => {
-            switch (error) {
-              case AccountServiceErrorCode.AccountNotFound:
-                res
-                  .status(StatusCodes.NOT_FOUND)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.AccountNotFound,
-                    ),
-                  );
-                break;
-              default:
-                res
-                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
-                  .json(
-                    createAccountServiceError(AccountServiceErrorCode.Unknown),
-                  );
-            }
-          },
+          (error) => res.status(error.statusCode).json(error),
         );
       },
     );
@@ -233,25 +186,7 @@ export class AccountController {
       async (req: Request, res: Response) => {
         Result.fromAsync(accountService.deleteById(req.accountId)).fold(
           (result) => res.status(StatusCodes.OK).json(result),
-          (error) => {
-            switch (error) {
-              case AccountServiceErrorCode.AccountNotFound:
-                res
-                  .status(StatusCodes.NOT_FOUND)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.AccountNotFound,
-                    ),
-                  );
-                break;
-              default:
-                res
-                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
-                  .json(
-                    createAccountServiceError(AccountServiceErrorCode.Unknown),
-                  );
-            }
-          },
+          (error) => res.status(error.statusCode).json(error),
         );
       },
     );

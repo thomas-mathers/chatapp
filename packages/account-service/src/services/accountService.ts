@@ -1,14 +1,15 @@
 import {
-  AccountServiceErrorCode,
   AccountSummary,
   GetAccountsRequest,
   Page,
 } from 'chatapp.account-service-contracts';
+import { ApiErrorCode } from 'chatapp.api-error';
 import { createHash, createJwt } from 'chatapp.crypto';
 import { EventBus, EventName } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
 import { Result } from 'typescript-result';
 
+import { ApiError } from '../../../api-error/src/apiError';
 import { Config } from '../config';
 import { toAccountSummary } from '../mappers/toAccountSummary';
 import { AccountRepository } from '../repositories/accountRepository';
@@ -26,13 +27,13 @@ export class AccountService {
     password: string,
     email: string,
     emailVerified: boolean,
-  ): Promise<Result<AccountSummary, AccountServiceErrorCode>> {
+  ): Promise<Result<AccountSummary, ApiError>> {
     if (await this.accountRepository.containsUsername(username)) {
-      return Result.error(AccountServiceErrorCode.UsernameExists);
+      return Result.error(ApiError.fromErrorCode(ApiErrorCode.UsernameExists));
     }
 
     if (await this.accountRepository.containsEmail(email)) {
-      return Result.error(AccountServiceErrorCode.EmailExists);
+      return Result.error(ApiError.fromErrorCode(ApiErrorCode.EmailExists));
     }
 
     const passwordHash = await createHash(password);
@@ -70,13 +71,11 @@ export class AccountService {
     return Result.ok(accountSummary);
   }
 
-  async getById(
-    id: string,
-  ): Promise<Result<AccountSummary, AccountServiceErrorCode>> {
+  async getById(id: string): Promise<Result<AccountSummary, ApiError>> {
     const account = await this.accountRepository.getById(id);
 
     if (!account) {
-      return Result.error(AccountServiceErrorCode.AccountNotFound);
+      return Result.error(ApiError.fromErrorCode(ApiErrorCode.AccountNotFound));
     }
 
     const accountSummary = toAccountSummary(account);
@@ -84,13 +83,11 @@ export class AccountService {
     return Result.ok(accountSummary);
   }
 
-  async getByEmail(
-    email: string,
-  ): Promise<Result<AccountSummary, AccountServiceErrorCode>> {
+  async getByEmail(email: string): Promise<Result<AccountSummary, ApiError>> {
     const account = await this.accountRepository.getByEmail(email);
 
     if (!account) {
-      return Result.error(AccountServiceErrorCode.AccountNotFound);
+      return Result.error(ApiError.fromErrorCode(ApiErrorCode.AccountNotFound));
     }
 
     const accountSummary = toAccountSummary(account);
@@ -107,11 +104,11 @@ export class AccountService {
     };
   }
 
-  async deleteById(id: string): Promise<Result<void, AccountServiceErrorCode>> {
+  async deleteById(id: string): Promise<Result<void, ApiError>> {
     const numDeleted = await this.accountRepository.deleteById(id);
 
     if (numDeleted === 0) {
-      return Result.error(AccountServiceErrorCode.AccountNotFound);
+      return Result.error(ApiError.fromErrorCode(ApiErrorCode.AccountNotFound));
     }
 
     this.logger.info('Account deleted', { id });

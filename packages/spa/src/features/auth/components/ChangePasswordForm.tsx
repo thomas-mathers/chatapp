@@ -1,10 +1,7 @@
 import { LoadingButton } from '@mui/lab';
 import { Alert, Container, Stack, TextField, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
-import {
-  AccountServiceErrorCode,
-  ChangePasswordRequest,
-} from 'chatapp.account-service-contracts';
+import { ChangePasswordRequest } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -31,7 +28,7 @@ export const ChangePasswordForm = () => {
 
   const { mutate, isPending, error } = useMutation<
     void,
-    ApiError<AccountServiceErrorCode>,
+    ApiError,
     ChangePasswordRequest
   >({
     mutationFn: (data) => authService.changePassword(data),

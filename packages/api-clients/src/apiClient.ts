@@ -1,3 +1,5 @@
+import { ApiError, ApiErrorCode } from 'chatapp.api-error';
+
 interface RequestParameters {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   path: string;
@@ -7,7 +9,10 @@ interface RequestParameters {
 }
 
 export class ApiClient {
-  constructor(private baseUrl: string) {}
+  constructor(
+    private readonly baseUrl: string,
+    private readonly onInvalidToken?: () => void,
+  ) {}
 
   public async requestJson<T>({
     method,
@@ -36,6 +41,10 @@ export class ApiClient {
     const responseBody = await response.json();
 
     if (!response.ok) {
+      const error = responseBody as ApiError;
+      if (error.code === ApiErrorCode.InvalidToken) {
+        this.onInvalidToken?.();
+      }
       throw responseBody;
     }
 

@@ -10,10 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
-import {
-  AccountServiceErrorCode,
-  LoginResponse,
-} from 'chatapp.account-service-contracts';
+import { LoginResponse } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -46,7 +43,7 @@ export const LoginForm = () => {
 
   const { mutate, isPending, error } = useMutation<
     LoginResponse,
-    ApiError<AccountServiceErrorCode>,
+    ApiError,
     LoginFormState
   >({
     mutationFn: (data) => authService.login(data),

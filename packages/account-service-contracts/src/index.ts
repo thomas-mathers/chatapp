@@ -12,4 +12,3 @@ export * from './responses/passwordResetTokenResponse';
 export * from './page';
 export * from './pageOptions';
 export * from './sortDirection';
-export * from './errorCode';

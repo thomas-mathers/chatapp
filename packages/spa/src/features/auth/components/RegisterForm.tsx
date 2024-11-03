@@ -10,7 +10,6 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import {
   AccountRegistrationRequest,
-  AccountServiceErrorCode,
   AccountSummary,
 } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
@@ -43,7 +42,7 @@ export const RegisterForm = () => {
 
   const { mutate, isPending, error } = useMutation<
     AccountSummary,
-    ApiError<AccountServiceErrorCode>,
+    ApiError,
     AccountRegistrationRequest
   >({
     mutationFn: (data) => accountService.createAccount(data),

@@ -1,10 +1,7 @@
 import { LoadingButton } from '@mui/lab';
 import { Alert, Container, Stack, TextField, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
-import {
-  AccountServiceErrorCode,
-  PasswordResetRequest,
-} from 'chatapp.account-service-contracts';
+import { PasswordResetRequest } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -34,7 +31,7 @@ export const ResetPasswordForm = () => {
 
   const { mutate, isPending, error } = useMutation<
     void,
-    ApiError<AccountServiceErrorCode>,
+    ApiError,
     PasswordResetRequest
   >({
     mutationFn: (data) => authService.resetPassword(data),

@@ -1,5 +1,4 @@
 import {
-  AccountServiceErrorCode,
   ChangePasswordRequest,
   ExchangeAuthCodeRequest,
   LoginRequest,
@@ -7,7 +6,6 @@ import {
   PasswordResetTokenRequest,
   changePasswordRequestSchema,
   confirmEmailRequestSchema,
-  createAccountServiceError,
   exchangeAuthCodeRequestSchema,
   loginRequestSchema,
   passwordResetRequestSchema,
@@ -73,43 +71,7 @@ export class AuthController {
         const body: LoginRequest = req.body;
         Result.fromAsync(authService.login(body.username, body.password)).fold(
           (result) => res.status(StatusCodes.OK).json(result),
-          (error) => {
-            switch (error) {
-              case AccountServiceErrorCode.IncorrectPassword:
-                res
-                  .status(StatusCodes.UNAUTHORIZED)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.IncorrectPassword,
-                    ),
-                  );
-                break;
-              case AccountServiceErrorCode.EmailNotVerified:
-                res
-                  .status(StatusCodes.UNAUTHORIZED)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.EmailNotVerified,
-                    ),
-                  );
-                break;
-              case AccountServiceErrorCode.AccountNotFound:
-                res
-                  .status(StatusCodes.NOT_FOUND)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.AccountNotFound,
-                    ),
-                  );
-                break;
-              default:
-                res
-                  .status(500)
-                  .json(
-                    createAccountServiceError(AccountServiceErrorCode.Unknown),
-                  );
-            }
-          },
+          (error) => res.status(error.statusCode).json(error),
         );
       },
     );
@@ -157,34 +119,7 @@ export class AuthController {
           ),
         ).fold(
           (result) => res.status(StatusCodes.OK).json(result),
-          (error) => {
-            switch (error) {
-              case AccountServiceErrorCode.IncorrectPassword:
-                res
-                  .status(StatusCodes.UNAUTHORIZED)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.IncorrectPassword,
-                    ),
-                  );
-                break;
-              case AccountServiceErrorCode.AccountNotFound:
-                res
-                  .status(StatusCodes.NOT_FOUND)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.AccountNotFound,
-                    ),
-                  );
-                break;
-              default:
-                res
-                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
-                  .json(
-                    createAccountServiceError(AccountServiceErrorCode.Unknown),
-                  );
-            }
-          },
+          (error) => res.status(error.statusCode).json(error),
         );
       },
     );
@@ -221,25 +156,7 @@ export class AuthController {
         const body: PasswordResetTokenRequest = req.body;
         Result.fromAsync(authService.resetPasswordRequest(body.email)).fold(
           (result) => res.status(StatusCodes.OK).json(result),
-          (error) => {
-            switch (error) {
-              case AccountServiceErrorCode.AccountNotFound:
-                res
-                  .status(StatusCodes.NOT_FOUND)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.AccountNotFound,
-                    ),
-                  );
-                break;
-              default:
-                res
-                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
-                  .json(
-                    createAccountServiceError(AccountServiceErrorCode.Unknown),
-                  );
-            }
-          },
+          (error) => res.status(error.statusCode).json(error),
         );
       },
     );
@@ -280,34 +197,7 @@ export class AuthController {
           authService.resetPassword(body.token, body.newPassword),
         ).fold(
           (result) => res.status(StatusCodes.OK).json(result),
-          (error) => {
-            switch (error) {
-              case AccountServiceErrorCode.InvalidToken:
-                res
-                  .status(StatusCodes.FORBIDDEN)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.InvalidToken,
-                    ),
-                  );
-                break;
-              case AccountServiceErrorCode.AccountNotFound:
-                res
-                  .status(StatusCodes.NOT_FOUND)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.AccountNotFound,
-                    ),
-                  );
-                break;
-              default:
-                res
-                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
-                  .json(
-                    createAccountServiceError(AccountServiceErrorCode.Unknown),
-                  );
-            }
-          },
+          (error) => res.status(error.statusCode).json(error),
         );
       },
     );
@@ -318,34 +208,7 @@ export class AuthController {
       async (req: Request, res: Response) => {
         Result.fromAsync(authService.confirmEmail(req.body.token)).fold(
           (result) => res.status(StatusCodes.OK).json(result),
-          (error) => {
-            switch (error) {
-              case AccountServiceErrorCode.InvalidToken:
-                res
-                  .status(StatusCodes.FORBIDDEN)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.InvalidToken,
-                    ),
-                  );
-                break;
-              case AccountServiceErrorCode.AccountNotFound:
-                res
-                  .status(StatusCodes.NOT_FOUND)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.AccountNotFound,
-                    ),
-                  );
-                break;
-              default:
-                res
-                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
-                  .json(
-                    createAccountServiceError(AccountServiceErrorCode.Unknown),
-                  );
-            }
-          },
+          (error) => res.status(error.statusCode).json(error),
         );
       },
     );
@@ -359,25 +222,7 @@ export class AuthController {
           authService.exchangeAuthCodeForToken(exchangeAuthCodeRequest.code),
         ).fold(
           (result) => res.status(StatusCodes.OK).json(result),
-          (error) => {
-            switch (error) {
-              case AccountServiceErrorCode.InvalidAuthCode:
-                res
-                  .status(StatusCodes.FORBIDDEN)
-                  .json(
-                    createAccountServiceError(
-                      AccountServiceErrorCode.InvalidAuthCode,
-                    ),
-                  );
-                break;
-              default:
-                res
-                  .status(StatusCodes.INTERNAL_SERVER_ERROR)
-                  .json(
-                    createAccountServiceError(AccountServiceErrorCode.Unknown),
-                  );
-            }
-          },
+          (error) => res.status(error.statusCode).json(error),
         );
       },
     );
