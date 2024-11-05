@@ -5,7 +5,7 @@ import { handleErrorMiddleware } from 'chatapp.middlewares';
 import cors from 'cors';
 import express from 'express';
 import { Server } from 'http';
-import { Db, MongoClient } from 'mongodb';
+import { MongoClient } from 'mongodb';
 import { RedisClientType, createClient } from 'redis';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
@@ -85,14 +85,17 @@ export class App {
     const mongoClient = new MongoClient(config.mongo.uri);
     await mongoClient.connect();
 
-    const mongoDatabase = mongoClient.db(config.mongo.databaseName);
-
-    await this.setupMongoIndexes(mongoDatabase);
+    await this.setupMongoIndexes(config, mongoClient);
 
     return mongoClient;
   }
 
-  private static async setupMongoIndexes(mongoDatabase: Db): Promise<void> {
+  private static async setupMongoIndexes(
+    config: Config,
+    mongoClient: MongoClient,
+  ): Promise<void> {
+    const mongoDatabase = mongoClient.db(config.mongo.databaseName);
+
     const accountsCollection = mongoDatabase.collection<Account>('accounts');
 
     await accountsCollection.createIndex({ username: 1 }, { unique: true });

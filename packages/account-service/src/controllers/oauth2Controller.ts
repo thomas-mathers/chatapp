@@ -55,6 +55,23 @@ export class OAuth2Controller {
     );
   }
 
+  private async verifyCallback(
+    provider: string,
+    profile: Profile,
+    done: (error: Error | null | unknown, account?: AccountSummary) => void,
+  ) {
+    try {
+      const account =
+        await this.externalAccountService.getOrCreateByExternalProfile(
+          provider,
+          profile,
+        );
+      done(null, account);
+    } catch (error) {
+      done(error);
+    }
+  }
+
   private configureRoutes() {
     this.configureRoute('facebook');
     this.configureRoute('google');
@@ -77,22 +94,5 @@ export class OAuth2Controller {
         res.redirect(`${this.config.frontEndUrl}?code=${code}`);
       },
     );
-  }
-
-  private async verifyCallback(
-    provider: string,
-    profile: Profile,
-    done: (error: Error | null | unknown, account?: AccountSummary) => void,
-  ) {
-    try {
-      const account =
-        await this.externalAccountService.getOrCreateByExternalProfile(
-          provider,
-          profile,
-        );
-      done(null, account);
-    } catch (error) {
-      done(error);
-    }
   }
 }

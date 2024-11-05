@@ -42,27 +42,21 @@ const swaggerDoc = swaggerJsdoc({
 
 export class App {
   private constructor(
+    private readonly _config: Config,
     private readonly _logger: Logger,
     private readonly _httpServer: Server,
     private readonly _mongoClient: MongoClient,
-    private readonly _mongoDatabase: Db,
     private readonly _chatServer: ChatServer,
   ) {}
 
   static async launch(config: Config): Promise<App> {
     const logger = new Logger({ level: config.logging.level });
 
-    const mongoClient = new MongoClient(config.mongo.uri);
-    await mongoClient.connect();
+    const mongoClient = await this.setupMongoClient(config);
 
     const mongoDatabase = mongoClient.db(config.mongo.databaseName);
 
     const messagesCollection = mongoDatabase.collection<Message>('messages');
-
-    await messagesCollection.createIndex({ accountId: 1 });
-    await messagesCollection.createIndex({ accountUsername: 1 });
-    await messagesCollection.createIndex({ dateCreated: 1 });
-
     const messageRepository = new MessageRepository(messagesCollection);
     const messageService = new MessageService(messageRepository);
     const messageController = new MessageController(messageService);
@@ -83,11 +77,33 @@ export class App {
         logger.info(`Server is running on port ${config.port}`);
       });
 
-    return new App(logger, httpServer, mongoClient, mongoDatabase, chatServer);
+    return new App(config, logger, httpServer, mongoClient, chatServer);
+  }
+
+  private static async setupMongoClient(config: Config): Promise<MongoClient> {
+    const mongoClient = new MongoClient(config.mongo.uri);
+    await mongoClient.connect();
+
+    await this.setupMongoIndexes(config, mongoClient);
+
+    return mongoClient;
+  }
+
+  private static async setupMongoIndexes(
+    config: Config,
+    mongoClient: MongoClient,
+  ): Promise<void> {
+    const mongoDatabase = mongoClient.db(config.mongo.databaseName);
+
+    const messagesCollection = mongoDatabase.collection<Message>('messages');
+
+    await messagesCollection.createIndex({ accountId: 1 });
+    await messagesCollection.createIndex({ accountUsername: 1 });
+    await messagesCollection.createIndex({ dateCreated: 1 });
   }
 
   async dropDatabase() {
-    await this._mongoDatabase.dropDatabase();
+    await this.mongoDatabase.dropDatabase();
   }
 
   async close() {
@@ -119,6 +135,6 @@ export class App {
   }
 
   get mongoDatabase(): Db {
-    return this._mongoDatabase;
+    return this._mongoClient.db(this._config.mongo.databaseName);
   }
 }
