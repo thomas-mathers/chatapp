@@ -7,7 +7,6 @@ import { createHash, createJwt, verifyHash, verifyJwt } from 'chatapp.crypto';
 import { EventBus, EventName } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
 import { Result } from 'typescript-result';
-import { v4 as uuidv4 } from 'uuid';
 
 import { Config } from '../config';
 import { AccountRepository } from '../repositories/accountRepository';
@@ -60,12 +59,13 @@ export class AuthService {
     return Result.ok({ accessToken });
   }
 
-  async getAuthCode({ id, username, email }: AccountSummary): Promise<string> {
+  async linkAuthCodeToJwt(
+    code: string,
+    { id, username, email }: AccountSummary,
+  ): Promise<string> {
     const jwt = createJwt({ userId: id, username }, this.config.jwt);
 
-    const authCode = uuidv4();
-
-    await this.authCodeRepository.insert(authCode, jwt);
+    await this.authCodeRepository.insert(code, jwt);
 
     this.logger.info('Auth code generated', {
       id,
@@ -73,7 +73,7 @@ export class AuthService {
       email,
     });
 
-    return authCode;
+    return code;
   }
 
   async exchangeAuthCodeForToken(

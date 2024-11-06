@@ -87,7 +87,8 @@ export class OAuth2Controller {
       `/${provider}/callback`,
       passport.authenticate(provider, { session: false }),
       async (req, res) => {
-        const code = await this.authService.getAuthCode(
+        const code = await this.authService.linkAuthCodeToJwt(
+          req.query.code as string,
           req.user as AccountSummary,
         );
 

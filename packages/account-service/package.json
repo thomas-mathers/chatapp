@@ -46,6 +46,7 @@
     "@types/supertest": "^6.0.2",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.6",
+    "nock": "^13.5.5",
     "supertest": "^7.0.0",
     "tsx": "^4.19.1",
     "vitest": "^2.1.2"
