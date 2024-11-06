@@ -204,6 +204,10 @@ export class App {
     await this.closeRedisClient();
   }
 
+  get config() {
+    return this._config;
+  }
+
   get httpServer() {
     return this._httpServer;
   }

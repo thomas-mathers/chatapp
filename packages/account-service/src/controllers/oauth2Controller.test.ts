@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { verifyJwt } from 'chatapp.crypto';
 import { ObjectId } from 'mongodb';
 import nock from 'nock';
 import request from 'supertest';
@@ -29,6 +30,8 @@ const scope = 'openid email profile';
 const sub = faker.internet.username();
 const email = faker.internet.email();
 const name = faker.person.fullName();
+
+const id = '69581b3bd9016fddded6f047';
 
 describe('OAuth2Controller', () => {
   describe('GET /oauth2/google/login', () => {
@@ -72,7 +75,7 @@ describe('OAuth2Controller', () => {
       app,
     }) => {
       await app.mongoDatabase.collection<Account>('accounts').insertOne({
-        _id: new ObjectId('69581b3bd9016fddded6f047'),
+        _id: new ObjectId(id),
         email,
         username: email,
         emailVerified: true,
@@ -83,7 +86,7 @@ describe('OAuth2Controller', () => {
       await app.mongoDatabase
         .collection<ExternalAccount>('externalAccounts')
         .insertOne({
-          accountId: new ObjectId('69581b3bd9016fddded6f047'),
+          accountId: new ObjectId(id),
           provider: 'google',
           providerAccountId: sub,
           dateCreated: new Date(),
@@ -96,12 +99,28 @@ describe('OAuth2Controller', () => {
       expect(response.headers.location).toContain(
         `${FRONT_END_URL}?code=${GOOGLE_AUTH_CODE}`,
       );
+
+      const jwtResponse = await request(app.httpServer)
+        .post('/auth/auth-codes')
+        .send({ code: GOOGLE_AUTH_CODE })
+        .expect(200);
+
+      expect(jwtResponse.body.accessToken).toBeDefined();
+
+      const accessToken = jwtResponse.body.accessToken;
+
+      const jwt = verifyJwt(accessToken, app.config.jwt);
+
+      expect(jwt).toBeDefined();
+      expect(jwt!.userId).toEqual(id);
+      expect(jwt!.username).toEqual(email);
     });
 
     it('should handle existing user signing in for the first time', async ({
       app,
     }) => {
       await app.mongoDatabase.collection<Account>('accounts').insertOne({
+        _id: new ObjectId(id),
         email,
         username: email,
         emailVerified: true,
@@ -116,6 +135,21 @@ describe('OAuth2Controller', () => {
       expect(response.headers.location).toContain(
         `${FRONT_END_URL}?code=${GOOGLE_AUTH_CODE}`,
       );
+
+      const jwtResponse = await request(app.httpServer)
+        .post('/auth/auth-codes')
+        .send({ code: GOOGLE_AUTH_CODE })
+        .expect(200);
+
+      expect(jwtResponse.body.accessToken).toBeDefined();
+
+      const accessToken = jwtResponse.body.accessToken;
+
+      const jwt = verifyJwt(accessToken, app.config.jwt);
+
+      expect(jwt).toBeDefined();
+      expect(jwt!.userId).toEqual(id);
+      expect(jwt!.username).toEqual(email);
     });
 
     it('should handle new user', async ({ app }) => {
@@ -126,6 +160,21 @@ describe('OAuth2Controller', () => {
       expect(response.headers.location).toContain(
         `${FRONT_END_URL}?code=${GOOGLE_AUTH_CODE}`,
       );
+
+      const jwtResponse = await request(app.httpServer)
+        .post('/auth/auth-codes')
+        .send({ code: GOOGLE_AUTH_CODE })
+        .expect(200);
+
+      expect(jwtResponse.body.accessToken).toBeDefined();
+
+      const accessToken = jwtResponse.body.accessToken;
+
+      const jwt = verifyJwt(accessToken, app.config.jwt);
+
+      expect(jwt).toBeDefined();
+      expect(jwt!.userId).toBeDefined();
+      expect(jwt!.username).toEqual(email);
     });
   });
 
@@ -172,7 +221,7 @@ describe('OAuth2Controller', () => {
       app,
     }) => {
       await app.mongoDatabase.collection<Account>('accounts').insertOne({
-        _id: new ObjectId('69581b3bd9016fddded6f047'),
+        _id: new ObjectId(id),
         email,
         username: email,
         emailVerified: true,
@@ -183,7 +232,7 @@ describe('OAuth2Controller', () => {
       await app.mongoDatabase
         .collection<ExternalAccount>('externalAccounts')
         .insertOne({
-          accountId: new ObjectId('69581b3bd9016fddded6f047'),
+          accountId: new ObjectId(id),
           provider: 'facebook',
           providerAccountId: sub,
           dateCreated: new Date(),
@@ -196,12 +245,28 @@ describe('OAuth2Controller', () => {
       expect(response.headers.location).toContain(
         `${FRONT_END_URL}?code=${FACEBOOK_AUTH_CODE}`,
       );
+
+      const jwtResponse = await request(app.httpServer)
+        .post('/auth/auth-codes')
+        .send({ code: FACEBOOK_AUTH_CODE })
+        .expect(200);
+
+      expect(jwtResponse.body.accessToken).toBeDefined();
+
+      const accessToken = jwtResponse.body.accessToken;
+
+      const jwt = verifyJwt(accessToken, app.config.jwt);
+
+      expect(jwt).toBeDefined();
+      expect(jwt!.userId).toEqual(id);
+      expect(jwt!.username).toEqual(email);
     });
 
     it('should handle existing user signing in for the first time', async ({
       app,
     }) => {
       await app.mongoDatabase.collection<Account>('accounts').insertOne({
+        _id: new ObjectId(id),
         email,
         username: email,
         emailVerified: true,
@@ -216,6 +281,21 @@ describe('OAuth2Controller', () => {
       expect(response.headers.location).toContain(
         `${FRONT_END_URL}?code=${FACEBOOK_AUTH_CODE}`,
       );
+
+      const jwtResponse = await request(app.httpServer)
+        .post('/auth/auth-codes')
+        .send({ code: FACEBOOK_AUTH_CODE })
+        .expect(200);
+
+      expect(jwtResponse.body.accessToken).toBeDefined();
+
+      const accessToken = jwtResponse.body.accessToken;
+
+      const jwt = verifyJwt(accessToken, app.config.jwt);
+
+      expect(jwt).toBeDefined();
+      expect(jwt!.userId).toEqual(id);
+      expect(jwt!.username).toEqual(email);
     });
 
     it('should handle new user', async ({ app }) => {
@@ -226,6 +306,25 @@ describe('OAuth2Controller', () => {
       expect(response.headers.location).toContain(
         `${FRONT_END_URL}?code=${FACEBOOK_AUTH_CODE}`,
       );
+
+      expect(response.headers.location).toContain(
+        `${FRONT_END_URL}?code=${FACEBOOK_AUTH_CODE}`,
+      );
+
+      const jwtResponse = await request(app.httpServer)
+        .post('/auth/auth-codes')
+        .send({ code: FACEBOOK_AUTH_CODE })
+        .expect(200);
+
+      expect(jwtResponse.body.accessToken).toBeDefined();
+
+      const accessToken = jwtResponse.body.accessToken;
+
+      const jwt = verifyJwt(accessToken, app.config.jwt);
+
+      expect(jwt).toBeDefined();
+      expect(jwt!.userId).toBeDefined();
+      expect(jwt!.username).toEqual(email);
     });
   });
 });
