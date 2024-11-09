@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "chatapp.account-service-contracts": "^1.0.0",
+    "chatapp.file-storage-service-contracts": "^1.0.0",
     "chatapp.message-service-contracts": "^1.0.0"
   },
   "exports": {

@@ -1,6 +1,7 @@
 import {
   ChangePasswordRequest,
   ConfirmEmailRequest,
+  ExchangeAuthCodeRequest,
   LoginRequest,
   LoginResponse,
   PasswordResetRequest,
@@ -17,7 +18,10 @@ export class AuthService {
   ) {}
 
   async login(body: LoginRequest): Promise<LoginResponse> {
-    const result = await this.apiClient.requestJson<LoginResponse>({
+    const result = await this.apiClient.requestJson<
+      LoginRequest,
+      LoginResponse
+    >({
       method: 'POST',
       path: '/auth/login',
       body,
@@ -28,11 +32,16 @@ export class AuthService {
     return result;
   }
 
-  async exchangeAuthCodeForToken(code: string): Promise<LoginResponse> {
-    const result = await this.apiClient.requestJson<LoginResponse>({
+  async exchangeAuthCodeForToken(
+    body: ExchangeAuthCodeRequest,
+  ): Promise<LoginResponse> {
+    const result = await this.apiClient.requestJson<
+      ExchangeAuthCodeRequest,
+      LoginResponse
+    >({
       method: 'POST',
       path: '/auth/auth-codes',
-      body: { code },
+      body,
     });
 
     this.jwtService.set(result.accessToken);
@@ -45,7 +54,7 @@ export class AuthService {
   }
 
   async changePassword(body: ChangePasswordRequest): Promise<void> {
-    await this.apiClient.requestJson<void>({
+    await this.apiClient.requestJson<ChangePasswordRequest, void>({
       method: 'PUT',
       path: '/auth/me/password',
       headers: {
@@ -56,7 +65,7 @@ export class AuthService {
   }
 
   async forgotPassword(body: PasswordResetTokenRequest): Promise<void> {
-    await this.apiClient.requestJson<void>({
+    await this.apiClient.requestJson<PasswordResetTokenRequest, void>({
       method: 'POST',
       path: '/auth/password-reset-requests',
       body,
@@ -64,7 +73,7 @@ export class AuthService {
   }
 
   async resetPassword(body: PasswordResetRequest): Promise<void> {
-    await this.apiClient.requestJson<void>({
+    await this.apiClient.requestJson<PasswordResetRequest, void>({
       method: 'POST',
       path: '/auth/password-resets',
       body,
@@ -72,7 +81,7 @@ export class AuthService {
   }
 
   async confirmEmail(body: ConfirmEmailRequest): Promise<void> {
-    await this.apiClient.requestJson<void>({
+    await this.apiClient.requestJson<ConfirmEmailRequest, void>({
       method: 'POST',
       path: `/auth/email-confirmations`,
       body,

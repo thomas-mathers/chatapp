@@ -89,11 +89,11 @@ export class FileController {
       }
 
       try {
-        const fileId = await fileService.upload(file.name, file.data);
+        const url = await fileService.upload(file.name, file.data);
 
-        logger.info('File uploaded', { fileId });
+        logger.info('File uploaded', { url });
 
-        res.status(201).json({ fileId });
+        res.status(201).json({ url });
       } catch (error) {
         res.status(500).json(
           ApiError.fromErrorCode({

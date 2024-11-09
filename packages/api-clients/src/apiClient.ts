@@ -1,11 +1,11 @@
 import { ApiError, ApiErrorCode } from 'chatapp.api-error';
 
-interface RequestParameters {
+interface RequestParameters<T> {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   path: string;
   headers?: Record<string, string>;
   queryParameters?: Record<string, string>;
-  body?: unknown;
+  body?: T;
 }
 
 export class ApiClient {
@@ -14,13 +14,13 @@ export class ApiClient {
     private readonly onInvalidToken?: () => void,
   ) {}
 
-  public async requestJson<T>({
+  public async request<TRequest, TResponse>({
     method,
     headers,
     path,
     queryParameters,
     body,
-  }: RequestParameters): Promise<T> {
+  }: RequestParameters<TRequest>): Promise<TResponse> {
     const url = new URL(path, this.baseUrl);
 
     if (queryParameters) {
@@ -32,10 +32,7 @@ export class ApiClient {
     const response = await fetch(url.toString(), {
       method,
       body: body ? JSON.stringify(body) : undefined,
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
+      headers,
     });
 
     const responseBody = await response.json();
@@ -48,6 +45,40 @@ export class ApiClient {
       throw responseBody;
     }
 
-    return responseBody as T;
+    return responseBody as TResponse;
+  }
+
+  public async requestJson<TRequest, TResponse>({
+    method,
+    headers,
+    path,
+    queryParameters,
+    body,
+  }: RequestParameters<TRequest>): Promise<TResponse> {
+    return this.request<TRequest, TResponse>({
+      method,
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      path,
+      queryParameters,
+      body,
+    });
+  }
+
+  public async requestFormData<TResponse>({
+    headers,
+    path,
+    queryParameters,
+    body,
+  }: RequestParameters<FormData>): Promise<TResponse> {
+    return this.request<FormData, TResponse>({
+      method: 'POST',
+      headers,
+      path,
+      queryParameters,
+      body,
+    });
   }
 }

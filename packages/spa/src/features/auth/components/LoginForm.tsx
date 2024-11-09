@@ -63,7 +63,7 @@ export const LoginForm = () => {
     }
     searchParams.delete('code');
     setSearchParams(searchParams);
-    authService.exchangeAuthCodeForToken(code).then(() => {
+    authService.exchangeAuthCodeForToken({ code }).then(() => {
       navigate('/dashboard');
     });
   }, [searchParams, setSearchParams, authService, navigate]);

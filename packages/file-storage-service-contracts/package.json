@@ -1,10 +1,10 @@
 {
-  "name": "chatapp.file-storage-service",
+  "name": "chatapp.file-storage-service-contracts",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "tsx src/index.ts",
-    "lint": "eslint --config ../../eslint.config.mjs",
+    "lint": "eslint --config ../../eslint.config.mjs  .",
     "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
     "format": "prettier --config ../../.prettierrc --check .",
     "format:fix": "prettier --config ../../.prettierrc --write .",
@@ -13,18 +13,7 @@
     "test:watch": "vitest --config vitest.config.mts",
     "test:coverage": "vitest --config vitest.config.mts --coverage --ws run"
   },
-  "dependencies": {
-    "chatapp.api-error": "^1.0.0",
-    "chatapp.logging": "^1.0.0",
-    "chatapp.middlewares": "^1.0.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express-fileupload": "^1.5.1",
-    "express": "^5.0.1",
-    "uuid": "^11.0.2"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.0",
-    "@types/express-fileupload": "^1.5.1"
+  "exports": {
+    ".": "./src/index.ts"
   }
 }

@@ -34,14 +34,16 @@ export class MessageService {
       queryParameters['sortDirection'] = sortDirection;
     }
 
-    const result = await this.apiClient.requestJson<Page<MessageSummary>>({
-      method: 'GET',
-      path: '/messages',
-      queryParameters,
-      headers: {
-        Authorization: `Bearer ${this.jwtService.get()}`,
+    const result = await this.apiClient.requestJson<void, Page<MessageSummary>>(
+      {
+        method: 'GET',
+        path: '/messages',
+        queryParameters,
+        headers: {
+          Authorization: `Bearer ${this.jwtService.get()}`,
+        },
       },
-    });
+    );
 
     return result;
   }

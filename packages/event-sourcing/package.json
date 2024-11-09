@@ -13,13 +13,13 @@
     "test:watch": "vitest --config vitest.config.mts",
     "test:coverage": "vitest --config vitest.config.mts --coverage --ws run"
   },
-  "devDependencies": {
-    "@types/amqplib": "^0.10.5"
-  },
   "dependencies": {
     "amqplib": "^0.10.4",
     "chatapp.logging": "1.0.0",
     "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.5"
   },
   "exports": {
     ".": "./src/index.ts"
