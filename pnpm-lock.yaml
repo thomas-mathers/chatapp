@@ -162,6 +162,9 @@ importers:
       chatapp.account-service-contracts:
         specifier: workspace:*
         version: link:../account-service-contracts
+      chatapp.api-error:
+        specifier: workspace:*
+        version: link:../api-error
       chatapp.file-storage-service-contracts:
         specifier: workspace:*
         version: link:../file-storage-service-contracts
@@ -413,6 +416,9 @@ importers:
       chatapp.api-clients:
         specifier: workspace:*
         version: link:../api-clients
+      chatapp.api-error:
+        specifier: workspace:*
+        version: link:../api-error
       chatapp.message-service-contracts:
         specifier: workspace:*
         version: link:../message-service-contracts

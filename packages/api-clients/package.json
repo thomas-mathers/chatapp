@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "chatapp.account-service-contracts": "workspace:*",
+    "chatapp.api-error": "workspace:*",
     "chatapp.file-storage-service-contracts": "workspace:*",
     "chatapp.message-service-contracts": "workspace:*"
   },
