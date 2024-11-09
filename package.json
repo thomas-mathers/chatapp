@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "test": "pnpm run -r test",
     "lint": "pnpm run -r lint",
     "lint:fix": "pnpm run -r lint:fix",
