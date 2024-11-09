@@ -28,11 +28,15 @@ export class AccountService {
     emailVerified: boolean,
   ): Promise<Result<AccountSummary, ApiError>> {
     if (await this.accountRepository.containsUsername(username)) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.UsernameExists));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.UsernameExists }),
+      );
     }
 
     if (await this.accountRepository.containsEmail(email)) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.EmailExists));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.EmailExists }),
+      );
     }
 
     const passwordHash = await createHash(password);
@@ -84,7 +88,9 @@ export class AccountService {
     const account = await this.accountRepository.getById(id);
 
     if (!account) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.AccountNotFound));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.AccountNotFound }),
+      );
     }
 
     const accountSummary = toAccountSummary(account);
@@ -96,7 +102,9 @@ export class AccountService {
     const account = await this.accountRepository.getByEmail(email);
 
     if (!account) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.AccountNotFound));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.AccountNotFound }),
+      );
     }
 
     const accountSummary = toAccountSummary(account);
@@ -117,7 +125,9 @@ export class AccountService {
     const numDeleted = await this.accountRepository.deleteById(id);
 
     if (numDeleted === 0) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.AccountNotFound));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.AccountNotFound }),
+      );
     }
 
     this.logger.info('Account deleted', { id });

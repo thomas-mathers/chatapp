@@ -28,12 +28,14 @@ export class AuthService {
     const account = await this.accountRepository.getByUsername(username);
 
     if (!account) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.AccountNotFound));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.AccountNotFound }),
+      );
     }
 
     if (!account.emailVerified) {
       return Result.error(
-        ApiError.fromErrorCode(ApiErrorCode.EmailNotVerified),
+        ApiError.fromErrorCode({ code: ApiErrorCode.EmailNotVerified }),
       );
     }
 
@@ -41,7 +43,7 @@ export class AuthService {
 
     if (!isPasswordCorrect) {
       return Result.error(
-        ApiError.fromErrorCode(ApiErrorCode.IncorrectPassword),
+        ApiError.fromErrorCode({ code: ApiErrorCode.IncorrectPassword }),
       );
     }
 
@@ -82,7 +84,9 @@ export class AuthService {
     const accessToken = await this.authCodeRepository.get(authCode);
 
     if (!accessToken) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.InvalidAuthCode));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.InvalidAuthCode }),
+      );
     }
 
     await this.authCodeRepository.delete(authCode);
@@ -98,7 +102,9 @@ export class AuthService {
     const account = await this.accountRepository.getById(id);
 
     if (!account) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.AccountNotFound));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.AccountNotFound }),
+      );
     }
 
     const isOldPasswordCorrect = await verifyHash(
@@ -108,7 +114,7 @@ export class AuthService {
 
     if (!isOldPasswordCorrect) {
       return Result.error(
-        ApiError.fromErrorCode(ApiErrorCode.IncorrectPassword),
+        ApiError.fromErrorCode({ code: ApiErrorCode.IncorrectPassword }),
       );
     }
 
@@ -129,7 +135,9 @@ export class AuthService {
     const account = await this.accountRepository.getByEmail(email);
 
     if (!account) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.AccountNotFound));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.AccountNotFound }),
+      );
     }
 
     const token = createJwt(
@@ -161,7 +169,9 @@ export class AuthService {
     const userCredentials = verifyJwt(token, this.config.jwt);
 
     if (userCredentials === undefined) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.InvalidToken));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.InvalidToken }),
+      );
     }
 
     const account = await this.accountRepository.getById(
@@ -169,7 +179,9 @@ export class AuthService {
     );
 
     if (!account) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.AccountNotFound));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.AccountNotFound }),
+      );
     }
 
     const password = await createHash(newPassword);
@@ -189,7 +201,9 @@ export class AuthService {
     const userCredentials = verifyJwt(token, this.config.jwt);
 
     if (userCredentials === undefined) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.InvalidToken));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.InvalidToken }),
+      );
     }
 
     const account = await this.accountRepository.getById(
@@ -197,7 +211,9 @@ export class AuthService {
     );
 
     if (!account) {
-      return Result.error(ApiError.fromErrorCode(ApiErrorCode.AccountNotFound));
+      return Result.error(
+        ApiError.fromErrorCode({ code: ApiErrorCode.AccountNotFound }),
+      );
     }
 
     await this.accountRepository.update({

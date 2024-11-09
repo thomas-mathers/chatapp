@@ -22,14 +22,19 @@ export class ApiError extends Error {
     this._details = details;
   }
 
-  public static fromErrorCode(
-    errorCode: ApiErrorCode,
-    details: Record<string, unknown> = {},
-  ): ApiError {
+  public static fromErrorCode({
+    code,
+    message,
+    details,
+  }: {
+    code: ApiErrorCode;
+    message?: string;
+    details?: Record<string, unknown>;
+  }): ApiError {
     return new ApiError(
-      ApiError.getStatusCode(errorCode),
-      errorCode,
-      ApiError.getErrorCodeMessage(errorCode),
+      ApiError.getStatusCode(code),
+      code,
+      message ?? ApiError.getErrorCodeMessage(code),
       details,
     );
   }
@@ -44,6 +49,10 @@ export class ApiError extends Error {
         return 'Email missing';
       case ApiErrorCode.EmailNotVerified:
         return 'Email not verified';
+      case ApiErrorCode.FileNotFound:
+        return 'File not found';
+      case ApiErrorCode.FileTooLarge:
+        return 'File too large';
       case ApiErrorCode.IncorrectPassword:
         return 'Incorrect password';
       case ApiErrorCode.InvalidAuthCode:
@@ -71,6 +80,10 @@ export class ApiError extends Error {
         return StatusCodes.BAD_REQUEST;
       case ApiErrorCode.EmailNotVerified:
         return StatusCodes.UNAUTHORIZED;
+      case ApiErrorCode.FileNotFound:
+        return StatusCodes.NOT_FOUND;
+      case ApiErrorCode.FileTooLarge:
+        return StatusCodes.REQUEST_TOO_LONG;
       case ApiErrorCode.IncorrectPassword:
         return StatusCodes.UNAUTHORIZED;
       case ApiErrorCode.InvalidAuthCode:
@@ -100,5 +113,14 @@ export class ApiError extends Error {
 
   public get details(): Record<string, unknown> {
     return this._details;
+  }
+
+  toJSON(): Record<string, unknown> {
+    return {
+      status: this._statusCode,
+      code: this._code,
+      message: this._message,
+      details: this._details,
+    };
   }
 }

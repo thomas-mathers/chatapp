@@ -3,6 +3,8 @@ export enum ApiErrorCode {
   EmailExists = 'EmailExists',
   EmailMissing = 'EmailMissing',
   EmailNotVerified = 'EmailNotVerified',
+  FileNotFound = 'FileNotFound',
+  FileTooLarge = 'FileTooLarge',
   IncorrectPassword = 'IncorrectPassword',
   InvalidAuthCode = 'InvalidAuthCode',
   InvalidRequest = 'InvalidRequest',

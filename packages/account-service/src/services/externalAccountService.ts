@@ -33,7 +33,7 @@ export class ExternalAccountService {
     const email = profile.emails?.[0].value;
 
     if (!email) {
-      throw ApiError.fromErrorCode(ApiErrorCode.EmailMissing);
+      throw ApiError.fromErrorCode({ code: ApiErrorCode.EmailMissing });
     }
 
     const account = await Result.fromAsync(

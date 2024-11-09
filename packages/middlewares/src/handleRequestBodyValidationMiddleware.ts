@@ -12,10 +12,10 @@ export function handleRequestBodyValidationMiddleware(
     const result = schema.safeParse(req.body);
 
     if (!result.success) {
-      const error = ApiError.fromErrorCode(
-        ApiErrorCode.InvalidRequest,
-        getErrorDetails(result.error),
-      );
+      const error = ApiError.fromErrorCode({
+        code: ApiErrorCode.InvalidRequest,
+        details: getErrorDetails(result.error),
+      });
 
       res.status(StatusCodes.BAD_REQUEST).json(error);
 
