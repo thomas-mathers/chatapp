@@ -14,7 +14,7 @@
     "test:coverage": "vitest --config vitest.config.mts --coverage --ws run"
   },
   "dependencies": {
-    "chatapp.api-error": "^1.0.0",
+    "chatapp.api-error": "workspace:*",
     "zod": "^3.23.8"
   },
   "exports": {

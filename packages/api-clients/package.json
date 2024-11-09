@@ -14,9 +14,9 @@
     "test:coverage": "vitest --config vitest.config.mts --coverage --ws run"
   },
   "dependencies": {
-    "chatapp.account-service-contracts": "^1.0.0",
-    "chatapp.file-storage-service-contracts": "^1.0.0",
-    "chatapp.message-service-contracts": "^1.0.0"
+    "chatapp.account-service-contracts": "workspace:*",
+    "chatapp.file-storage-service-contracts": "workspace:*",
+    "chatapp.message-service-contracts": "workspace:*"
   },
   "exports": {
     ".": "./src/index.ts"

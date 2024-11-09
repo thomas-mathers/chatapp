@@ -3,7 +3,7 @@ import { AccountRegistrationRequest } from 'chatapp.account-service-contracts';
 import { createHashSync } from 'chatapp.crypto';
 import { ObjectId } from 'mongodb';
 import request from 'supertest';
-import { beforeEach, describe, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { Account } from '../models/account';
 
