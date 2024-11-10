@@ -8,10 +8,10 @@
     "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
     "format": "prettier --config ../../.prettierrc --check .",
     "format:fix": "prettier --config ../../.prettierrc --write .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "depcheck": "depcheck"
   },
   "dependencies": {
-    "chatapp.api-error": "workspace:*",
     "zod": "^3.23.8"
   },
   "exports": {

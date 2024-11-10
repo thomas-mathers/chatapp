@@ -11,7 +11,8 @@
     "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
     "format": "prettier --config ../../.prettierrc --check .",
     "format:fix": "prettier --config ../../.prettierrc --write .",
-    "type-check": "tsc --noEmit --extendedDiagnostics"
+    "type-check": "tsc --noEmit",
+    "depcheck": "depcheck"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",

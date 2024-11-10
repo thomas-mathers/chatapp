@@ -11,12 +11,12 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run --config vitest.config.mts",
     "test:watch": "vitest --config vitest.config.mts",
-    "test:coverage": "vitest --config vitest.config.mts --coverage --ws run"
+    "test:coverage": "vitest --config vitest.config.mts --coverage --ws run",
+    "depcheck": "depcheck"
   },
   "dependencies": {
     "body-parser": "^1.20.3",
     "chatapp.account-service-contracts": "workspace:*",
-    "chatapp.api-clients": "workspace:*",
     "chatapp.api-error": "workspace:*",
     "chatapp.crypto": "workspace:*",
     "chatapp.event-sourcing": "workspace:*",
@@ -34,7 +34,6 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "typescript-result": "^3.0.0",
-    "uuid": "^11.0.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -42,7 +41,6 @@
     "@types/body-parser": "^1.19.5",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
-    "@types/jest": "^29.5.13",
     "@types/node": "^22.7.5",
     "@types/passport": "^1.0.17",
     "@types/passport-facebook": "^3.0.3",
