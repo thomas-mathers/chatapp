@@ -6,10 +6,6 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "depcheck": "depcheck",
-    "format:fix": "prettier --config ../../.prettierrc --write .",
-    "format": "prettier --config ../../.prettierrc --check .",
-    "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
-    "lint": "eslint --config ../../eslint.config.mjs .",
     "preview": "vite preview",
     "start": "vite",
     "type-check": "tsc --noEmit"

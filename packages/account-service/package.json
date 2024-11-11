@@ -4,14 +4,7 @@
   "private": true,
   "scripts": {
     "depcheck": "depcheck",
-    "format:fix": "prettier --config ../../.prettierrc --write .",
-    "format": "prettier --config ../../.prettierrc --check .",
-    "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
-    "lint": "eslint --config ../../eslint.config.mjs",
     "start": "tsx --env-file=.env src/index.ts",
-    "test:coverage": "vitest --config vitest.config.mts --coverage --ws run",
-    "test:watch": "vitest --config vitest.config.mts",
-    "test": "vitest run --config vitest.config.mts",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
