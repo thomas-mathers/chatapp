@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "tsx src/index.ts",
-    "lint": "eslint --config ../../eslint.config.mjs .",
-    "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
-    "format": "prettier --config ../../.prettierrc --check .",
+    "depcheck": "depcheck",
     "format:fix": "prettier --config ../../.prettierrc --write .",
-    "type-check": "tsc --noEmit",
-    "test": "vitest run --config vitest.config.mts",
-    "test:watch": "vitest --config vitest.config.mts",
+    "format": "prettier --config ../../.prettierrc --check .",
+    "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
+    "lint": "eslint --config ../../eslint.config.mjs .",
+    "start": "tsx --env-file=.env src/index.ts",
     "test:coverage": "vitest --config vitest.config.mts --coverage --ws run",
-    "depcheck": "depcheck"
+    "test:watch": "vitest --config vitest.config.mts",
+    "test": "vitest run --config vitest.config.mts",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "body-parser": "^1.20.3",
@@ -21,7 +21,6 @@
     "chatapp.message-service-contracts": "workspace:*",
     "chatapp.middlewares": "workspace:*",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
     "express": "^5.0.0",
     "http-status-codes": "^2.3.0",
     "mongodb": "^6.9.0",
@@ -40,9 +39,7 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.6",
     "@types/ws": "^8.5.12",
-    "supertest": "^7.0.0",
-    "tsx": "^4.19.1",
-    "vitest": "^2.1.2"
+    "supertest": "^7.0.0"
   },
   "exports": {
     ".": "./src/index.ts"

@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "tsx src/index.ts",
-    "lint": "eslint --config ../../eslint.config.mjs  .",
-    "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
-    "format": "prettier --config ../../.prettierrc --check .",
+    "depcheck": "depcheck",
     "format:fix": "prettier --config ../../.prettierrc --write .",
-    "type-check": "tsc --noEmit",
-    "depcheck": "depcheck"
+    "format": "prettier --config ../../.prettierrc --check .",
+    "lint:fix": "eslint --config ../../eslint.config.mjs --fix .",
+    "lint": "eslint --config ../../eslint.config.mjs  .",
+    "start": "tsx src/index.ts",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "zod": "^3.23.8"
