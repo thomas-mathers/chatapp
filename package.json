@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preinstall": "npx only-allow pnpm",
     "test:coverage": "vitest --coverage",
-    "test": "vitest",
+    "test:watch": "vitest",
+    "test": "vitest run",
     "type-check": "pnpm run -r type-check"
   },
   "devDependencies": {
