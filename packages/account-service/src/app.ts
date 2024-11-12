@@ -7,7 +7,6 @@ import express from 'express';
 import { Server } from 'http';
 import { MongoClient } from 'mongodb';
 import { RedisClientType, createClient } from 'redis';
-import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 import { Config } from './config';
@@ -22,27 +21,7 @@ import { ExternalAccountRepository } from './repositories/externalAccountReposit
 import { AccountService } from './services/accountService';
 import { AuthService } from './services/authService';
 import { ExternalAccountService } from './services/externalAccountService';
-
-const swaggerDoc = swaggerJsdoc({
-  swaggerDefinition: {
-    openapi: '3.0.1',
-    info: {
-      title: 'Account Service',
-      version: '1.0.0',
-      description: 'Account Service API',
-    },
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-        },
-      },
-    },
-  },
-  apis: ['**/controllers/*.{ts,js}'],
-});
+import { swaggerDoc } from './swaggerDoc';
 
 export class App {
   private constructor(
