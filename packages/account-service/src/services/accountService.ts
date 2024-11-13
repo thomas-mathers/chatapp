@@ -3,7 +3,6 @@ import {
   GetAccountsRequest,
   Page,
 } from 'chatapp.account-service-contracts';
-import { FileStorageService } from 'chatapp.api-clients';
 import { ApiError, ApiErrorCode } from 'chatapp.api-error';
 import { createHash, createJwt } from 'chatapp.crypto';
 import { EventBus, EventName } from 'chatapp.event-sourcing';
@@ -21,7 +20,6 @@ export class AccountService {
     private readonly logger: Logger,
     private readonly accountRepository: AccountRepository,
     private readonly eventBus: EventBus,
-    private readonly fileStorageService: FileStorageService,
   ) {}
 
   async insert({

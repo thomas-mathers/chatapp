@@ -1,4 +1,6 @@
-import { AccountService } from 'chatapp.api-clients';
+import { AccountServiceClient } from 'chatapp.api-clients';
 import { createContext } from 'react';
 
-export const AccountServiceContext = createContext<AccountService | null>(null);
+export const AccountServiceContext = createContext<AccountServiceClient | null>(
+  null,
+);

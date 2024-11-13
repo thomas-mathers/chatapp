@@ -11,7 +11,7 @@ import {
 import { ApiClient } from './apiClient';
 import { JwtService } from './jwtService';
 
-export class AuthService {
+export class AuthServiceClient {
   constructor(
     private readonly apiClient: ApiClient,
     private readonly jwtService: JwtService,

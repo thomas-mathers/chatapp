@@ -1,5 +1,4 @@
 import { AccountSummary } from 'chatapp.account-service-contracts';
-import { FileStorageService } from 'chatapp.api-clients';
 import { Router } from 'express';
 import passport, { Profile } from 'passport';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
@@ -16,7 +15,6 @@ export class OAuth2Controller {
     private readonly config: Config,
     private readonly accountService: AccountService,
     private readonly authService: AuthService,
-    private readonly fileStorageService: FileStorageService,
   ) {
     this.configureStrategies();
     this.configureRoutes();

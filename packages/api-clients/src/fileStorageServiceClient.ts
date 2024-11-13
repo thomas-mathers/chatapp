@@ -2,7 +2,7 @@ import { FileUploadResponse } from 'chatapp.file-storage-service-contracts';
 
 import { ApiClient } from './apiClient';
 
-export class FileStorageService {
+export class FileStorageServiceClient {
   constructor(private readonly apiClient: ApiClient) {}
 
   async upload(

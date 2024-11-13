@@ -3,7 +3,7 @@ import {
   accountRegistrationRequest,
   getAccountsRequestSchema,
 } from 'chatapp.account-service-contracts';
-import { FileStorageService } from 'chatapp.api-clients';
+import { FileStorageServiceClient } from 'chatapp.api-clients';
 import { ApiError, ApiErrorCode } from 'chatapp.api-error';
 import {
   handleAuthMiddleware,
@@ -23,7 +23,7 @@ export class AccountController {
   constructor(
     readonly config: Config,
     readonly accountService: AccountService,
-    readonly fileStorageService: FileStorageService,
+    readonly fileStorageService: FileStorageServiceClient,
   ) {
     this._router.get(
       '/',

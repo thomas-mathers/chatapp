@@ -280,6 +280,9 @@ importers:
       body-parser:
         specifier: ^1.20.3
         version: 1.20.3
+      chatapp.api-clients:
+        specifier: workspace:*
+        version: link:../api-clients
       chatapp.crypto:
         specifier: workspace:*
         version: link:../crypto

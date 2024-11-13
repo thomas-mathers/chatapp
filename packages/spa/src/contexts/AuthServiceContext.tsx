@@ -1,4 +1,4 @@
-import { AuthService } from 'chatapp.api-clients';
+import { AuthServiceClient } from 'chatapp.api-clients';
 import { createContext } from 'react';
 
-export const AuthServiceContext = createContext<AuthService | null>(null);
+export const AuthServiceContext = createContext<AuthServiceClient | null>(null);

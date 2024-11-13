@@ -7,7 +7,7 @@ import {
 import { ApiClient } from './apiClient';
 import { JwtService } from './jwtService';
 
-export class MessageService {
+export class MessageServiceClient {
   constructor(
     private readonly apiClient: ApiClient,
     private readonly jwtService: JwtService,

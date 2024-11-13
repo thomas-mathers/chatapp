@@ -3,10 +3,10 @@ import type {} from '@mui/lab/themeAugmentation';
 import { createTheme } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
-  AccountService,
+  AccountServiceClient,
   ApiClient,
-  AuthService,
-  MessageService,
+  AuthServiceClient,
+  MessageServiceClient,
 } from 'chatapp.api-clients';
 
 import { getConfig } from '@app/config';
@@ -41,18 +41,21 @@ const jwtTokenService = new LocalStorageJwtService();
 const accountServiceApiClient = new ApiClient(
   config.VITE_ACCOUNT_SERVICE_BASE_URL,
 );
-const accountService = new AccountService(
+const accountService = new AccountServiceClient(
   accountServiceApiClient,
   jwtTokenService,
 );
 
 const authServiceApiClient = new ApiClient(config.VITE_AUTH_SERVICE_BASE_URL);
-const authService = new AuthService(authServiceApiClient, jwtTokenService);
+const authService = new AuthServiceClient(
+  authServiceApiClient,
+  jwtTokenService,
+);
 
 const messageServiceApiClient = new ApiClient(
   config.VITE_MESSAGE_SERVICE_BASE_URL,
 );
-const messageService = new MessageService(
+const messageService = new MessageServiceClient(
   messageServiceApiClient,
   jwtTokenService,
 );
