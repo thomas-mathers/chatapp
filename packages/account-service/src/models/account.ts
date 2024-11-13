@@ -6,6 +6,6 @@ export interface Account {
   password: string;
   email: string;
   emailVerified: boolean;
-  profilePictureUrl?: string;
+  profilePictureUrl: string | null;
   dateCreated: Date;
 }

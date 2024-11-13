@@ -1,19 +1,10 @@
+import { ApiError, ApiErrorCode } from 'chatapp.api-error';
 import { ObjectId } from 'mongodb';
 import { Profile } from 'passport';
 import { Result } from 'typescript-result';
 
-import { ApiError } from '../../../api-error/src/apiError';
-import { ApiErrorCode } from '../../../api-error/src/apiErrorCode';
-import { toExternalAccountSummary } from '../mappers/toExternalAccountSummary';
-import { ExternalAccountSummary } from '../models/externalAccountSummary';
 import { ExternalAccountRepository } from '../repositories/externalAccountRepository';
 import { AccountService } from './accountService';
-
-interface CreateExternalAccountRequest {
-  accountId: string;
-  provider: string;
-  providerAccountId: string;
-}
 
 export class ExternalAccountService {
   constructor(
@@ -21,16 +12,30 @@ export class ExternalAccountService {
     private readonly accountService: AccountService,
   ) {}
 
-  async getOrCreateByExternalProfile(provider: string, profile: Profile) {
-    const externalAccount = await this.getByProvider(provider, profile.id);
+  async getOrCreateByExternalProfile(
+    provider: string,
+    { id: providerAccountId, emails, photos }: Profile,
+  ) {
+    const email = emails?.[0].value;
+    const profilePictureUrl = photos?.[0].value;
+
+    const externalAccount = await this.externalAccountRepository.getByProvider(
+      provider,
+      providerAccountId,
+    );
 
     if (externalAccount) {
+      if (profilePictureUrl) {
+        await this.refreshProfilePicture(
+          externalAccount.accountId.toString(),
+          profilePictureUrl,
+        );
+      }
+
       return await Result.fromAsync(
-        this.accountService.getById(externalAccount.accountId),
+        this.accountService.getById(externalAccount.accountId.toString()),
       ).getOrThrow();
     }
-
-    const email = profile.emails?.[0].value;
 
     if (!email) {
       throw ApiError.fromErrorCode({ code: ApiErrorCode.EmailMissing });
@@ -40,42 +45,47 @@ export class ExternalAccountService {
       this.accountService.getOrCreateByEmail(email),
     ).getOrThrow();
 
-    await this.insert({
-      accountId: account.id,
+    if (profilePictureUrl) {
+      await this.refreshProfilePicture(account.id, profilePictureUrl);
+    }
+
+    await this.externalAccountRepository.insert({
+      accountId: new ObjectId(account.id),
       provider,
-      providerAccountId: profile.id,
+      providerAccountId,
+      dateCreated: new Date(),
     });
 
     return account;
   }
 
-  private async insert({
-    accountId,
-    provider,
-    providerAccountId,
-  }: CreateExternalAccountRequest): Promise<ExternalAccountSummary> {
-    const externalAccount = await this.externalAccountRepository.insert({
-      accountId: new ObjectId(accountId),
-      provider,
-      providerAccountId,
-      dateCreated: new Date(),
-    });
-    return toExternalAccountSummary(externalAccount);
-  }
+  private async getProfilePictureBlob(
+    profilePictureUrl: string,
+  ): Promise<Blob> {
+    const response = await fetch(profilePictureUrl);
 
-  private async getByProvider(
-    provider: string,
-    providerAccountId: string,
-  ): Promise<ExternalAccountSummary | null> {
-    const externalAccount = await this.externalAccountRepository.getByProvider(
-      provider,
-      providerAccountId,
-    );
-
-    if (!externalAccount) {
-      return null;
+    if (!response.ok) {
+      throw ApiError.fromErrorCode({
+        code: ApiErrorCode.AccountNotFound,
+        message: 'Failed to download profile picture',
+      });
     }
 
-    return toExternalAccountSummary(externalAccount);
+    const profilePictureBlob = await response.blob();
+
+    return profilePictureBlob;
+  }
+
+  private async refreshProfilePicture(
+    accountId: string,
+    profilePictureUrl: string,
+  ) {
+    const profilePictureBlob =
+      await this.getProfilePictureBlob(profilePictureUrl);
+
+    await this.accountService.updateProfilePicture(
+      accountId,
+      profilePictureBlob,
+    );
   }
 }

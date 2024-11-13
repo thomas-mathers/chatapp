@@ -69,6 +69,20 @@ export class AccountController {
         );
       },
     );
+
+    this._router.put(
+      '/me/profile-picture',
+      handleAuthMiddleware(config.jwt),
+      async (req: Request, res: Response) => {
+        const { mimetype, buffer } = req.file!;
+
+        const blob = new Blob([buffer], { type: mimetype });
+
+        await accountService.updateProfilePicture(req.accountId, blob);
+
+        res.status(201).json();
+      },
+    );
   }
 
   get router(): Router {

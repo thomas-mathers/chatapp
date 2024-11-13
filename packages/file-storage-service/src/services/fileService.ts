@@ -1,4 +1,4 @@
 export interface FileService {
-  upload(name: string, contents: Buffer): Promise<string>;
-  download(name: string): Promise<Buffer | null>;
+  upload(accountId: string, name: string, contents: Buffer): Promise<string>;
+  download(accountId: string, name: string): Promise<Buffer | null>;
 }

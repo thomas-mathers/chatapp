@@ -27,6 +27,8 @@ export const configSchema = z
     FACEBOOK_CLIENT_ID: z.string(),
     FACEBOOK_CLIENT_SECRET: z.string(),
     FRONT_END_URL: z.string(),
+    FILE_STORAGE_SERVICE_URL: z.string(),
+    FILE_STORAGE_SERVICE_MAX_FILE_SIZE: z.coerce.number(),
   })
   .transform(
     ({
@@ -46,6 +48,8 @@ export const configSchema = z
       FACEBOOK_CLIENT_ID,
       FACEBOOK_CLIENT_SECRET,
       FRONT_END_URL,
+      FILE_STORAGE_SERVICE_URL,
+      FILE_STORAGE_SERVICE_MAX_FILE_SIZE,
     }) => ({
       port: PORT,
       jwt: {
@@ -77,6 +81,10 @@ export const configSchema = z
         clientSecret: FACEBOOK_CLIENT_SECRET,
       },
       frontEndUrl: FRONT_END_URL,
+      fileStorageService: {
+        url: FILE_STORAGE_SERVICE_URL,
+        maxFileSize: FILE_STORAGE_SERVICE_MAX_FILE_SIZE,
+      },
     }),
   );
 

@@ -67,10 +67,16 @@ export class AccountRepository {
     };
   }
 
-  async update(replacement: Account): Promise<Account> {
+  async update(replacement: Account): Promise<void> {
     const { username } = replacement;
     await this.accountCollection.replaceOne({ username }, replacement);
-    return replacement;
+  }
+
+  async patch(id: string, patch: Partial<Account>): Promise<void> {
+    await this.accountCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: patch },
+    );
   }
 
   async deleteById(id: string): Promise<number> {

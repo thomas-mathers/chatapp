@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+import { ApiClient, FileStorageService } from 'chatapp.api-clients';
 import { EventBus } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
 import { handleErrorMiddleware } from 'chatapp.middlewares';
@@ -6,6 +7,7 @@ import cors from 'cors';
 import express from 'express';
 import { Server } from 'http';
 import { MongoClient } from 'mongodb';
+import multer from 'multer';
 import { RedisClientType, createClient } from 'redis';
 import swaggerUi from 'swagger-ui-express';
 
@@ -125,6 +127,10 @@ export class App {
   ): Promise<Server> {
     const mongoDatabase = mongoClient.db(config.mongo.databaseName);
 
+    const fileStorageService = new FileStorageService(
+      new ApiClient(config.fileStorageService.url),
+    );
+
     const accountCollection = mongoDatabase.collection<Account>('accounts');
     const accountRepository = new AccountRepository(accountCollection);
     const accountService = new AccountService(
@@ -132,7 +138,9 @@ export class App {
       logger,
       accountRepository,
       eventBus,
+      fileStorageService,
     );
+
     const accountController = new AccountController(config, accountService);
 
     const authCodeRepository = new AuthCodeRepository(redisClient);
@@ -164,6 +172,11 @@ export class App {
     const httpServer = express()
       .use(cors())
       .use(bodyParser.json())
+      .use(
+        multer({
+          limits: { fileSize: config.fileStorageService.maxFileSize },
+        }).single('file'),
+      )
       .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
       .use('/accounts', accountController.router)
       .use('/auth', authController.router)

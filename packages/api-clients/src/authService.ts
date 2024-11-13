@@ -18,11 +18,7 @@ export class AuthService {
   ) {}
 
   async login(body: LoginRequest): Promise<LoginResponse> {
-    const result = await this.apiClient.requestJson<
-      LoginRequest,
-      LoginResponse
-    >({
-      method: 'POST',
+    const result = await this.apiClient.postJson<LoginResponse>({
       path: '/auth/login',
       body,
     });
@@ -35,11 +31,7 @@ export class AuthService {
   async exchangeAuthCodeForToken(
     body: ExchangeAuthCodeRequest,
   ): Promise<LoginResponse> {
-    const result = await this.apiClient.requestJson<
-      ExchangeAuthCodeRequest,
-      LoginResponse
-    >({
-      method: 'POST',
+    const result = await this.apiClient.postJson<LoginResponse>({
       path: '/auth/auth-codes',
       body,
     });
@@ -54,8 +46,7 @@ export class AuthService {
   }
 
   async changePassword(body: ChangePasswordRequest): Promise<void> {
-    await this.apiClient.requestJson<ChangePasswordRequest, void>({
-      method: 'PUT',
+    await this.apiClient.putJson({
       path: '/auth/me/password',
       headers: {
         Authorization: `Bearer ${this.jwtService.get()}`,
@@ -65,24 +56,21 @@ export class AuthService {
   }
 
   async forgotPassword(body: PasswordResetTokenRequest): Promise<void> {
-    await this.apiClient.requestJson<PasswordResetTokenRequest, void>({
-      method: 'POST',
+    await this.apiClient.postJson({
       path: '/auth/password-reset-requests',
       body,
     });
   }
 
   async resetPassword(body: PasswordResetRequest): Promise<void> {
-    await this.apiClient.requestJson<PasswordResetRequest, void>({
-      method: 'POST',
+    await this.apiClient.postJson({
       path: '/auth/password-resets',
       body,
     });
   }
 
   async confirmEmail(body: ConfirmEmailRequest): Promise<void> {
-    await this.apiClient.requestJson<ConfirmEmailRequest, void>({
-      method: 'POST',
+    await this.apiClient.postJson({
       path: `/auth/email-confirmations`,
       body,
     });

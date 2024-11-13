@@ -3,8 +3,8 @@ import { Logger } from 'chatapp.logging';
 import { handleErrorMiddleware } from 'chatapp.middlewares';
 import cors from 'cors';
 import express from 'express';
-import fileUpload from 'express-fileupload';
 import { Server } from 'http';
+import multer from 'multer';
 
 import { Config } from './config';
 import { FileController } from './controllers/fileController';
@@ -25,14 +25,7 @@ export class App {
     const httpServer = express()
       .use(cors())
       .use(bodyParser.json())
-      .use(
-        fileUpload({
-          limits: {
-            fileSize: config.maxFileSize,
-          },
-          abortOnLimit: true,
-        }),
-      )
+      .use(multer({ limits: { fileSize: config.maxFileSize } }).single('file'))
       .use('/files', fileController.router)
       .use(handleErrorMiddleware)
       .listen(config.port, () => {

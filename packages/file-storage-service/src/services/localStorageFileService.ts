@@ -7,8 +7,12 @@ import { FileService } from './fileService';
 export class LocalStorageFileService implements FileService {
   constructor(private readonly _config: Config) {}
 
-  async upload(filename: string, file: Buffer): Promise<string> {
-    const filePath = path.join(this._config.basePath, filename);
+  async upload(
+    accountId: string,
+    filename: string,
+    file: Buffer,
+  ): Promise<string> {
+    const filePath = path.join(this._config.basePath, accountId, filename);
 
     const fileDir = path.dirname(filePath);
 
@@ -16,11 +20,11 @@ export class LocalStorageFileService implements FileService {
 
     await fs.promises.writeFile(filePath, file);
 
-    return filename;
+    return filePath;
   }
 
-  async download(filename: string): Promise<Buffer | null> {
-    const filePath = path.join(this._config.basePath, filename);
+  async download(accountId: string, filename: string): Promise<Buffer | null> {
+    const filePath = path.join(this._config.basePath, accountId, filename);
 
     const bytes = await fs.promises.readFile(filePath);
 

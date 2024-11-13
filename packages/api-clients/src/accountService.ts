@@ -15,11 +15,7 @@ export class AccountService {
   async createAccount(
     body: AccountRegistrationRequest,
   ): Promise<AccountSummary> {
-    const result = await this.apiClient.requestJson<
-      AccountRegistrationRequest,
-      AccountSummary
-    >({
-      method: 'POST',
+    const result = await this.apiClient.postJson<AccountSummary>({
       path: '/accounts',
       body,
     });
@@ -28,8 +24,7 @@ export class AccountService {
   }
 
   async getAccount(): Promise<AccountSummary> {
-    const result = await this.apiClient.requestJson<void, AccountSummary>({
-      method: 'GET',
+    const result = await this.apiClient.getJson<AccountSummary>({
       path: '/accounts/me',
       headers: {
         Authorization: `Bearer ${this.jwtService.get()}`,
@@ -40,8 +35,7 @@ export class AccountService {
   }
 
   async deleteAccount(): Promise<void> {
-    await this.apiClient.requestJson<void, void>({
-      method: 'DELETE',
+    await this.apiClient.deleteJson({
       path: '/accounts/me',
       headers: {
         Authorization: `Bearer ${this.jwtService.get()}`,

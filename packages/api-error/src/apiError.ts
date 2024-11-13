@@ -49,10 +49,6 @@ export class ApiError extends Error {
         return 'Email missing';
       case ApiErrorCode.EmailNotVerified:
         return 'Email not verified';
-      case ApiErrorCode.FileNotFound:
-        return 'File not found';
-      case ApiErrorCode.FileTooLarge:
-        return 'File too large';
       case ApiErrorCode.IncorrectPassword:
         return 'Incorrect password';
       case ApiErrorCode.InvalidAuthCode:
@@ -80,10 +76,6 @@ export class ApiError extends Error {
         return StatusCodes.BAD_REQUEST;
       case ApiErrorCode.EmailNotVerified:
         return StatusCodes.UNAUTHORIZED;
-      case ApiErrorCode.FileNotFound:
-        return StatusCodes.NOT_FOUND;
-      case ApiErrorCode.FileTooLarge:
-        return StatusCodes.REQUEST_TOO_LONG;
       case ApiErrorCode.IncorrectPassword:
         return StatusCodes.UNAUTHORIZED;
       case ApiErrorCode.InvalidAuthCode:

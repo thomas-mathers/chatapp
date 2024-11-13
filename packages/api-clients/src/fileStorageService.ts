@@ -5,18 +5,18 @@ import { ApiClient } from './apiClient';
 export class FileStorageService {
   constructor(private readonly apiClient: ApiClient) {}
 
-  async uploadFile(
-    fileName: string,
+  async upload(
+    accountId: string,
+    filename: string,
     contents: Blob,
   ): Promise<FileUploadResponse> {
-    const formData = new FormData();
+    const body = new FormData();
 
-    formData.append(fileName, contents);
+    body.append('file', contents);
 
-    const response = await this.apiClient.requestFormData<FileUploadResponse>({
-      method: 'POST',
-      path: '/files',
-      body: formData,
+    const response = await this.apiClient.postFormData<FileUploadResponse>({
+      path: `/files/${accountId}/${filename}`,
+      body,
     });
 
     return response;

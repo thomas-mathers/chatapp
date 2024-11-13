@@ -3,6 +3,7 @@ import {
   GetAccountsRequest,
   Page,
 } from 'chatapp.account-service-contracts';
+import { FileStorageService } from 'chatapp.api-clients';
 import { ApiError, ApiErrorCode } from 'chatapp.api-error';
 import { createHash, createJwt } from 'chatapp.crypto';
 import { EventBus, EventName } from 'chatapp.event-sourcing';
@@ -19,6 +20,7 @@ export class AccountService {
     private readonly logger: Logger,
     private readonly accountRepository: AccountRepository,
     private readonly eventBus: EventBus,
+    private readonly fileStorageService: FileStorageService,
   ) {}
 
   async create(
@@ -46,6 +48,7 @@ export class AccountService {
       password: passwordHash,
       email,
       emailVerified,
+      profilePictureUrl: null,
       dateCreated: new Date(),
     });
 
@@ -133,5 +136,17 @@ export class AccountService {
     this.logger.info('Account deleted', { id });
 
     return Result.ok();
+  }
+
+  async updateProfilePicture(accountId: string, blob: Blob): Promise<void> {
+    const result = await this.fileStorageService.upload(
+      accountId,
+      'profile-picture',
+      blob,
+    );
+
+    await this.accountRepository.patch(accountId, {
+      profilePictureUrl: result.url,
+    });
   }
 }

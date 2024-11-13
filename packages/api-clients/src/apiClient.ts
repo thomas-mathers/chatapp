@@ -1,10 +1,12 @@
 import { ApiError, ApiErrorCode } from 'chatapp.api-error';
 
-interface RequestParameters<T> {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+interface FetchRequest {
   path: string;
   headers?: Record<string, string>;
   queryParameters?: Record<string, string>;
+}
+
+interface FetchRequestWithBody<T> extends FetchRequest {
   body?: T;
 }
 
@@ -14,13 +16,66 @@ export class ApiClient {
     private readonly onInvalidToken?: () => void,
   ) {}
 
-  public async request<TRequest, TResponse>({
-    method,
+  public async getJson<TResponse>(request: FetchRequest): Promise<TResponse> {
+    return await this.requestJson<TResponse>('GET', request);
+  }
+
+  public async postJson<TResponse>(
+    request: FetchRequestWithBody<unknown>,
+  ): Promise<TResponse> {
+    return await this.requestJson<TResponse>('POST', request);
+  }
+
+  public async putJson<TResponse>(
+    request: FetchRequestWithBody<unknown>,
+  ): Promise<TResponse> {
+    return await this.requestJson<TResponse>('PUT', request);
+  }
+
+  public async deleteJson<TResponse>(
+    request: FetchRequestWithBody<unknown>,
+  ): Promise<TResponse> {
+    return await this.requestJson<TResponse>('DELETE', request);
+  }
+
+  public async postFormData<TResponse>({
     headers,
     path,
     queryParameters,
     body,
-  }: RequestParameters<TRequest>): Promise<TResponse> {
+  }: FetchRequestWithBody<FormData>): Promise<TResponse> {
+    return this.request<TResponse>(
+      'POST',
+      path,
+      headers,
+      queryParameters,
+      body,
+    );
+  }
+
+  private async requestJson<TResponse>(
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    { headers, path, queryParameters, body }: FetchRequestWithBody<unknown>,
+  ): Promise<TResponse> {
+    return this.request<TResponse>(
+      method,
+      path,
+      {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      queryParameters,
+      body ? JSON.stringify(body) : undefined,
+    );
+  }
+
+  private async request<TResponse>(
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    path: string,
+    headers?: Record<string, string>,
+    queryParameters?: Record<string, string>,
+    body?: BodyInit,
+  ): Promise<TResponse> {
     const url = new URL(path, this.baseUrl);
 
     if (queryParameters) {
@@ -31,7 +86,7 @@ export class ApiClient {
 
     const response = await fetch(url.toString(), {
       method,
-      body: body ? JSON.stringify(body) : undefined,
+      body,
       headers,
     });
 
@@ -39,46 +94,14 @@ export class ApiClient {
 
     if (!response.ok) {
       const error = responseBody as ApiError;
+
       if (error.code === ApiErrorCode.InvalidToken) {
         this.onInvalidToken?.();
       }
+
       throw responseBody;
     }
 
     return responseBody as TResponse;
-  }
-
-  public async requestJson<TRequest, TResponse>({
-    method,
-    headers,
-    path,
-    queryParameters,
-    body,
-  }: RequestParameters<TRequest>): Promise<TResponse> {
-    return this.request<TRequest, TResponse>({
-      method,
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json',
-      },
-      path,
-      queryParameters,
-      body,
-    });
-  }
-
-  public async requestFormData<TResponse>({
-    headers,
-    path,
-    queryParameters,
-    body,
-  }: RequestParameters<FormData>): Promise<TResponse> {
-    return this.request<FormData, TResponse>({
-      method: 'POST',
-      headers,
-      path,
-      queryParameters,
-      body,
-    });
   }
 }

@@ -1,4 +1,5 @@
 {
   "editor.fontLigatures": true,
-  "editor.mouseWheelZoom": true
+  "editor.mouseWheelZoom": true,
+  "editor.renderWhitespace": "all"
 }
