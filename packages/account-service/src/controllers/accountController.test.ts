@@ -20,6 +20,7 @@ const accounts: Account[] = [
     email: myEmail,
     emailVerified: true,
     profilePictureUrl: null,
+    oauthProviderAccountIds: {},
     dateCreated: new Date('2023-01-01T00:00:00.000Z'),
   },
   {
@@ -29,6 +30,7 @@ const accounts: Account[] = [
     email: faker.internet.email(),
     emailVerified: true,
     profilePictureUrl: null,
+    oauthProviderAccountIds: {},
     dateCreated: new Date('2024-01-02T00:00:00.000Z'),
   },
   {
@@ -38,6 +40,7 @@ const accounts: Account[] = [
     email: faker.internet.email(),
     emailVerified: true,
     profilePictureUrl: null,
+    oauthProviderAccountIds: {},
     dateCreated: new Date('2024-01-03T00:00:00.000Z'),
   },
   {
@@ -47,6 +50,7 @@ const accounts: Account[] = [
     email: faker.internet.email(),
     emailVerified: true,
     profilePictureUrl: null,
+    oauthProviderAccountIds: {},
     dateCreated: new Date('2024-01-04T00:00:00.000Z'),
   },
 ];
@@ -388,8 +392,6 @@ describe('AccountController', () => {
         .get('/accounts')
         .query({ sortBy: 'dateCreated', sortDirection: 'desc' })
         .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
-
-      console.log('WTF', response.body);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject({

@@ -9,8 +9,7 @@ import { Logger } from 'chatapp.logging';
 import { Result } from 'typescript-result';
 
 import { Config } from '../config';
-import { AccountRepository } from '../repositories/accountRepository';
-import { AuthCodeRepository } from '../repositories/authCodeRepository';
+import { AccountRepository, AuthCodeRepository } from '../repositories';
 
 export class AuthService {
   constructor(

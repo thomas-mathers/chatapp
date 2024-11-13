@@ -37,6 +37,15 @@ export class AccountRepository {
     return await this.accountCollection.findOne({ email });
   }
 
+  async getByLinkedAccount(
+    provider: string,
+    providerAccountId: string,
+  ): Promise<Account | null> {
+    return await this.accountCollection.findOne({
+      [`linkedAccounts.${provider}`]: providerAccountId,
+    });
+  }
+
   async getPage({
     accountIds,
     page = 1,
@@ -72,11 +81,14 @@ export class AccountRepository {
     await this.accountCollection.replaceOne({ username }, replacement);
   }
 
-  async patch(id: string, patch: Partial<Account>): Promise<void> {
-    await this.accountCollection.updateOne(
+  async patch(id: string, patch: Partial<Account>): Promise<Account | null> {
+    const result = await this.accountCollection.findOneAndUpdate(
       { _id: new ObjectId(id) },
       { $set: patch },
+      { returnDocument: 'after' },
     );
+
+    return result;
   }
 
   async deleteById(id: string): Promise<number> {

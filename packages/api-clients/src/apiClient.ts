@@ -74,7 +74,8 @@ export class ApiClient {
     path: string,
     headers?: Record<string, string>,
     queryParameters?: Record<string, string>,
-    body?: BodyInit,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    body?: any,
   ): Promise<TResponse> {
     const url = new URL(path, this.baseUrl);
 

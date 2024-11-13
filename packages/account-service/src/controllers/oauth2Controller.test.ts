@@ -6,7 +6,6 @@ import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { Account } from '../models/account';
-import { ExternalAccount } from '../models/externalAccount';
 
 const GOOGLE_AUTH_CODE =
   '4/_QCXwy-PG5Ub_JTiL7ULaCVb6K-Jsv45c7TPqPsG2-sCPYMTseEtqHWcU_ynqWQJB3Vuw5Ad1etoWqNPBaGvGHY';
@@ -80,17 +79,12 @@ describe('OAuth2Controller', () => {
         username: email,
         emailVerified: true,
         password: faker.internet.password(),
+        profilePictureUrl: null,
+        oauthProviderAccountIds: {
+          google: sub,
+        },
         dateCreated: new Date(),
       });
-
-      await app.mongoDatabase
-        .collection<ExternalAccount>('externalAccounts')
-        .insertOne({
-          accountId: new ObjectId(id),
-          provider: 'google',
-          providerAccountId: sub,
-          dateCreated: new Date(),
-        });
 
       const response = await request(app.httpServer)
         .get(`/oauth2/google/callback?code=${GOOGLE_AUTH_CODE}`)
@@ -125,6 +119,8 @@ describe('OAuth2Controller', () => {
         username: email,
         emailVerified: true,
         password: faker.internet.password(),
+        profilePictureUrl: null,
+        oauthProviderAccountIds: {},
         dateCreated: new Date(),
       });
 
@@ -226,17 +222,12 @@ describe('OAuth2Controller', () => {
         username: email,
         emailVerified: true,
         password: faker.internet.password(),
+        profilePictureUrl: null,
+        oauthProviderAccountIds: {
+          facebook: sub,
+        },
         dateCreated: new Date(),
       });
-
-      await app.mongoDatabase
-        .collection<ExternalAccount>('externalAccounts')
-        .insertOne({
-          accountId: new ObjectId(id),
-          provider: 'facebook',
-          providerAccountId: sub,
-          dateCreated: new Date(),
-        });
 
       const response = await request(app.httpServer)
         .get(`/oauth2/facebook/callback?code=${FACEBOOK_AUTH_CODE}`)
@@ -271,6 +262,8 @@ describe('OAuth2Controller', () => {
         username: email,
         emailVerified: true,
         password: faker.internet.password(),
+        profilePictureUrl: null,
+        oauthProviderAccountIds: {},
         dateCreated: new Date(),
       });
 

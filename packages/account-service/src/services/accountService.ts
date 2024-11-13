@@ -12,7 +12,8 @@ import { Result } from 'typescript-result';
 
 import { Config } from '../config';
 import { toAccountSummary } from '../mappers/toAccountSummary';
-import { AccountRepository } from '../repositories/accountRepository';
+import { Account } from '../models/account';
+import { AccountRepository } from '../repositories';
 
 export class AccountService {
   constructor(
@@ -23,12 +24,16 @@ export class AccountService {
     private readonly fileStorageService: FileStorageService,
   ) {}
 
-  async create(
-    username: string,
-    password: string,
-    email: string,
-    emailVerified: boolean,
-  ): Promise<Result<AccountSummary, ApiError>> {
+  async insert({
+    _id,
+    username,
+    password,
+    email,
+    emailVerified,
+    profilePictureUrl,
+    oauthProviderAccountIds,
+    dateCreated = new Date(),
+  }: Account): Promise<Result<AccountSummary, ApiError>> {
     if (await this.accountRepository.containsUsername(username)) {
       return Result.error(
         ApiError.fromErrorCode({ code: ApiErrorCode.UsernameExists }),
@@ -44,12 +49,14 @@ export class AccountService {
     const passwordHash = await createHash(password);
 
     const account = await this.accountRepository.insert({
+      _id,
       username,
       password: passwordHash,
       email,
       emailVerified,
-      profilePictureUrl: null,
-      dateCreated: new Date(),
+      profilePictureUrl,
+      oauthProviderAccountIds,
+      dateCreated,
     });
 
     const accountSummary = toAccountSummary(account);
@@ -77,42 +84,50 @@ export class AccountService {
     return Result.ok(accountSummary);
   }
 
-  async getOrCreateByEmail(
-    email: string,
-  ): Promise<Result<AccountSummary, ApiError>> {
-    const account = await this.accountRepository.getByEmail(email);
-
-    return account
-      ? Result.ok(toAccountSummary(account))
-      : this.create(email, '', email, true);
-  }
-
-  async getById(id: string): Promise<Result<AccountSummary, ApiError>> {
+  async getById(id: string): Promise<AccountSummary | null> {
     const account = await this.accountRepository.getById(id);
 
     if (!account) {
-      return Result.error(
-        ApiError.fromErrorCode({ code: ApiErrorCode.AccountNotFound }),
-      );
+      return null;
     }
 
     const accountSummary = toAccountSummary(account);
 
-    return Result.ok(accountSummary);
+    return accountSummary;
   }
 
-  async getByEmail(email: string): Promise<Result<AccountSummary, ApiError>> {
+  async getByEmail(email: string): Promise<AccountSummary | null> {
     const account = await this.accountRepository.getByEmail(email);
 
     if (!account) {
-      return Result.error(
-        ApiError.fromErrorCode({ code: ApiErrorCode.AccountNotFound }),
-      );
+      return null;
     }
 
     const accountSummary = toAccountSummary(account);
 
-    return Result.ok(accountSummary);
+    return accountSummary;
+  }
+
+  async getByLinkedAccount(
+    provider: string,
+    providerAccountId: string,
+  ): Promise<AccountSummary | null> {
+    const account = await this.accountRepository.getByLinkedAccount(
+      provider,
+      providerAccountId,
+    );
+
+    if (!account) {
+      return null;
+    }
+
+    const accountSummary = toAccountSummary(account);
+
+    return accountSummary;
+  }
+
+  async containsEmail(email: string): Promise<boolean> {
+    return await this.accountRepository.containsEmail(email);
   }
 
   async getPage(request: GetAccountsRequest): Promise<Page<AccountSummary>> {
@@ -122,6 +137,13 @@ export class AccountService {
       ...page,
       records: page.records.map(toAccountSummary),
     };
+  }
+
+  async patch(
+    accountId: string,
+    changes: Partial<Account>,
+  ): Promise<Account | null> {
+    return await this.accountRepository.patch(accountId, changes);
   }
 
   async deleteById(id: string): Promise<Result<void, ApiError>> {
@@ -136,17 +158,5 @@ export class AccountService {
     this.logger.info('Account deleted', { id });
 
     return Result.ok();
-  }
-
-  async updateProfilePicture(accountId: string, blob: Blob): Promise<void> {
-    const result = await this.fileStorageService.upload(
-      accountId,
-      'profile-picture',
-      blob,
-    );
-
-    await this.accountRepository.patch(accountId, {
-      profilePictureUrl: result.url,
-    });
   }
 }

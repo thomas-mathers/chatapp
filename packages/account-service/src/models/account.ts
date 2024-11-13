@@ -1,5 +1,7 @@
 import { ObjectId } from 'mongodb';
 
+import { OauthProvider } from './oauthProvider';
+
 export interface Account {
   _id?: ObjectId;
   username: string;
@@ -7,5 +9,6 @@ export interface Account {
   email: string;
   emailVerified: boolean;
   profilePictureUrl: string | null;
+  oauthProviderAccountIds: { [key in OauthProvider]?: string };
   dateCreated: Date;
 }

@@ -12,17 +12,14 @@ import { RedisClientType, createClient } from 'redis';
 import swaggerUi from 'swagger-ui-express';
 
 import { Config } from './config';
-import { AccountController } from './controllers/accountController';
-import { AuthController } from './controllers/authController';
-import { OAuth2Controller } from './controllers/oauth2Controller';
+import {
+  AccountController,
+  AuthController,
+  OAuth2Controller,
+} from './controllers';
 import { Account } from './models/account';
-import { ExternalAccount } from './models/externalAccount';
-import { AccountRepository } from './repositories/accountRepository';
-import { AuthCodeRepository } from './repositories/authCodeRepository';
-import { ExternalAccountRepository } from './repositories/externalAccountRepository';
-import { AccountService } from './services/accountService';
-import { AuthService } from './services/authService';
-import { ExternalAccountService } from './services/externalAccountService';
+import { AccountRepository, AuthCodeRepository } from './repositories';
+import { AccountService, AuthService } from './services';
 import { swaggerDoc } from './swaggerDoc';
 
 export class App {
@@ -81,14 +78,6 @@ export class App {
 
     await accountsCollection.createIndex({ username: 1 }, { unique: true });
     await accountsCollection.createIndex({ email: 1 }, { unique: true });
-
-    const externalAccountsCollection =
-      mongoDatabase.collection<ExternalAccount>('externalAccounts');
-
-    await externalAccountsCollection.createIndex(
-      { provider: 1, providerAccountId: 1 },
-      { unique: true },
-    );
   }
 
   private static async setupEventBus(
@@ -141,7 +130,11 @@ export class App {
       fileStorageService,
     );
 
-    const accountController = new AccountController(config, accountService);
+    const accountController = new AccountController(
+      config,
+      accountService,
+      fileStorageService,
+    );
 
     const authCodeRepository = new AuthCodeRepository(redisClient);
 
@@ -154,19 +147,11 @@ export class App {
     );
     const authController = new AuthController(config, authService);
 
-    const externalAccountCollection =
-      mongoDatabase.collection<ExternalAccount>('externalAccounts');
-    const externalAccountRepository = new ExternalAccountRepository(
-      externalAccountCollection,
-    );
-    const externalAccountService = new ExternalAccountService(
-      externalAccountRepository,
-      accountService,
-    );
     const oauth2Controller = new OAuth2Controller(
       config,
-      externalAccountService,
+      accountService,
       authService,
+      fileStorageService,
     );
 
     const httpServer = express()

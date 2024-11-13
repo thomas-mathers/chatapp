@@ -28,7 +28,7 @@ export class ChatServer {
     private readonly logger: Logger,
     messageService: MessageService,
   ) {
-    this.webSocketServer = new WebSocketServer({ port: 3002 });
+    this.webSocketServer = new WebSocketServer({ port: config.wss.port });
 
     this.webSocketServer.on('connection', (webSocket: WebSocket, request) => {
       logger.info(`${request.socket.remoteAddress} connected`);

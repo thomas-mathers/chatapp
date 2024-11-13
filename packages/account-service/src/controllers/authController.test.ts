@@ -21,6 +21,8 @@ const accounts: Account[] = [
     password: createHashSync(myPassword),
     email: myEmail,
     emailVerified: true,
+    profilePictureUrl: null,
+    oauthProviderAccountIds: {},
     dateCreated: new Date('2023-01-01T00:00:00.000Z'),
   },
   {
@@ -29,6 +31,8 @@ const accounts: Account[] = [
     password: createHashSync(myUnverifiedEmailPassword),
     email: myUnverifiedEmail,
     emailVerified: false,
+    profilePictureUrl: null,
+    oauthProviderAccountIds: {},
     dateCreated: new Date('2023-01-01T00:00:00.000Z'),
   },
 ];

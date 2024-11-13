@@ -3,6 +3,8 @@ import {
   accountRegistrationRequest,
   getAccountsRequestSchema,
 } from 'chatapp.account-service-contracts';
+import { FileStorageService } from 'chatapp.api-clients';
+import { ApiError, ApiErrorCode } from 'chatapp.api-error';
 import {
   handleAuthMiddleware,
   handleRequestBodyValidationMiddleware,
@@ -21,6 +23,7 @@ export class AccountController {
   constructor(
     readonly config: Config,
     readonly accountService: AccountService,
+    readonly fileStorageService: FileStorageService,
   ) {
     this._router.get(
       '/',
@@ -40,7 +43,15 @@ export class AccountController {
         const { username, password, email }: AccountRegistrationRequest =
           req.body;
         Result.fromAsync(
-          accountService.create(username, password, email, false),
+          accountService.insert({
+            username,
+            password,
+            email,
+            emailVerified: false,
+            profilePictureUrl: null,
+            oauthProviderAccountIds: {},
+            dateCreated: new Date(),
+          }),
         ).fold(
           (result) => res.status(201).json(result),
           (error) => res.status(error.statusCode).json(error),
@@ -52,10 +63,16 @@ export class AccountController {
       '/me',
       handleAuthMiddleware(config.jwt),
       async (req: Request, res: Response) => {
-        Result.fromAsync(accountService.getById(req.accountId)).fold(
-          (result) => res.status(StatusCodes.OK).json(result),
-          (error) => res.status(error.statusCode).json(error),
-        );
+        const account = await accountService.getById(req.accountId);
+        if (!account) {
+          res.status(StatusCodes.NOT_FOUND).json(
+            ApiError.fromErrorCode({
+              code: ApiErrorCode.AccountNotFound,
+            }),
+          );
+        } else {
+          res.status(StatusCodes.OK).json(account);
+        }
       },
     );
 
@@ -78,7 +95,15 @@ export class AccountController {
 
         const blob = new Blob([buffer], { type: mimetype });
 
-        await accountService.updateProfilePicture(req.accountId, blob);
+        const { url } = await fileStorageService.upload(
+          req.accountId,
+          'profile-picture.png',
+          blob,
+        );
+
+        await accountService.patch(req.accountId, {
+          profilePictureUrl: url,
+        });
 
         res.status(201).json();
       },
