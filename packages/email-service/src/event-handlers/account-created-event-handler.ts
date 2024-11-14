@@ -41,7 +41,7 @@ export class AccountCreatedEventHandler {
   }: AccountCreated): EmailMessage {
     const subject = 'Welcome to ChatApp';
 
-    const url = `${this.config.SPA_URL}/confirm-email?token=${token}`;
+    const url = `${this.config.SPA_URL}?token=${token}`;
 
     const text = `Click here to confirm your email: ${url}`;
 

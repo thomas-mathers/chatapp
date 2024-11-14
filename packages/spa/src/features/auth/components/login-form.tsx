@@ -40,16 +40,16 @@ export const LoginForm = () => {
     },
   });
 
-  const [, setJwt] = useLocalStorage('jwt', '');
+  const [, setAccessToken] = useLocalStorage('jwt', '');
 
-  const { mutate, isPending, error } = useMutation<
-    LoginResponse,
-    ApiError,
-    LoginFormState
-  >({
+  const {
+    mutate,
+    isPending,
+    error: loginError,
+  } = useMutation<LoginResponse, ApiError, LoginFormState>({
     mutationFn: (data) => authService.login(data),
     onSuccess: ({ accessToken }) => {
-      setJwt(accessToken);
+      setAccessToken(accessToken);
       navigate('/dashboard');
     },
   });
@@ -60,16 +60,24 @@ export const LoginForm = () => {
 
   useEffect(() => {
     const code = searchParams.get('code');
-    if (!code) {
-      return;
+
+    if (code) {
+      searchParams.delete('code');
+      setSearchParams(searchParams);
+      authService.exchangeAuthCodeForToken({ code }).then(({ accessToken }) => {
+        setAccessToken(accessToken);
+        navigate('/dashboard');
+      });
     }
-    searchParams.delete('code');
-    setSearchParams(searchParams);
-    authService.exchangeAuthCodeForToken({ code }).then(({ accessToken }) => {
-      setJwt(accessToken);
-      navigate('/dashboard');
-    });
-  }, [searchParams, setSearchParams, navigate, setJwt]);
+
+    const token = searchParams.get('token');
+
+    if (token) {
+      searchParams.delete('token');
+      setSearchParams(searchParams);
+      authService.confirmEmail({ token });
+    }
+  }, [searchParams, setSearchParams, navigate, setAccessToken]);
 
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>
@@ -111,7 +119,7 @@ export const LoginForm = () => {
           <LoadingButton type="submit" loading={isPending} variant="contained">
             Login
           </LoadingButton>
-          {error && <Alert severity="error">{error.message}</Alert>}
+          {loginError && <Alert severity="error">{loginError.message}</Alert>}
           <Typography variant="body2">
             Don't have an account?{' '}
             <Link component={RouterLink} to="/register">
