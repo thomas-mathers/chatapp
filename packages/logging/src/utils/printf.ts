@@ -1,4 +1,4 @@
-import { prettyPrint } from './prettyPrint';
+import { prettyPrint } from './pretty-print';
 
 export function printf(
   timestamp: string,

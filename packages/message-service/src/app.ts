@@ -11,14 +11,14 @@ import { Server } from 'http';
 import { Db, MongoClient } from 'mongodb';
 import swaggerUi from 'swagger-ui-express';
 
-import { ChatServer } from './chatServer';
+import { ChatServer } from './chat-server';
 import { Config } from './config';
-import { MessageController } from './controllers/messageController';
-import { UserController } from './controllers/userController';
+import { MessageController } from './controllers/message-controller';
+import { UserController } from './controllers/user-controller';
 import { Message } from './models/message';
-import { MessageRepository } from './repositories/messageRepository';
-import { MessageService } from './services/messageService';
-import { swaggerDoc } from './swaggerDoc';
+import { MessageRepository } from './repositories/message-repository';
+import { MessageService } from './services/message-service';
+import { swaggerDoc } from './swagger-doc';
 
 export class App {
   private constructor(

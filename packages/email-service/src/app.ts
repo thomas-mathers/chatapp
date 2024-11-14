@@ -8,9 +8,9 @@ import { Logger } from 'chatapp.logging';
 import { Resend } from 'resend';
 
 import { Config } from './config';
-import { AccountCreatedEventHandler } from './event-handlers/accountCreatedEventHandler';
-import { RequestResetPasswordEventHandler } from './event-handlers/requestResetPasswordEventHandler';
-import { EmailService } from './services/emailService';
+import { AccountCreatedEventHandler } from './event-handlers/account-created-event-handler';
+import { RequestResetPasswordEventHandler } from './event-handlers/request-reset-password-event-handler';
+import { EmailService } from './services/email-service';
 
 export class App {
   private constructor(

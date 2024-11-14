@@ -20,7 +20,7 @@ import {
 import { Account } from './models/account';
 import { AccountRepository, AuthCodeRepository } from './repositories';
 import { AccountService, AuthService } from './services';
-import { swaggerDoc } from './swaggerDoc';
+import { swaggerDoc } from './swagger-doc';
 
 export class App {
   private constructor(

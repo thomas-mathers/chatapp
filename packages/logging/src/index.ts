@@ -1,3 +1,3 @@
 export * from './logger';
-export * from './logLevel';
-export * from './logOptions';
+export * from './log-level';
+export * from './log-options';

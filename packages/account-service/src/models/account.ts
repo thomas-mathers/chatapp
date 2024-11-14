@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-import { OauthProvider } from './oauthProvider';
+import { OauthProvider } from './oauth-provider';
 
 export interface Account {
   _id?: ObjectId;

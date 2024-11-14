@@ -1,2 +1,2 @@
-export * from './accountRepository';
-export * from './authCodeRepository';
+export * from './account-repository';
+export * from './auth-code-repository';

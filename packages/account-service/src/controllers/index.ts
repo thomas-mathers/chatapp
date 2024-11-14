@@ -1,3 +1,3 @@
-export * from './accountController';
-export * from './authController';
-export * from './oauth2Controller';
+export * from './account-controller';
+export * from './auth-controller';
+export * from './oauth2-controller';

@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import { ProtectedRoute } from './components/protectedRoute';
+import { ProtectedRoute } from './components/protected-route';
 import {
   ChangePasswordForm,
   ForgotPasswordForm,
@@ -8,7 +8,7 @@ import {
   RegisterForm,
   ResetPasswordForm,
 } from './features/auth';
-import { ConfirmEmail } from './features/auth/components/confirmEmail';
+import { ConfirmEmail } from './features/auth/components/confirm-email';
 import { Dashboard } from './features/dashboard/components/dashboard';
 
 export const router = createBrowserRouter([

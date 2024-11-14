@@ -1,1 +1,1 @@
-export * from './responses/fileUploadResponse';
+export * from './responses/file-upload-response';

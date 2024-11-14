@@ -5,8 +5,8 @@ import {
   transports,
 } from 'winston';
 
-import { LogLevel } from './logLevel';
-import { LogOptions } from './logOptions';
+import { LogLevel } from './log-level';
+import { LogOptions } from './log-options';
 import { printf } from './utils/printf';
 
 export class Logger {

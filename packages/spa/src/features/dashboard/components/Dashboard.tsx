@@ -16,12 +16,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { RealtimeServiceProvider } from '@app/providers/realtimeServiceProvider';
-import { RealtimeService } from '@app/services/realtimeService';
+import { RealtimeServiceProvider } from '@app/providers/realtime-service-provider';
+import { RealtimeService } from '@app/services/realtime-service';
 
-import { MessageInput } from './messageInput';
-import { MessageList } from './messageList';
-import { UserList } from './userList';
+import { MessageInput } from './message-input';
+import { MessageList } from './message-list';
+import { UserList } from './user-list';
 
 const Header = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);

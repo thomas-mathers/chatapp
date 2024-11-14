@@ -1,7 +1,7 @@
 import { CssBaseline } from '@mui/material';
 import { RouterProvider } from 'react-router-dom';
 
-import { AppProvider } from './providers/appProvider';
+import { AppProvider } from './providers/app-provider';
 import { router } from './router';
 
 function App() {

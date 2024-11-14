@@ -7,8 +7,8 @@ import { Server } from 'http';
 import multer from 'multer';
 
 import { Config } from './config';
-import { FileController } from './controllers/fileController';
-import { LocalStorageFileService } from './services/localStorageFileService';
+import { FileController } from './controllers/file-controller';
+import { LocalStorageFileService } from './services/local-storage-file-service';
 
 export class App {
   private constructor(
