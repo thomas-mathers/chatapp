@@ -3,6 +3,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { SortDirection } from 'chatapp.account-service-contracts';
 import { MessageSummary } from 'chatapp.message-service-contracts';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { useMessageService } from '@app/hooks/useMessageService';
 import { useRealtimeService } from '@app/hooks/useRealtimeService';
@@ -15,15 +16,20 @@ export const MessageList = () => {
 
   const messageService = useMessageService();
 
+  const [jwt] = useLocalStorage('jwt', '');
+
   const { data, fetchNextPage, hasNextPage, isFetching } = useInfiniteQuery({
     queryKey: ['messages'],
     queryFn: async ({ pageParam: page }) => {
-      const answer = await messageService.getMessages({
-        page,
-        pageSize: 50,
-        sortBy: 'dateCreated',
-        sortDirection: SortDirection.Desc,
-      });
+      const answer = await messageService.getMessages(
+        {
+          page,
+          pageSize: 50,
+          sortBy: 'dateCreated',
+          sortDirection: SortDirection.Desc,
+        },
+        jwt,
+      );
       return answer;
     },
     initialPageParam: 1,

@@ -1,7 +1,4 @@
-import {
-  CreateMessageRequest,
-  getMessagesRequestSchema,
-} from 'chatapp.message-service-contracts';
+import { getMessagesRequestSchema } from 'chatapp.message-service-contracts';
 import { handleRequestQueryValidationMiddleware } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -22,15 +19,17 @@ export class MessageController {
       },
     );
 
-    this._router.post('/', async (req: Request, res: Response) => {
-      const body: CreateMessageRequest = req.body;
-      const result = await messageService.createMessage(
-        req.accountId,
-        req.accountUsername,
-        body.content,
-      );
-      res.status(StatusCodes.OK).json(result);
-    });
+    this._router.post(
+      '/',
+      async ({ accountId, body }: Request, res: Response) => {
+        const result = await messageService.createMessage(
+          accountId,
+          body.content,
+        );
+
+        res.status(StatusCodes.OK).json(result);
+      },
+    );
   }
 
   get router(): Router {

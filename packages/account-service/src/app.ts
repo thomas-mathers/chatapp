@@ -1,5 +1,5 @@
 import bodyParser from 'body-parser';
-import { ApiClient, FileStorageServiceClient } from 'chatapp.api-clients';
+import { FileStorageServiceClient, HttpClient } from 'chatapp.api-clients';
 import { EventBus } from 'chatapp.event-sourcing';
 import { Logger } from 'chatapp.logging';
 import { handleErrorMiddleware } from 'chatapp.middlewares';
@@ -117,7 +117,7 @@ export class App {
     const mongoDatabase = mongoClient.db(config.mongo.databaseName);
 
     const fileStorageService = new FileStorageServiceClient(
-      new ApiClient(config.fileStorageService.url),
+      new HttpClient(config.fileStorageService.url),
     );
 
     const accountCollection = mongoDatabase.collection<Account>('accounts');

@@ -1,11 +1,10 @@
 import { Navigate, Outlet } from 'react-router-dom';
-
-import { useJwtService } from '@app/hooks/useJwtService';
+import { useLocalStorage } from 'usehooks-ts';
 
 export const ProtectedRoute = () => {
-  const jwtService = useJwtService();
+  const [jwt] = useLocalStorage('jwt', '');
 
-  const isAuthenticated = jwtService.get() !== null;
+  const isAuthenticated = Boolean(jwt);
 
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;

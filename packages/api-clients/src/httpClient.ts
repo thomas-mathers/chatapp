@@ -1,5 +1,3 @@
-import { ApiError, ApiErrorCode } from 'chatapp.api-error';
-
 interface FetchRequest {
   path: string;
   headers?: Record<string, string>;
@@ -10,11 +8,8 @@ interface FetchRequestWithBody<T> extends FetchRequest {
   body?: T;
 }
 
-export class ApiClient {
-  constructor(
-    private readonly baseUrl: string,
-    private readonly onInvalidToken?: () => void,
-  ) {}
+export class HttpClient {
+  constructor(private readonly baseUrl: string) {}
 
   public async getJson<TResponse>(request: FetchRequest): Promise<TResponse> {
     return await this.requestJson<TResponse>('GET', request);
@@ -74,8 +69,7 @@ export class ApiClient {
     path: string,
     headers?: Record<string, string>,
     queryParameters?: Record<string, string>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    body?: any,
+    body?: FormData | string,
   ): Promise<TResponse> {
     const url = new URL(path, this.baseUrl);
 
@@ -94,12 +88,6 @@ export class ApiClient {
     const responseBody = await response.json();
 
     if (!response.ok) {
-      const error = responseBody as ApiError;
-
-      if (error.code === ApiErrorCode.InvalidToken) {
-        this.onInvalidToken?.();
-      }
-
       throw responseBody;
     }
 

@@ -57,7 +57,6 @@ export class ChatServer {
 
           const message = await messageService.createMessage(
             userCredentials.userId,
-            userCredentials.username,
             createMessageRequest.content,
           );
 

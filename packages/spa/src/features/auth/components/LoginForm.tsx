@@ -19,6 +19,7 @@ import {
   useNavigate,
   useSearchParams,
 } from 'react-router-dom';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { PasswordField } from '@app/components/passwordField';
 import { useAuthService } from '@app/hooks';
@@ -39,6 +40,8 @@ export const LoginForm = () => {
     },
   });
 
+  const [, setJwt] = useLocalStorage('jwt', '');
+
   const authService = useAuthService();
 
   const { mutate, isPending, error } = useMutation<
@@ -47,7 +50,8 @@ export const LoginForm = () => {
     LoginFormState
   >({
     mutationFn: (data) => authService.login(data),
-    onSuccess: () => {
+    onSuccess: ({ accessToken }) => {
+      setJwt(accessToken);
       navigate('/dashboard');
     },
   });
@@ -63,10 +67,11 @@ export const LoginForm = () => {
     }
     searchParams.delete('code');
     setSearchParams(searchParams);
-    authService.exchangeAuthCodeForToken({ code }).then(() => {
+    authService.exchangeAuthCodeForToken({ code }).then(({ accessToken }) => {
+      setJwt(accessToken);
       navigate('/dashboard');
     });
-  }, [searchParams, setSearchParams, authService, navigate]);
+  }, [searchParams, setSearchParams, authService, navigate, setJwt]);
 
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>

@@ -59,7 +59,7 @@ export class AccountService {
 
     const accountSummary = toAccountSummary(account);
 
-    const jwt = createJwt(
+    const confirmEmailToken = createJwt(
       { userId: account._id!.toString(), username: account.username },
       this.config.jwt,
     );
@@ -69,7 +69,7 @@ export class AccountService {
       accountId: account._id!.toString(),
       accountName: account.username,
       accountEmail: account.email,
-      token: jwt,
+      token: confirmEmailToken,
       emailVerified: account.emailVerified,
     });
 

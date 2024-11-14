@@ -1,9 +1,9 @@
 import { FileUploadResponse } from 'chatapp.file-storage-service-contracts';
 
-import { ApiClient } from './apiClient';
+import { HttpClient } from './httpClient';
 
 export class FileStorageServiceClient {
-  constructor(private readonly apiClient: ApiClient) {}
+  constructor(private readonly httpClient: HttpClient) {}
 
   async upload(
     accountId: string,
@@ -14,7 +14,7 @@ export class FileStorageServiceClient {
 
     body.append('file', contents);
 
-    const response = await this.apiClient.postFormData<FileUploadResponse>({
+    const response = await this.httpClient.postFormData<FileUploadResponse>({
       path: `/files/${accountId}/${filename}`,
       body,
     });

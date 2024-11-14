@@ -1,23 +1,32 @@
+import { AccountServiceClient } from 'chatapp.api-clients';
 import {
   GetMessagesRequest,
   MessageSummary,
   Page,
 } from 'chatapp.message-service-contracts';
 
-import { Message } from '../models/message';
+import { Config } from '../config';
+import { toMessageSummary } from '../mappers/toMessageSummary';
 import { MessageRepository } from '../repositories/messageRepository';
 
 export class MessageService {
-  constructor(private readonly messageRepository: MessageRepository) {}
+  constructor(
+    private readonly config: Config,
+    private readonly messageRepository: MessageRepository,
+    private readonly accountServiceClient: AccountServiceClient,
+  ) {}
 
-  async createMessage(
-    accountId: string,
-    accountUsername: string,
-    content: string,
-  ): Promise<MessageSummary> {
+  async createMessage(id: string, content: string): Promise<MessageSummary> {
+    const { username, profilePictureUrl } =
+      await this.accountServiceClient.getAccountById(
+        id,
+        this.config.accountService.apiKey,
+      );
+
     const message = await this.messageRepository.createMessage({
-      accountId,
-      accountUsername,
+      accountId: id,
+      username,
+      profilePictureUrl,
       content,
       dateCreated: new Date(),
     });
@@ -32,15 +41,4 @@ export class MessageService {
       records: page.records.map(toMessageSummary),
     };
   }
-}
-
-export function toMessageSummary(message: Message): MessageSummary {
-  const { _id, accountId, accountUsername, content, dateCreated } = message;
-  return {
-    id: _id!.toHexString(),
-    accountId,
-    accountUsername,
-    content,
-    dateCreated: dateCreated.toISOString(),
-  };
 }

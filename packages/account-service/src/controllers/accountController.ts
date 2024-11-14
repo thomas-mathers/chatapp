@@ -6,7 +6,8 @@ import {
 import { FileStorageServiceClient } from 'chatapp.api-clients';
 import { ApiError, ApiErrorCode } from 'chatapp.api-error';
 import {
-  handleAuthMiddleware,
+  handleApiKeyAuthMiddleware,
+  handleJwtAuthMiddleware,
   handleRequestBodyValidationMiddleware,
   handleRequestQueryValidationMiddleware,
 } from 'chatapp.middlewares';
@@ -27,7 +28,7 @@ export class AccountController {
   ) {
     this._router.get(
       '/',
-      handleAuthMiddleware(config.jwt),
+      handleJwtAuthMiddleware(config.jwt),
       handleRequestQueryValidationMiddleware(getAccountsRequestSchema),
       async (req: Request, res: Response) => {
         const getAccountsRequest = getAccountsRequestSchema.parse(req.query);
@@ -61,7 +62,7 @@ export class AccountController {
 
     this._router.get(
       '/me',
-      handleAuthMiddleware(config.jwt),
+      handleJwtAuthMiddleware(config.jwt),
       async (req: Request, res: Response) => {
         const account = await accountService.getById(req.accountId);
         if (!account) {
@@ -76,9 +77,26 @@ export class AccountController {
       },
     );
 
+    this._router.get(
+      '/:id',
+      handleApiKeyAuthMiddleware(config.apiKey),
+      async (req: Request, res: Response) => {
+        const account = await accountService.getById(req.params.id);
+        if (!account) {
+          res.status(StatusCodes.NOT_FOUND).json(
+            ApiError.fromErrorCode({
+              code: ApiErrorCode.AccountNotFound,
+            }),
+          );
+        } else {
+          res.status(StatusCodes.OK).json(account);
+        }
+      },
+    );
+
     this._router.delete(
       '/me',
-      handleAuthMiddleware(config.jwt),
+      handleJwtAuthMiddleware(config.jwt),
       async (req: Request, res: Response) => {
         Result.fromAsync(accountService.deleteById(req.accountId)).fold(
           (result) => res.status(StatusCodes.OK).json(result),
@@ -89,7 +107,7 @@ export class AccountController {
 
     this._router.put(
       '/me/profile-picture',
-      handleAuthMiddleware(config.jwt),
+      handleJwtAuthMiddleware(config.jwt),
       async (req: Request, res: Response) => {
         const { mimetype, buffer } = req.file!;
 

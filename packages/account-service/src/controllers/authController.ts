@@ -12,7 +12,7 @@ import {
   passwordResetTokenRequestSchema,
 } from 'chatapp.account-service-contracts';
 import {
-  handleAuthMiddleware,
+  handleJwtAuthMiddleware,
   handleRequestBodyValidationMiddleware,
 } from 'chatapp.middlewares';
 import { Request, Response, Router } from 'express';
@@ -43,7 +43,7 @@ export class AuthController {
 
     this._router.put(
       '/me/password',
-      handleAuthMiddleware(config.jwt),
+      handleJwtAuthMiddleware(config.jwt),
       handleRequestBodyValidationMiddleware(changePasswordRequestSchema),
       async (req: Request, res: Response) => {
         const body: ChangePasswordRequest = req.body;

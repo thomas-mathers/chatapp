@@ -1,8 +1,9 @@
 import bodyParser from 'body-parser';
+import { AccountServiceClient, HttpClient } from 'chatapp.api-clients';
 import { Logger } from 'chatapp.logging';
 import {
-  handleAuthMiddleware,
   handleErrorMiddleware,
+  handleJwtAuthMiddleware,
 } from 'chatapp.middlewares';
 import cors from 'cors';
 import express from 'express';
@@ -35,9 +36,17 @@ export class App {
 
     const mongoDatabase = mongoClient.db(config.mongo.databaseName);
 
+    const accountServiceClient = new AccountServiceClient(
+      new HttpClient(config.accountService.url),
+    );
+
     const messagesCollection = mongoDatabase.collection<Message>('messages');
     const messageRepository = new MessageRepository(messagesCollection);
-    const messageService = new MessageService(messageRepository);
+    const messageService = new MessageService(
+      config,
+      messageRepository,
+      accountServiceClient,
+    );
     const messageController = new MessageController(messageService);
 
     const chatServer = new ChatServer(config, logger, messageService);
@@ -48,7 +57,7 @@ export class App {
       .use(cors())
       .use(bodyParser.json())
       .use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
-      .use(handleAuthMiddleware(config.jwt))
+      .use(handleJwtAuthMiddleware(config.jwt))
       .use('/messages', messageController.router)
       .use('/users', userController.router)
       .use(handleErrorMiddleware)
@@ -77,7 +86,7 @@ export class App {
     const messagesCollection = mongoDatabase.collection<Message>('messages');
 
     await messagesCollection.createIndex({ accountId: 1 });
-    await messagesCollection.createIndex({ accountUsername: 1 });
+    await messagesCollection.createIndex({ username: 1 });
     await messagesCollection.createIndex({ dateCreated: 1 });
   }
 

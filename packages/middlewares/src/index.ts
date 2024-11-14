@@ -1,4 +1,5 @@
 export * from './handleErrorMiddleware';
 export * from './handleRequestBodyValidationMiddleware';
 export * from './handleRequestQueryValidationMiddleware';
-export * from './handleAuthMiddleware';
+export * from './handleJwtAuthMiddleware';
+export * from './handleApiKeyAuthMiddleware';

@@ -9,11 +9,11 @@ export const Message = ({ message }: { message: MessageSummary }) => {
   );
   return (
     <Stack direction="row" gap={2}>
-      <Avatar>{message.accountUsername[0]}</Avatar>
+      <Avatar src={message.profilePictureUrl}>{message.username[0]}</Avatar>
       <Box>
         <Box>
           <Typography variant="body1" component="span" sx={{ marginRight: 1 }}>
-            <strong>{message.accountUsername}</strong>
+            <strong>{message.username}</strong>
           </Typography>
           <Typography variant="body1" component="span">
             {dateCreated}

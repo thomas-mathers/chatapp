@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { ChangePasswordRequest } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { useAuthService } from '@app/hooks';
 
@@ -26,12 +27,14 @@ export const ChangePasswordForm = () => {
 
   const authService = useAuthService();
 
+  const [jwt] = useLocalStorage('jwt', '');
+
   const { mutate, isPending, error } = useMutation<
     void,
     ApiError,
     ChangePasswordRequest
   >({
-    mutationFn: (data) => authService.changePassword(data),
+    mutationFn: (data) => authService.changePassword(data, jwt),
   });
 
   const onSubmit = (data: ChangePasswordFormState) => {

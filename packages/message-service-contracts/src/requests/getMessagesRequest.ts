@@ -7,7 +7,7 @@ type MessageSummaryKeys = keyof MessageSummary;
 
 const sortColumns: MessageSummaryKeys[] = [
   'accountId',
-  'accountUsername',
+  'username',
   'content',
   'dateCreated',
 ];

@@ -3,19 +3,15 @@ import {
   AccountSummary,
 } from 'chatapp.account-service-contracts';
 
-import { ApiClient } from './apiClient';
-import { JwtService } from './jwtService';
+import { HttpClient } from './httpClient';
 
 export class AccountServiceClient {
-  constructor(
-    private readonly apiClient: ApiClient,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly httpClient: HttpClient) {}
 
   async createAccount(
     body: AccountRegistrationRequest,
   ): Promise<AccountSummary> {
-    const result = await this.apiClient.postJson<AccountSummary>({
+    const result = await this.httpClient.postJson<AccountSummary>({
       path: '/accounts',
       body,
     });
@@ -23,22 +19,36 @@ export class AccountServiceClient {
     return result;
   }
 
-  async getAccount(): Promise<AccountSummary> {
-    const result = await this.apiClient.getJson<AccountSummary>({
-      path: '/accounts/me',
+  async getAccountById(
+    accountId: string,
+    apiKey: string,
+  ): Promise<AccountSummary> {
+    const result = await this.httpClient.getJson<AccountSummary>({
+      path: `/accounts/${accountId}`,
       headers: {
-        Authorization: `Bearer ${this.jwtService.get()}`,
+        'X-API-KEY': apiKey,
       },
     });
 
     return result;
   }
 
-  async deleteAccount(): Promise<void> {
-    await this.apiClient.deleteJson({
+  async getAccount(accessToken: string): Promise<AccountSummary> {
+    const result = await this.httpClient.getJson<AccountSummary>({
       path: '/accounts/me',
       headers: {
-        Authorization: `Bearer ${this.jwtService.get()}`,
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return result;
+  }
+
+  async deleteAccount(accessToken: string): Promise<void> {
+    await this.httpClient.deleteJson({
+      path: '/accounts/me',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
       },
     });
   }

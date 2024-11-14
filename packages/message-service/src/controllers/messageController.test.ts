@@ -3,42 +3,47 @@ import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { toMessageSummary } from '../mappers/toMessageSummary';
 import { Message } from '../models/message';
-import { toMessageSummary } from '../services/messageService';
 
 const messages: Message[] = [
   {
     _id: new ObjectId(),
     accountId: faker.string.uuid(),
-    accountUsername: faker.internet.username(),
+    username: faker.internet.username(),
+    profilePictureUrl: faker.internet.url(),
     content: faker.lorem.sentence(),
     dateCreated: new Date('2024-01-01T00:00:00.000Z'),
   },
   {
     _id: new ObjectId(),
     accountId: faker.string.uuid(),
-    accountUsername: faker.internet.username(),
+    username: faker.internet.username(),
+    profilePictureUrl: faker.internet.url(),
     content: faker.lorem.sentence(),
     dateCreated: new Date('2024-01-01T00:00:00.000Z'),
   },
   {
     _id: new ObjectId(),
     accountId: faker.string.uuid(),
-    accountUsername: faker.internet.username(),
+    username: faker.internet.username(),
+    profilePictureUrl: faker.internet.url(),
     content: faker.lorem.sentence(),
     dateCreated: new Date('2024-01-01T00:00:00.000Z'),
   },
   {
     _id: new ObjectId(),
     accountId: faker.string.uuid(),
-    accountUsername: faker.internet.username(),
+    username: faker.internet.username(),
+    profilePictureUrl: faker.internet.url(),
     content: faker.lorem.sentence(),
     dateCreated: new Date('2024-01-01T00:00:00.000Z'),
   },
   {
     _id: new ObjectId(),
     accountId: faker.string.uuid(),
-    accountUsername: faker.internet.username(),
+    username: faker.internet.username(),
+    profilePictureUrl: faker.internet.url(),
     content: faker.lorem.sentence(),
     dateCreated: new Date('2024-01-01T00:00:00.000Z'),
   },
@@ -49,7 +54,7 @@ function compareByAccountId(a: Message, b: Message): number {
 }
 
 function compareByAccountUsername(a: Message, b: Message): number {
-  return a.accountUsername.localeCompare(b.accountUsername);
+  return a.username.localeCompare(b.username);
 }
 
 function compareByContent(a: Message, b: Message): number {
@@ -203,14 +208,14 @@ describe('MessageController', () => {
         });
       });
 
-      it('should sort by accountUsername in ascending order', async ({
+      it('should sort by username in ascending order', async ({
         app,
         token,
       }) => {
         const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
-          .query({ sortBy: 'accountUsername' });
+          .query({ sortBy: 'username' });
 
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({
@@ -224,14 +229,14 @@ describe('MessageController', () => {
         });
       });
 
-      it('should sort by accountUsername in descending order', async ({
+      it('should sort by username in descending order', async ({
         app,
         token,
       }) => {
         const response = await request(app.httpServer)
           .get('/messages')
           .set('Authorization', `Bearer ${token}`)
-          .query({ sortBy: 'accountUsername', sortDirection: 'desc' });
+          .query({ sortBy: 'username', sortDirection: 'desc' });
 
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({

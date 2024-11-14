@@ -4,17 +4,15 @@ import { createTheme } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   AccountServiceClient,
-  ApiClient,
   AuthServiceClient,
+  HttpClient,
   MessageServiceClient,
 } from 'chatapp.api-clients';
 
 import { getConfig } from '@app/config';
-import { LocalStorageJwtService } from '@app/services/localStorageJwtService';
 
 import { AccountServiceProvider } from './accountServiceProvider';
 import { AuthServiceProvider } from './authServiceProvider';
-import { JwtServiceProvider } from './jwtServiceProvider';
 import { MessageServiceProvider } from './messageServiceProvider';
 
 const config = getConfig();
@@ -36,29 +34,18 @@ const theme = createTheme({
   },
 });
 
-const jwtTokenService = new LocalStorageJwtService();
-
-const accountServiceApiClient = new ApiClient(
+const accountServiceApiClient = new HttpClient(
   config.VITE_ACCOUNT_SERVICE_BASE_URL,
 );
-const accountService = new AccountServiceClient(
-  accountServiceApiClient,
-  jwtTokenService,
-);
+const accountService = new AccountServiceClient(accountServiceApiClient);
 
-const authServiceApiClient = new ApiClient(config.VITE_AUTH_SERVICE_BASE_URL);
-const authService = new AuthServiceClient(
-  authServiceApiClient,
-  jwtTokenService,
-);
+const authServiceApiClient = new HttpClient(config.VITE_AUTH_SERVICE_BASE_URL);
+const authService = new AuthServiceClient(authServiceApiClient);
 
-const messageServiceApiClient = new ApiClient(
+const messageServiceApiClient = new HttpClient(
   config.VITE_MESSAGE_SERVICE_BASE_URL,
 );
-const messageService = new MessageServiceClient(
-  messageServiceApiClient,
-  jwtTokenService,
-);
+const messageService = new MessageServiceClient(messageServiceApiClient);
 
 const queryClient = new QueryClient();
 
@@ -70,15 +57,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   return (
     <ThemeProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
-        <JwtServiceProvider value={jwtTokenService}>
-          <AccountServiceProvider value={accountService}>
-            <AuthServiceProvider value={authService}>
-              <MessageServiceProvider value={messageService}>
-                {children}
-              </MessageServiceProvider>
-            </AuthServiceProvider>
-          </AccountServiceProvider>
-        </JwtServiceProvider>
+        <AccountServiceProvider value={accountService}>
+          <AuthServiceProvider value={authService}>
+            <MessageServiceProvider value={messageService}>
+              {children}
+            </MessageServiceProvider>
+          </AuthServiceProvider>
+        </AccountServiceProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

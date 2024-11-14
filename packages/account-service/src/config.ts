@@ -29,6 +29,7 @@ export const configSchema = z
     FRONT_END_URL: z.string(),
     FILE_STORAGE_SERVICE_URL: z.string(),
     FILE_STORAGE_SERVICE_MAX_FILE_SIZE: z.coerce.number(),
+    API_KEY: z.string(),
   })
   .transform(
     ({
@@ -50,6 +51,7 @@ export const configSchema = z
       FRONT_END_URL,
       FILE_STORAGE_SERVICE_URL,
       FILE_STORAGE_SERVICE_MAX_FILE_SIZE,
+      API_KEY,
     }) => ({
       port: PORT,
       jwt: {
@@ -85,6 +87,7 @@ export const configSchema = z
         url: FILE_STORAGE_SERVICE_URL,
         maxFileSize: FILE_STORAGE_SERVICE_MAX_FILE_SIZE,
       },
+      apiKey: API_KEY,
     }),
   );
 

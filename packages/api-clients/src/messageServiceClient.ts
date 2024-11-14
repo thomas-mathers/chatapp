@@ -4,21 +4,15 @@ import {
   Page,
 } from 'chatapp.message-service-contracts';
 
-import { ApiClient } from './apiClient';
-import { JwtService } from './jwtService';
+import { HttpClient } from './httpClient';
 
 export class MessageServiceClient {
-  constructor(
-    private readonly apiClient: ApiClient,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly httpClient: HttpClient) {}
 
-  public async getMessages({
-    page,
-    pageSize,
-    sortBy,
-    sortDirection,
-  }: GetMessagesRequest): Promise<Page<MessageSummary>> {
+  public async getMessages(
+    { page, pageSize, sortBy, sortDirection }: GetMessagesRequest,
+    accessToken: string,
+  ): Promise<Page<MessageSummary>> {
     const queryParameters: Record<string, string> = {};
 
     if (page) {
@@ -34,11 +28,11 @@ export class MessageServiceClient {
       queryParameters['sortDirection'] = sortDirection;
     }
 
-    const result = await this.apiClient.getJson<Page<MessageSummary>>({
+    const result = await this.httpClient.getJson<Page<MessageSummary>>({
       path: '/messages',
       queryParameters,
       headers: {
-        Authorization: `Bearer ${this.jwtService.get()}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 

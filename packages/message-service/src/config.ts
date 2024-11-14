@@ -20,6 +20,8 @@ export const configSchema = z
       'debug',
       'silly',
     ]),
+    ACCOUNT_SERVICE_URL: z.string(),
+    ACCOUNT_SERVICE_API_KEY: z.string(),
   })
   .transform(
     ({
@@ -32,6 +34,8 @@ export const configSchema = z
       MONGO_DATABASE_NAME,
       WEB_SOCKET_SERVER_PORT,
       LOG_LEVEL,
+      ACCOUNT_SERVICE_URL,
+      ACCOUNT_SERVICE_API_KEY,
     }) => ({
       port: PORT,
       jwt: {
@@ -49,6 +53,10 @@ export const configSchema = z
       },
       logging: {
         level: LOG_LEVEL as LogLevel,
+      },
+      accountService: {
+        url: ACCOUNT_SERVICE_URL,
+        apiKey: ACCOUNT_SERVICE_API_KEY,
       },
     }),
   );

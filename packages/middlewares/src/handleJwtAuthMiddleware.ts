@@ -1,7 +1,7 @@
 import { JwtOptions, verifyJwt } from 'chatapp.crypto';
 import { NextFunction, Request, Response } from 'express';
 
-export const handleAuthMiddleware =
+export const handleJwtAuthMiddleware =
   (options: JwtOptions) =>
   (req: Request, res: Response, next: NextFunction): void => {
     const authorizationSegments = req.headers.authorization?.split(' ') ?? [];
@@ -25,7 +25,7 @@ export const handleAuthMiddleware =
       }
 
       req.accountId = userCredentials.userId;
-      req.accountUsername = userCredentials.username;
+      req.token = token;
 
       next();
     } catch {

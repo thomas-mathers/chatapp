@@ -14,9 +14,8 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLocalStorage } from 'usehooks-ts';
 
-import { useAuthService } from '@app/hooks';
-import { useJwtService } from '@app/hooks/useJwtService';
 import { RealtimeServiceProvider } from '@app/providers/realtimeServiceProvider';
 import { RealtimeService } from '@app/services/realtimeService';
 
@@ -33,7 +32,8 @@ const Header = () => {
 
   const isAccountMenuOpen = Boolean(anchorEl);
 
-  const authService = useAuthService();
+  const [, , removeJwt] = useLocalStorage('jwt', '');
+
   const navigate = useNavigate();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -46,7 +46,7 @@ const Header = () => {
 
   const handleLogout = () => {
     handleMenuClose();
-    authService.logout();
+    removeJwt();
     navigate('/');
   };
 
@@ -131,15 +131,13 @@ const LoadingScreen = () => {
 };
 
 export const Dashboard = () => {
-  const jwtService = useJwtService();
-
-  const token = jwtService.get();
-
   const [realtimeService, setRealtimeService] =
     useState<RealtimeService | null>(null);
 
+  const [jwt] = useLocalStorage('jwt', '');
+
   useEffect(() => {
-    const url = `${import.meta.env.VITE_REALTIME_MESSAGE_SERVICE_BASE_URL}?token=${token}`;
+    const url = `${import.meta.env.VITE_REALTIME_MESSAGE_SERVICE_BASE_URL}?token=${jwt}`;
 
     const createRealtimeServiceTask = RealtimeService.create(url).then(
       (realtimeService) => {
@@ -153,7 +151,7 @@ export const Dashboard = () => {
         realtimeService.close();
       });
     };
-  }, [token]);
+  }, [jwt]);
 
   if (!realtimeService) {
     return <LoadingScreen />;
