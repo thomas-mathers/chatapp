@@ -5,16 +5,14 @@ import { MessageSummary } from 'chatapp.message-service-contracts';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { useMessageService } from '@app/hooks/use-message-service';
-import { useRealtimeService } from '@app/hooks/use-realtime-service';
+import { messageService } from '@app/lib/api-client';
 
+import { useRealtimeService } from '../contexts/realtime-service-context';
 import { Message } from './message';
 
 export const MessageList = () => {
   const firstMessageRef = useRef<HTMLDivElement | null>(null);
   const lastMessageRef = useRef<HTMLDivElement | null>(null);
-
-  const messageService = useMessageService();
 
   const [jwt] = useLocalStorage('jwt', '');
 

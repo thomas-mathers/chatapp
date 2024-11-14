@@ -13,7 +13,7 @@ import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { useAuthService } from '@app/hooks';
+import { authService } from '@app/lib/api-client';
 
 interface ForgotPasswordFormState {
   email: string;
@@ -27,8 +27,6 @@ export const ForgotPasswordForm = () => {
       },
     },
   );
-
-  const authService = useAuthService();
 
   const { mutate, isPending, error } = useMutation<
     void,

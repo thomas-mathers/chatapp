@@ -6,7 +6,7 @@ import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { useAuthService } from '@app/hooks';
+import { authService } from '@app/lib/api-client';
 
 interface ResetPasswordFormState {
   newPassword: string;
@@ -26,8 +26,6 @@ export const ResetPasswordForm = () => {
       newPasswordConfirm: '',
     },
   });
-
-  const authService = useAuthService();
 
   const { mutate, isPending, error } = useMutation<
     void,

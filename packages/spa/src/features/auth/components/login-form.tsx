@@ -22,7 +22,7 @@ import {
 import { useLocalStorage } from 'usehooks-ts';
 
 import { PasswordField } from '@app/components/password-field';
-import { useAuthService } from '@app/hooks';
+import { authService } from '@app/lib/api-client';
 
 interface LoginFormState {
   username: string;
@@ -41,8 +41,6 @@ export const LoginForm = () => {
   });
 
   const [, setJwt] = useLocalStorage('jwt', '');
-
-  const authService = useAuthService();
 
   const { mutate, isPending, error } = useMutation<
     LoginResponse,
@@ -71,7 +69,7 @@ export const LoginForm = () => {
       setJwt(accessToken);
       navigate('/dashboard');
     });
-  }, [searchParams, setSearchParams, authService, navigate, setJwt]);
+  }, [searchParams, setSearchParams, navigate, setJwt]);
 
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>

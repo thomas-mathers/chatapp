@@ -17,7 +17,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 import { PasswordField } from '@app/components/password-field';
-import { useAccountService } from '@app/hooks';
+import { accountService } from '@app/lib/api-client';
 
 interface RegisterFormState {
   email: string;
@@ -37,8 +37,6 @@ export const RegisterForm = () => {
       username: '',
     },
   });
-
-  const accountService = useAccountService();
 
   const { mutate, isPending, error } = useMutation<
     AccountSummary,

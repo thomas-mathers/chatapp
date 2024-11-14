@@ -1,7 +1,10 @@
-import { useContext } from 'react';
+import { createContext, useContext } from 'react';
 
-import { RealtimeServiceContext } from '@app/contexts/realtime-service-context';
-import { RealtimeService } from '@app/services/realtime-service';
+import { RealtimeService } from '@app/lib/realtime-service';
+
+export const RealtimeServiceContext = createContext<RealtimeService | null>(
+  null,
+);
 
 export const useRealtimeService = (): RealtimeService => {
   const realtimeMessageService = useContext(RealtimeServiceContext);

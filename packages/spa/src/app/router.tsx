@@ -1,15 +1,15 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import { ProtectedRoute } from './components/protected-route';
+import { ProtectedRoute } from '../components/protected-route';
 import {
   ChangePasswordForm,
   ForgotPasswordForm,
   LoginForm,
   RegisterForm,
   ResetPasswordForm,
-} from './features/auth';
-import { ConfirmEmail } from './features/auth/components/confirm-email';
-import { Dashboard } from './features/dashboard/components/dashboard';
+} from '../features/auth';
+import { ConfirmEmail } from '../features/auth/components/confirm-email';
+import { Dashboard } from '../features/dashboard/components/dashboard';
 
 export const router = createBrowserRouter([
   {

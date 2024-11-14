@@ -16,9 +16,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { RealtimeServiceProvider } from '@app/providers/realtime-service-provider';
-import { RealtimeService } from '@app/services/realtime-service';
+import { RealtimeService } from '@app/lib/realtime-service';
 
+import { RealtimeServiceContext } from '../contexts/realtime-service-context';
 import { MessageInput } from './message-input';
 import { MessageList } from './message-list';
 import { UserList } from './user-list';
@@ -158,11 +158,11 @@ export const Dashboard = () => {
   }
 
   return (
-    <RealtimeServiceProvider value={realtimeService}>
+    <RealtimeServiceContext.Provider value={realtimeService}>
       <Stack sx={{ height: '100%' }}>
         <Header />
         <Body />
       </Stack>
-    </RealtimeServiceProvider>
+    </RealtimeServiceContext.Provider>
   );
 };

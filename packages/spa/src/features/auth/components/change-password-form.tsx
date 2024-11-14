@@ -6,7 +6,7 @@ import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { useAuthService } from '@app/hooks';
+import { authService } from '@app/lib/api-client';
 
 interface ChangePasswordFormState {
   oldPassword: string;
@@ -24,8 +24,6 @@ export const ChangePasswordForm = () => {
       },
     },
   );
-
-  const authService = useAuthService();
 
   const [jwt] = useLocalStorage('jwt', '');
 
