@@ -14,6 +14,7 @@ import {
 } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 import { PasswordField } from '@app/components/password-field';
@@ -53,22 +54,24 @@ export const RegisterForm = () => {
     mutate(data);
   };
 
+  const { t } = useTranslation();
+
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
           <Typography variant="h4" component="h1">
-            Register
+            {t('register-form.register')}
           </Typography>
           <Controller
             name="username"
             control={control}
-            rules={{ required: 'Username is required' }}
+            rules={{ required: t('register-form.username-is-required') }}
             render={({ field }) => (
               <TextField
                 {...field}
                 type="text"
-                label="Username"
+                label={t('register-form.username')}
                 helperText={formState.errors.username?.message}
                 error={Boolean(formState.errors.username)}
               />
@@ -77,12 +80,12 @@ export const RegisterForm = () => {
           <Controller
             name="email"
             control={control}
-            rules={{ required: 'Email is required' }}
+            rules={{ required: t('register-form.email-is-required') }}
             render={({ field }) => (
               <TextField
                 {...field}
                 type="email"
-                label="Email"
+                label={t('register-form.email')}
                 helperText={formState.errors.email?.message}
                 error={Boolean(formState.errors.email)}
               />
@@ -91,12 +94,11 @@ export const RegisterForm = () => {
           <Controller
             name="password"
             control={control}
-            rules={{ required: 'Password is required' }}
+            rules={{ required: t('register-form.password-is-required') }}
             render={({ field }) => (
               <PasswordField
                 {...field}
-                type="password"
-                label="Password"
+                label={t('register-form.password')}
                 helperText={formState.errors.password?.message}
                 error={Boolean(formState.errors.password)}
               />
@@ -106,26 +108,25 @@ export const RegisterForm = () => {
             name="confirmPassword"
             control={control}
             rules={{
-              required: 'Confirm Password is required',
+              required: t('register-form.confirm-password-is-required'),
             }}
             render={({ field }) => (
               <PasswordField
                 {...field}
-                type="password"
-                label="Confirm Password"
+                label={t('register-form.confirm-password')}
                 helperText={formState.errors.confirmPassword?.message}
                 error={Boolean(formState.errors.confirmPassword)}
               />
             )}
           />
           <LoadingButton type="submit" loading={isPending} variant="contained">
-            Submit
+            {t('register-form.submit')}
           </LoadingButton>
           {error && <Alert severity="error">{error.message}</Alert>}
           <Typography variant="body2">
-            Already have an account?{' '}
+            {t('register-form.already-have-an-account')}{' '}
             <Link component={RouterLink} to="/">
-              Login
+              {t('register-form.login')}
             </Link>
           </Typography>
         </Stack>

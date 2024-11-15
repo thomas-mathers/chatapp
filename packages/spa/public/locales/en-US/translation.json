@@ -1,0 +1,57 @@
+{
+  "change-password-form": {
+    "change-password": "Change Password",
+    "current-password": "Current Password",
+    "current-password-is-required": "Current Password is required",
+    "password": "Password",
+    "password-is-required": "Password is required",
+    "confirm-password": "Confirm Password",
+    "confirm-password-is-required": "Confirm Password is required",
+    "passwords-do-not-match": "Passwords do not match",
+    "submit": "Submit"
+  },
+  "forgot-password-form": {
+    "forgot-password": "Forgot Password",
+    "email": "Email",
+    "email-is-required": "Email is required",
+    "submit": "Submit",
+    "return-to": "Return to",
+    "login": "Login"
+  },
+  "login-form": {
+    "username": "Username",
+    "password": "Password",
+    "login": "Login",
+    "username-is-required": "Username is required",
+    "password-is-required": "Password is required",
+    "forgot-password": "Forgot password?",
+    "do-not-have-an-account": "Don't have an account?",
+    "register": "Register",
+    "or": "OR",
+    "continue-with-google": "Continue with Google",
+    "continue-with-facebook": "Continue with Facebook"
+  },
+  "register-form": {
+    "register": "Register",
+    "username-is-required": "Username is required",
+    "username": "Username",
+    "email-is-required": "Email is required",
+    "email": "Email",
+    "password-is-required": "Password is required",
+    "password": "Password",
+    "confirm-password-is-required": "Confirm Password is required",
+    "confirm-password": "Confirm Password",
+    "submit": "Submit",
+    "already-have-an-account": "Already have an account?",
+    "login": "Login"
+  },
+  "reset-password-form": {
+    "reset-password": "Reset Password",
+    "new-password": "Password",
+    "new-password-is-required": "Password is required",
+    "confirm-password": "Confirm Password",
+    "confirm-password-is-required": "Confirm Password is required",
+    "passwords-do-not-match": "Passwords do not match",
+    "submit": "Submit"
+  }
+}

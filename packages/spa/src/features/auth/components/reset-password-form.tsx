@@ -1,11 +1,13 @@
 import { LoadingButton } from '@mui/lab';
-import { Alert, Container, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Container, Stack, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import { PasswordResetRequest } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { PasswordField } from '@app/components/password-field';
 import { authService } from '@app/lib/api-client';
 
 interface ResetPasswordFormState {
@@ -42,22 +44,25 @@ export const ResetPasswordForm = () => {
     mutate({ newPassword: data.newPassword, token: token! });
   };
 
+  const { t } = useTranslation();
+
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
           <Typography variant="h4" component="h1">
-            Reset Password
+            {t('reset-password-form.reset-password')}
           </Typography>
           <Controller
             name="newPassword"
             control={control}
-            rules={{ required: 'New Password is required' }}
+            rules={{
+              required: t('reset-password-form.new-password-is-required'),
+            }}
             render={({ field }) => (
-              <TextField
+              <PasswordField
                 {...field}
-                type="password"
-                label="New Password"
+                label={t('reset-password-form.new-password')}
                 helperText={formState.errors.newPassword?.message}
                 error={Boolean(formState.errors.newPassword)}
               />
@@ -66,19 +71,20 @@ export const ResetPasswordForm = () => {
           <Controller
             name="newPasswordConfirm"
             control={control}
-            rules={{ required: 'Confirm New Password is required' }}
+            rules={{
+              required: t('reset-password-form.confirm-password-is-required'),
+            }}
             render={({ field }) => (
-              <TextField
+              <PasswordField
                 {...field}
-                type="password"
-                label="Confirm New Password"
+                label={t('reset-password-form.confirm-password')}
                 helperText={formState.errors.newPasswordConfirm?.message}
                 error={Boolean(formState.errors.newPasswordConfirm)}
               />
             )}
           />
           <LoadingButton type="submit" variant="contained" loading={isPending}>
-            Submit
+            {t('reset-password-form.submit')}
           </LoadingButton>
           {error && <Alert severity="error">{error.message}</Alert>}
         </Stack>

@@ -14,6 +14,7 @@ import { LoginResponse } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   Link as RouterLink,
   useNavigate,
@@ -64,6 +65,7 @@ export const LoginForm = () => {
     if (code) {
       searchParams.delete('code');
       setSearchParams(searchParams);
+
       authService.exchangeAuthCodeForToken({ code }).then(({ accessToken }) => {
         setAccessToken(accessToken);
         navigate('/dashboard');
@@ -75,26 +77,29 @@ export const LoginForm = () => {
     if (token) {
       searchParams.delete('token');
       setSearchParams(searchParams);
+
       authService.confirmEmail({ token });
     }
   }, [searchParams, setSearchParams, navigate, setAccessToken]);
+
+  const { t } = useTranslation();
 
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
           <Typography variant="h4" component="h1">
-            Login
+            {t('login-form.login')}
           </Typography>
           <Controller
             name="username"
             control={control}
-            rules={{ required: 'Username is required' }}
+            rules={{ required: t('login-form.username-is-required') }}
             render={({ field }) => (
               <TextField
                 {...field}
                 type="text"
-                label="Username"
+                label={t('login-form.username')}
                 helperText={formState.errors.username?.message}
                 error={Boolean(formState.errors.username)}
               />
@@ -103,37 +108,39 @@ export const LoginForm = () => {
           <Controller
             name="password"
             control={control}
-            rules={{ required: 'Password is required' }}
+            rules={{ required: t('login-form.password-is-required') }}
             render={({ field }) => (
               <PasswordField
                 {...field}
-                label="Password"
+                label={t('login-form.password')}
                 helperText={formState.errors.password?.message}
                 error={Boolean(formState.errors.password)}
               />
             )}
           />
           <Link component={RouterLink} to="/forgot-password">
-            <Typography variant="body2">Forgot Password?</Typography>
+            <Typography variant="body2">
+              {t('login-form.forgot-password')}
+            </Typography>
           </Link>
           <LoadingButton type="submit" loading={isPending} variant="contained">
-            Login
+            {t('login-form.login')}
           </LoadingButton>
           {loginError && <Alert severity="error">{loginError.message}</Alert>}
           <Typography variant="body2">
-            Don't have an account?{' '}
+            {t('login-form.do-not-have-an-account')}{' '}
             <Link component={RouterLink} to="/register">
-              Register
+              {t('login-form.register')}
             </Link>
           </Typography>
-          <Divider>OR</Divider>
+          <Divider>{t('login-form.or')}</Divider>
           <Button
             href="http://localhost:3000/oauth2/google/login"
             variant="contained"
             color="primary"
             fullWidth
           >
-            Continue with Google
+            {t('login-form.continue-with-google')}
           </Button>
           <Button
             href="http://localhost:3000/oauth2/facebook/login"
@@ -141,7 +148,7 @@ export const LoginForm = () => {
             color="primary"
             fullWidth
           >
-            Continue with Facebook
+            {t('login-form.continue-with-facebook')}
           </Button>
         </Stack>
       </form>
