@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import { useMutation } from '@tanstack/react-query';
 import { PasswordResetRequest } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
+import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -49,6 +50,9 @@ export const ResetPasswordForm = () => {
   >({
     mutationFn: (data) => authService.resetPassword(data),
     onSuccess: () => {
+      enqueueSnackbar(t('reset-password-form.success'), {
+        variant: 'success',
+      });
       navigate('/');
     },
   });
@@ -58,6 +62,8 @@ export const ResetPasswordForm = () => {
   };
 
   const { t } = useTranslation();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>

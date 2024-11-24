@@ -1,9 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { HttpResponse, http } from 'msw';
 import { byLabelText, byRole, byText } from 'testing-library-selector';
 import { describe, expect, it } from 'vitest';
 
+import { server } from '@app/testing/mocks/server';
 import { TestAppProvider } from '@app/testing/provider';
 
 import { RegisterForm } from './register-form';
@@ -84,5 +86,49 @@ describe('<RegisterForm>', () => {
     await user.click(ui.submit.get());
 
     expect(ui.confirmPasswordDoesNotMatch.get()).toBeVisible();
+  });
+
+  it('should display error message when there is a backend error', async () => {
+    const errorMessage = 'Internal Server Error';
+
+    server.use(
+      http.post('/accounts', () => {
+        return HttpResponse.json({ message: errorMessage }, { status: 500 });
+      }),
+    );
+
+    const { user } = renderComponent();
+
+    const username = faker.internet.username();
+    const email = faker.internet.email();
+    const password = faker.internet.password();
+
+    await user.type(ui.username.get(), username);
+    await user.type(ui.email.get(), email);
+    await user.type(ui.password.get(), password);
+    await user.type(ui.confirmPassword.get(), password);
+
+    await user.click(ui.submit.get());
+
+    expect(await screen.findByText(errorMessage)).toBeVisible();
+  });
+
+  it('should display success message when registration is successful', async () => {
+    const successMessage = 'Registration successful';
+
+    const { user } = renderComponent();
+
+    const username = faker.internet.username();
+    const email = faker.internet.email();
+    const password = faker.internet.password();
+
+    await user.type(ui.username.get(), username);
+    await user.type(ui.email.get(), email);
+    await user.type(ui.password.get(), password);
+    await user.type(ui.confirmPassword.get(), password);
+
+    await user.click(ui.submit.get());
+
+    expect(await screen.findByText(successMessage)).toBeVisible();
   });
 });

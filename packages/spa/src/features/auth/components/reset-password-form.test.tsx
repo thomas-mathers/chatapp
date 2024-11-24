@@ -1,9 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { HttpResponse, http } from 'msw';
 import { byLabelText, byRole, byText } from 'testing-library-selector';
 import { describe, expect, it } from 'vitest';
 
+import { server } from '@app/testing/mocks/server';
 import { TestAppProvider } from '@app/testing/provider';
 
 import { ResetPasswordForm } from './reset-password-form';
@@ -63,5 +65,43 @@ describe('<ResetPasswordForm>', () => {
     await user.click(ui.submit.get());
 
     expect(ui.confirmPasswordDoesNotMatch.get()).toBeVisible();
+  });
+
+  it('should display an error message when there is a backend error', async () => {
+    const errorMessage = 'Internal Server Error';
+
+    server.use(
+      http.post('/auth/password-resets', () => {
+        return HttpResponse.json({ message: errorMessage }, { status: 500 });
+      }),
+    );
+
+    const { user } = renderComponent();
+
+    const newPassword = faker.internet.password();
+    const confirmPassword = newPassword;
+
+    await user.type(ui.newPassword.get(), newPassword);
+    await user.type(ui.confirmPassword.get(), confirmPassword);
+
+    await user.click(ui.submit.get());
+
+    expect(await screen.findByText(errorMessage)).toBeVisible();
+  });
+
+  it('should display a success message when the password reset is successful', async () => {
+    const successMessage = 'Password reset successful';
+
+    const { user } = renderComponent();
+
+    const newPassword = faker.internet.password();
+    const confirmPassword = newPassword;
+
+    await user.type(ui.newPassword.get(), newPassword);
+    await user.type(ui.confirmPassword.get(), confirmPassword);
+
+    await user.click(ui.submit.get());
+
+    expect(await screen.findByText(successMessage)).toBeVisible();
   });
 });

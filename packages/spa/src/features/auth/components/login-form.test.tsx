@@ -1,8 +1,10 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { HttpResponse, http } from 'msw';
 import { byLabelText, byRole } from 'testing-library-selector';
 import { describe, expect, it } from 'vitest';
 
+import { server } from '@app/testing/mocks/server';
 import { TestAppProvider } from '@app/testing/provider';
 
 import { LoginForm } from './login-form';
@@ -44,5 +46,37 @@ describe('<LoginForm>', () => {
     await user.click(ui.submit.get());
 
     expect(ui.password.get()).toBeInvalid();
+  });
+
+  it('should display an error message when the username or password is incorrect', async () => {
+    const errorMessage = 'Invalid username or password';
+
+    server.use(
+      http.post('/auth/login', () => {
+        return HttpResponse.json({ message: errorMessage }, { status: 401 });
+      }),
+    );
+
+    const { user } = renderComponent();
+
+    await user.type(ui.username.get(), 'invalid-username');
+    await user.type(ui.password.get(), 'invalid-password');
+
+    await user.click(ui.submit.get());
+
+    expect(await screen.findByText(errorMessage)).toBeVisible();
+  });
+
+  it('should display a success message when the login is successful', async () => {
+    const successMessage = 'Login successful';
+
+    const { user } = renderComponent();
+
+    await user.type(ui.username.get(), 'valid-username');
+    await user.type(ui.password.get(), 'valid-password');
+
+    await user.click(ui.submit.get());
+
+    expect(await screen.findByText(successMessage)).toBeVisible();
   });
 });

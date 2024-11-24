@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import { useMutation } from '@tanstack/react-query';
 import { ChangePasswordRequest } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
+import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useLocalStorage } from 'usehooks-ts';
@@ -48,6 +49,11 @@ export const ChangePasswordForm = () => {
     ChangePasswordRequest
   >({
     mutationFn: (data) => authService.changePassword(data, jwt),
+    onSuccess: () => {
+      enqueueSnackbar(t('change-password-form.password-changed'), {
+        variant: 'success',
+      });
+    },
   });
 
   const onSubmit = (data: ChangePasswordFormState) => {
@@ -55,6 +61,8 @@ export const ChangePasswordForm = () => {
   };
 
   const { t } = useTranslation();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>

@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
@@ -8,15 +9,19 @@ import Typography from '@mui/material/Typography';
 import { useMutation } from '@tanstack/react-query';
 import { PasswordResetTokenRequest } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
+import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
+import { z } from 'zod';
 
 import { authService } from '@app/lib/api-client';
 
-interface ForgotPasswordFormState {
-  email: string;
-}
+const forgotPasswordFormSchema = z.object({
+  email: z.string().min(1, 'Email is required').email('Email is invalid'),
+});
+
+type ForgotPasswordFormState = z.infer<typeof forgotPasswordFormSchema>;
 
 export const ForgotPasswordForm = () => {
   const { control, formState, handleSubmit } = useForm<ForgotPasswordFormState>(
@@ -24,6 +29,7 @@ export const ForgotPasswordForm = () => {
       defaultValues: {
         email: '',
       },
+      resolver: zodResolver(forgotPasswordFormSchema),
     },
   );
 
@@ -33,6 +39,11 @@ export const ForgotPasswordForm = () => {
     PasswordResetTokenRequest
   >({
     mutationFn: (data) => authService.forgotPassword(data),
+    onSuccess: () => {
+      enqueueSnackbar(t('forgot-password-form.email-sent'), {
+        variant: 'success',
+      });
+    },
   });
 
   const onSubmit = (data: ForgotPasswordFormState) => {
@@ -40,6 +51,8 @@ export const ForgotPasswordForm = () => {
   };
 
   const { t } = useTranslation();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>

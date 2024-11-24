@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import { useMutation } from '@tanstack/react-query';
 import { LoginResponse } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
+import { useSnackbar } from 'notistack';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -48,6 +49,7 @@ export const LoginForm = () => {
   } = useMutation<LoginResponse, ApiError, LoginFormState>({
     mutationFn: (data) => authService.login(data),
     onSuccess: ({ accessToken }) => {
+      enqueueSnackbar(t('login-form.success'), { variant: 'success' });
       setAccessToken(accessToken);
       navigate('/dashboard');
     },
@@ -81,6 +83,8 @@ export const LoginForm = () => {
   }, [searchParams, setSearchParams, navigate, setAccessToken]);
 
   const { t } = useTranslation();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>

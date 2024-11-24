@@ -12,6 +12,7 @@ import {
   AccountSummary,
 } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
+import { useSnackbar } from 'notistack';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
@@ -54,6 +55,7 @@ export const RegisterForm = () => {
   >({
     mutationFn: (data) => accountService.createAccount(data),
     onSuccess: () => {
+      enqueueSnackbar(t('register-form.success'), { variant: 'success' });
       navigate('/');
     },
   });
@@ -63,6 +65,8 @@ export const RegisterForm = () => {
   };
 
   const { t } = useTranslation();
+
+  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <Container maxWidth="xs" sx={{ paddingTop: 2 }}>

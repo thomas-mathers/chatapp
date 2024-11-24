@@ -1,9 +1,11 @@
 import { faker } from '@faker-js/faker';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { HttpResponse, http } from 'msw';
 import { byLabelText, byRole, byText } from 'testing-library-selector';
 import { describe, expect, it } from 'vitest';
 
+import { server } from '@app/testing/mocks/server';
 import { TestAppProvider } from '@app/testing/provider';
 
 import { ChangePasswordForm } from './change-password-form';
@@ -76,5 +78,47 @@ describe('<ChangePasswordForm>', () => {
     await user.click(ui.submitButton.get());
 
     expect(ui.confirmNewPasswordDoesNotMatchError.get()).toBeVisible();
+  });
+
+  it('should display an error message if the current password is incorrect', async () => {
+    const errorMessage = 'Password is incorrect';
+
+    server.use(
+      http.put('/auth/me/password', () => {
+        return HttpResponse.json({ message: errorMessage }, { status: 401 });
+      }),
+    );
+
+    const { user } = renderComponent();
+
+    const oldPassword = faker.internet.password();
+    const newPassword = faker.internet.password();
+    const confirmNewPassword = newPassword;
+
+    await user.type(ui.currentPassword.get(), oldPassword);
+    await user.type(ui.newPassword.get(), newPassword);
+    await user.type(ui.confirmNewPassword.get(), confirmNewPassword);
+
+    await user.click(ui.submitButton.get());
+
+    expect(await screen.findByText(errorMessage)).toBeVisible();
+  });
+
+  it('should display a success message if the password is updated successfully', async () => {
+    const successMessage = 'Password changed successfully';
+
+    const { user } = renderComponent();
+
+    const oldPassword = faker.internet.password();
+    const newPassword = faker.internet.password();
+    const confirmNewPassword = newPassword;
+
+    await user.type(ui.currentPassword.get(), oldPassword);
+    await user.type(ui.newPassword.get(), newPassword);
+    await user.type(ui.confirmNewPassword.get(), confirmNewPassword);
+
+    await user.click(ui.submitButton.get());
+
+    expect(await screen.findByText(successMessage)).toBeVisible();
   });
 });
