@@ -17,6 +17,7 @@
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
     "@fontsource/roboto": "^5.1.0",
+    "@hookform/resolvers": "^3.9.1",
     "@mui/icons-material": "^6.1.8",
     "@mui/lab": "6.0.0-beta.16",
     "@mui/material": "^6.1.8",
@@ -37,6 +38,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.0.3",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
@@ -47,6 +49,7 @@
     "eslint-plugin-react-hooks": "5.1.0-rc-fb9a90fa48-20240614",
     "eslint-plugin-react-refresh": "^0.4.14",
     "jsdom": "^25.0.1",
+    "msw": "^2.6.6",
     "testing-library-selector": "0.3.1",
     "vite": "^5.4.11"
   }

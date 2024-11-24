@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
@@ -14,16 +15,24 @@ import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 
 import { PasswordField } from '@app/components/password-field';
 import { accountService } from '@app/lib/api-client';
 
-interface RegisterFormState {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  username: string;
-}
+const registerFormSchema = z
+  .object({
+    email: z.string().min(1, 'Email is required').email(),
+    password: z.string().min(1, 'Password is required'),
+    confirmPassword: z.string().min(1, 'Confirm password is required'),
+    username: z.string().min(1, 'Username is required'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Passwords must match',
+  });
+
+type RegisterFormState = z.infer<typeof registerFormSchema>;
 
 export const RegisterForm = () => {
   const navigate = useNavigate();
@@ -35,6 +44,7 @@ export const RegisterForm = () => {
       confirmPassword: '',
       username: '',
     },
+    resolver: zodResolver(registerFormSchema),
   });
 
   const { mutate, isPending, error } = useMutation<

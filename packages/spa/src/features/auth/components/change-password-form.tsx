@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
@@ -9,15 +10,23 @@ import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useLocalStorage } from 'usehooks-ts';
+import z from 'zod';
 
 import { PasswordField } from '@app/components/password-field';
 import { authService } from '@app/lib/api-client';
 
-interface ChangePasswordFormState {
-  currentPassword: string;
-  password: string;
-  passwordConfirm: string;
-}
+const changePasswordFormSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    password: z.string().min(1, 'Password is required'),
+    passwordConfirm: z.string().min(1, 'Confirm password is required'),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    path: ['passwordConfirm'],
+    message: 'Passwords do not match',
+  });
+
+type ChangePasswordFormState = z.infer<typeof changePasswordFormSchema>;
 
 export const ChangePasswordForm = () => {
   const { control, formState, handleSubmit } = useForm<ChangePasswordFormState>(
@@ -27,6 +36,7 @@ export const ChangePasswordForm = () => {
         password: '',
         passwordConfirm: '',
       },
+      resolver: zodResolver(changePasswordFormSchema),
     },
   );
 

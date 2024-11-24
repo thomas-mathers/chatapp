@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Alert from '@mui/material/Alert';
 import Container from '@mui/material/Container';
@@ -9,14 +10,22 @@ import { ApiError } from 'chatapp.api-error';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { z } from 'zod';
 
 import { PasswordField } from '@app/components/password-field';
 import { authService } from '@app/lib/api-client';
 
-interface ResetPasswordFormState {
-  newPassword: string;
-  newPasswordConfirm: string;
-}
+const resetPasswordFormSchema = z
+  .object({
+    newPassword: z.string().min(1, 'Password is required'),
+    newPasswordConfirm: z.string().min(1, 'Confirm password is required'),
+  })
+  .refine((data) => data.newPassword === data.newPasswordConfirm, {
+    path: ['newPasswordConfirm'],
+    message: 'Passwords must match',
+  });
+
+type ResetPasswordFormState = z.infer<typeof resetPasswordFormSchema>;
 
 export const ResetPasswordForm = () => {
   const navigate = useNavigate();
@@ -30,6 +39,7 @@ export const ResetPasswordForm = () => {
       newPassword: '',
       newPasswordConfirm: '',
     },
+    resolver: zodResolver(resetPasswordFormSchema),
   });
 
   const { mutate, isPending, error } = useMutation<
