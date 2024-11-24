@@ -1,5 +1,8 @@
-import { LoadingButton } from '@mui/lab';
-import { Alert, Container, Stack, Typography } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import Alert from '@mui/material/Alert';
+import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import { useMutation } from '@tanstack/react-query';
 import { ChangePasswordRequest } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';
@@ -11,7 +14,7 @@ import { PasswordField } from '@app/components/password-field';
 import { authService } from '@app/lib/api-client';
 
 interface ChangePasswordFormState {
-  oldPassword: string;
+  currentPassword: string;
   password: string;
   passwordConfirm: string;
 }
@@ -20,7 +23,7 @@ export const ChangePasswordForm = () => {
   const { control, formState, handleSubmit } = useForm<ChangePasswordFormState>(
     {
       defaultValues: {
-        oldPassword: '',
+        currentPassword: '',
         password: '',
         passwordConfirm: '',
       },
@@ -38,7 +41,7 @@ export const ChangePasswordForm = () => {
   });
 
   const onSubmit = (data: ChangePasswordFormState) => {
-    mutate({ oldPassword: data.oldPassword, newPassword: data.password });
+    mutate({ oldPassword: data.currentPassword, newPassword: data.password });
   };
 
   const { t } = useTranslation();
@@ -51,7 +54,7 @@ export const ChangePasswordForm = () => {
             {t('change-password-form.change-password')}
           </Typography>
           <Controller
-            name="oldPassword"
+            name="currentPassword"
             control={control}
             rules={{
               required: t('change-password-form.current-password-is-required'),
@@ -60,8 +63,8 @@ export const ChangePasswordForm = () => {
               <PasswordField
                 {...field}
                 label={t('change-password-form.current-password')}
-                helperText={formState.errors.oldPassword?.message}
-                error={Boolean(formState.errors.oldPassword)}
+                helperText={formState.errors.currentPassword?.message}
+                error={Boolean(formState.errors.currentPassword)}
               />
             )}
           />

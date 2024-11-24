@@ -1,4 +1,6 @@
-import { CircularProgress, Link, Stack } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import Link from '@mui/material/Link';
+import Stack from '@mui/material/Stack';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { SortDirection } from 'chatapp.account-service-contracts';
 import { MessageSummary } from 'chatapp.message-service-contracts';

@@ -15,19 +15,19 @@
     "type-check": "pnpm run -r type-check"
   },
   "devDependencies": {
-    "@eslint/js": "^9.12.0",
+    "@eslint/js": "^9.15.0",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@vitest/coverage-v8": "2.1.4",
+    "@vitest/coverage-v8": "2.1.5",
     "depcheck": "^1.4.7",
-    "eslint": "^9.12.0",
+    "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-check-file": "^2.8.0",
-    "globals": "^15.10.0",
+    "globals": "^15.12.0",
     "prettier": "^3.3.3",
-    "tsx": "^4.19.1",
-    "typescript": "^5.6.3",
-    "typescript-eslint": "^8.7.0",
-    "vitest": "^2.1.2"
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.15.0",
+    "vitest": "^2.1.5"
   },
   "workspaces": [
     "packages/*"

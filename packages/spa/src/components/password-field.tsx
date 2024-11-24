@@ -1,10 +1,8 @@
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import {
-  IconButton,
-  InputAdornment,
-  TextField,
-  TextFieldProps,
-} from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { Ref, forwardRef, useState } from 'react';
 
 export const PasswordField = forwardRef(
@@ -35,7 +33,9 @@ export const PasswordField = forwardRef(
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
-                  aria-label="toggle password visibility"
+                  aria-label={
+                    showPassword ? 'password visible' : 'password hidden'
+                  }
                   onClick={handleClickShowPassword}
                   onMouseDown={handleMouseDownPassword}
                   onMouseUp={handleMouseUpPassword}

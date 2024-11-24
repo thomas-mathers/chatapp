@@ -1,5 +1,8 @@
-import { LoadingButton } from '@mui/lab';
-import { Alert, Container, Stack, Typography } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import Alert from '@mui/material/Alert';
+import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import { useMutation } from '@tanstack/react-query';
 import { PasswordResetRequest } from 'chatapp.account-service-contracts';
 import { ApiError } from 'chatapp.api-error';

@@ -1,4 +1,4 @@
-import { CssBaseline } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 import { RouterProvider } from 'react-router-dom';
 
 import { AppProvider } from './provider';

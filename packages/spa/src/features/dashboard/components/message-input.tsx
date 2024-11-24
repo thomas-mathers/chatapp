@@ -1,5 +1,7 @@
 import SendIcon from '@mui/icons-material/Send';
-import { IconButton, Stack, TextField } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 import { useState } from 'react';
 
 import { useRealtimeService } from '../contexts/realtime-service-context';

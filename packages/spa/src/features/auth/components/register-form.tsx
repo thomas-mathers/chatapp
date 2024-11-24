@@ -1,12 +1,10 @@
-import { LoadingButton } from '@mui/lab';
-import {
-  Alert,
-  Container,
-  Link,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import Alert from '@mui/material/Alert';
+import Container from '@mui/material/Container';
+import Link from '@mui/material/Link';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { useMutation } from '@tanstack/react-query';
 import {
   AccountRegistrationRequest,

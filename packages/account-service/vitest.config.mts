@@ -1,7 +1,7 @@
 import { loadEnvFile } from 'process';
 import { defineConfig } from 'vitest/config';
 
-loadEnvFile('test.env');
+loadEnvFile('./packages/account-service/test.env');
 
 export default defineConfig({
   test: {

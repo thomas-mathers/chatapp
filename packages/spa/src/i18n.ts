@@ -1,16 +1,21 @@
-import i18n from 'i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
-import Backend from 'i18next-http-backend';
+import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-export default i18n
-  .use(Backend)
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    fallbackLng: 'en',
-    debug: true,
-    interpolation: {
-      escapeValue: false,
+import en from '../public/locales/en-US/translation.json';
+
+const i18n = i18next.use(initReactI18next);
+
+i18n.init({
+  lng: 'en',
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
+  resources: {
+    en: {
+      translation: en,
     },
-  });
+  },
+});
+
+export default i18n;
