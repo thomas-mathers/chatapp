@@ -85,6 +85,10 @@ export class HttpClient {
       headers,
     });
 
+    if (response.status === 204) {
+      return undefined as unknown as TResponse;
+    }
+
     const responseBody = await response.json();
 
     if (!response.ok) {

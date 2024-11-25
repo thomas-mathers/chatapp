@@ -574,7 +574,7 @@ describe('AccountController', () => {
       expect(response.status).toBe(401);
     });
 
-    it('should return 200 when a valid token is provided', async ({ app }) => {
+    it('should return 204 when a valid token is provided', async ({ app }) => {
       const authResponse = await request(app.httpServer)
         .post('/auth/login')
         .send({
@@ -588,7 +588,7 @@ describe('AccountController', () => {
         .delete('/accounts/me')
         .set('Authorization', `Bearer ${authResponse.body.accessToken}`);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(204);
     });
   });
 });

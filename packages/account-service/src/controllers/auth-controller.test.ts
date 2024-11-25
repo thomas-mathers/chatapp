@@ -187,7 +187,7 @@ describe('AuthController', () => {
       expect(response.status).toBe(401);
     });
 
-    it('should return 200 when old password is correct', async ({ app }) => {
+    it('should return 204 when old password is correct', async ({ app }) => {
       const authResponse = await request(app.httpServer)
         .post('/auth/login')
         .send({
@@ -205,7 +205,7 @@ describe('AuthController', () => {
           newPassword: faker.internet.password(),
         });
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(204);
     });
   });
 
@@ -226,7 +226,7 @@ describe('AuthController', () => {
       expect(response.status).toBe(404);
     });
 
-    it('should return 200 when email is found', async ({ app }) => {
+    it('should return 204 when email is found', async ({ app }) => {
       const newAccount: Partial<AccountRegistrationRequest> = {
         username: faker.internet.username(),
         email: faker.internet.email(),
@@ -243,7 +243,7 @@ describe('AuthController', () => {
         .post('/auth/password-reset-requests')
         .send({ email: newAccount.email });
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(204);
     });
   });
 });

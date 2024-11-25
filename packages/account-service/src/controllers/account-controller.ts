@@ -99,7 +99,7 @@ export class AccountController {
       handleJwtAuthMiddleware(config.jwt),
       async (req: Request, res: Response) => {
         Result.fromAsync(accountService.deleteById(req.accountId)).fold(
-          (result) => res.status(StatusCodes.OK).json(result),
+          () => res.status(StatusCodes.NO_CONTENT).end(),
           (error) => res.status(error.statusCode).json(error),
         );
       },

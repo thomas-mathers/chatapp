@@ -54,7 +54,7 @@ export class AuthController {
             body.newPassword,
           ),
         ).fold(
-          (result) => res.status(StatusCodes.OK).json(result),
+          () => res.status(StatusCodes.NO_CONTENT).end(),
           (error) => res.status(error.statusCode).json(error),
         );
       },
@@ -66,7 +66,7 @@ export class AuthController {
       async (req: Request, res: Response) => {
         const body: PasswordResetTokenRequest = req.body;
         Result.fromAsync(authService.resetPasswordRequest(body.email)).fold(
-          (result) => res.status(StatusCodes.OK).json(result),
+          () => res.status(StatusCodes.NO_CONTENT).end(),
           (error) => res.status(error.statusCode).json(error),
         );
       },
@@ -80,7 +80,7 @@ export class AuthController {
         Result.fromAsync(
           authService.resetPassword(body.token, body.newPassword),
         ).fold(
-          (result) => res.status(StatusCodes.OK).json(result),
+          () => res.status(StatusCodes.NO_CONTENT).end(),
           (error) => res.status(error.statusCode).json(error),
         );
       },
@@ -91,7 +91,7 @@ export class AuthController {
       handleRequestBodyValidationMiddleware(confirmEmailRequestSchema),
       async (req: Request, res: Response) => {
         Result.fromAsync(authService.confirmEmail(req.body.token)).fold(
-          (result) => res.status(StatusCodes.OK).json(result),
+          () => res.status(StatusCodes.NO_CONTENT).end(),
           (error) => res.status(error.statusCode).json(error),
         );
       },
