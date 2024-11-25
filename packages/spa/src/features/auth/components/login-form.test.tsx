@@ -1,11 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HttpResponse, http } from 'msw';
+import { MemoryRouter } from 'react-router-dom';
 import { byLabelText, byRole } from 'testing-library-selector';
 import { describe, expect, it } from 'vitest';
 
+import { AppProvider } from '@app/app/provider';
 import { server } from '@app/testing/mocks/server';
-import { TestAppProvider } from '@app/testing/provider';
 
 import { LoginForm } from './login-form';
 
@@ -18,7 +19,12 @@ const ui = {
 function renderComponent() {
   const user = userEvent.setup();
   return {
-    ...render(<LoginForm />, { wrapper: TestAppProvider }),
+    ...render(
+      <MemoryRouter>
+        <LoginForm />
+      </MemoryRouter>,
+      { wrapper: AppProvider },
+    ),
     user,
   };
 }

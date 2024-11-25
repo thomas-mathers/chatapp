@@ -2,11 +2,12 @@ import { faker } from '@faker-js/faker';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HttpResponse, http } from 'msw';
+import { MemoryRouter } from 'react-router-dom';
 import { byLabelText, byRole, byText } from 'testing-library-selector';
 import { describe, expect, it } from 'vitest';
 
+import { AppProvider } from '@app/app/provider';
 import { server } from '@app/testing/mocks/server';
-import { TestAppProvider } from '@app/testing/provider';
 
 import { ChangePasswordForm } from './change-password-form';
 
@@ -26,7 +27,12 @@ function renderComponent() {
 
   return {
     user,
-    ...render(<ChangePasswordForm />, { wrapper: TestAppProvider }),
+    ...render(
+      <MemoryRouter>
+        <ChangePasswordForm />
+      </MemoryRouter>,
+      { wrapper: AppProvider },
+    ),
   };
 }
 

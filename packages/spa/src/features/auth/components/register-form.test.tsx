@@ -2,11 +2,12 @@ import { faker } from '@faker-js/faker';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HttpResponse, http } from 'msw';
+import { MemoryRouter } from 'react-router-dom';
 import { byLabelText, byRole, byText } from 'testing-library-selector';
 import { describe, expect, it } from 'vitest';
 
+import { AppProvider } from '@app/app/provider';
 import { server } from '@app/testing/mocks/server';
-import { TestAppProvider } from '@app/testing/provider';
 
 import { RegisterForm } from './register-form';
 
@@ -26,7 +27,12 @@ const ui = {
 function renderComponent() {
   const user = userEvent.setup();
   return {
-    ...render(<RegisterForm />, { wrapper: TestAppProvider }),
+    ...render(
+      <MemoryRouter>
+        <RegisterForm />
+      </MemoryRouter>,
+      { wrapper: AppProvider },
+    ),
     user,
   };
 }
