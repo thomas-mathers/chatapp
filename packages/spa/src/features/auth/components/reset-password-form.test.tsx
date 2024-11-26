@@ -35,7 +35,7 @@ function renderComponent() {
 }
 
 describe('<ResetPasswordForm>', () => {
-  it('should render all expected fields', () => {
+  it('should render all expected fieldss', () => {
     renderComponent();
 
     expect(ui.newPassword.get()).toBeVisible();
