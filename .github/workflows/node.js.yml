@@ -114,20 +114,7 @@ jobs:
       - name: Tear down containers with volumes
         run: docker compose down --volumes
 
-      - name: Upload coverage to GitHub Actions
-        uses: actions/upload-artifact@v3
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          name: coverage-report
-          path: coverage/lcov-report/*
-
-      - name: Generate and comment coverage report
-        if: github.event_name == 'pull_request'
-        run: |
-          # Check if the coverage report exists and read it
-          if [ -f coverage/lcov-report/index.html ]; then
-            lcov_report=$(cat coverage/lcov-report/index.html)
-            echo "Coverage summary: $lcov_report"
-          else
-            echo "Coverage report not found."
-            exit 1
-          fi
+          token: ${{ secrets.CODECOV_TOKEN }}
