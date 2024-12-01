@@ -83,9 +83,6 @@ jobs:
       - name: Run format
         run: pnpm format
 
-      - name: List all running containers
-        run: docker-compose ps --orphans=false
-
       - name: Wait for containers to be healthy
         run: |
           #!/bin/bash
@@ -97,7 +94,7 @@ jobs:
           # Function to check the health of containers
           check_health() {
               # Get the container IDs
-              containers=$(docker-compose ps --orphans=false -q)
+              containers=$(docker-compose ps -q)
 
               # Check if containers exist
               if [ -z "$containers" ]; then
