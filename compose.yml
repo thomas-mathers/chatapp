@@ -7,6 +7,12 @@ services:
     volumes:
       - account-service-redis-data:/data
     profiles: [development]
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 5s
 
   account-service-redis-test:
     image: redis:alpine
@@ -16,6 +22,12 @@ services:
     volumes:
       - account-service-redis-test-data:/data
     profiles: [test, ci]
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 5s
 
   account-service-mongo:
     image: mongo
@@ -28,6 +40,20 @@ services:
       - account-service-mongo-data:/data/db
       - account-service-mongo-config:/data/configdb
     profiles: [development]
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mongosh',
+          '--port',
+          '27017',
+          '--eval',
+          'db.adminCommand("ping")',
+        ]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 5s
 
   account-service-mongo-express:
     image: mongo-express
@@ -52,6 +78,20 @@ services:
       - account-service-mongo-test-data:/data/db
       - account-service-mongo-test-config:/data/configdb
     profiles: [test, ci]
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mongosh',
+          '--port',
+          '27018',
+          '--eval',
+          'db.adminCommand("ping")',
+        ]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 5s
 
   account-service-mongo-test-express:
     image: mongo-express
@@ -75,6 +115,20 @@ services:
       - message-service-mongo-data:/data/db
       - message-service-mongo-config:/data/configdb
     profiles: [development]
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mongosh',
+          '--port',
+          '27019',
+          '--eval',
+          'db.adminCommand("ping")',
+        ]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 5s
 
   message-service-mongo-express:
     image: mongo-express
@@ -98,6 +152,20 @@ services:
       - message-service-mongo-test-data:/data/db
       - message-service-mongo-test-config:/data/configdb
     profiles: [test, ci]
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mongosh',
+          '--port',
+          '27020',
+          '--eval',
+          'db.adminCommand("ping")',
+        ]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 5s
 
   message-service-mongo-test-express:
     image: mongo-express
@@ -119,6 +187,12 @@ services:
     volumes:
       - rabbitmq:/var/lib/rabbitmq
     profiles: [development]
+    healthcheck:
+      test: ['CMD', 'rabbitmqctl', 'status']
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 5s
 
   rabbitmq-test:
     image: 'rabbitmq:management-alpine'
