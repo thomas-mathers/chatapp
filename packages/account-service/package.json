@@ -4,8 +4,11 @@
   "private": true,
   "scripts": {
     "depcheck": "depcheck",
-    "start": "tsx --env-file=.env src/index.ts",
-    "type-check": "tsc --noEmit"
+    "start": "tsx --env-file=C:\\Users\\mathe\\source\\repos\\chatapp\\packages\\.env src/index.ts",
+    "type-check": "tsc --noEmit",
+    "test:coverage": "vitest --coverage",
+    "test:watch": "vitest",
+    "test": "vitest run"
   },
   "dependencies": {
     "body-parser": "^1.20.3",

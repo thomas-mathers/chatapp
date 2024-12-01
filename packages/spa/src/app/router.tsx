@@ -1,43 +1,54 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import { ProtectedRoute } from '../components/protected-route';
+import { ProtectedRoute } from '@app/components/protected-route';
 import {
   ChangePasswordForm,
   ForgotPasswordForm,
   LoginForm,
   RegisterForm,
   ResetPasswordForm,
-} from '../features/auth';
-import { Dashboard } from '../features/dashboard';
+} from '@app/features/auth';
+import { Dashboard } from '@app/features/dashboard/components/dashboard';
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <LoginForm />,
+    },
+    {
+      path: '/register',
+      element: <RegisterForm />,
+    },
+    {
+      path: '/forgot-password',
+      element: <ForgotPasswordForm />,
+    },
+    {
+      path: '/reset-password',
+      element: <ResetPasswordForm />,
+    },
+    {
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '/change-password',
+          element: <ChangePasswordForm />,
+        },
+        {
+          path: '/dashboard',
+          element: <Dashboard />,
+        },
+      ],
+    },
+  ],
   {
-    path: '/',
-    element: <LoginForm />,
+    future: {
+      v7_fetcherPersist: true,
+      v7_normalizeFormMethod: true,
+      v7_partialHydration: true,
+      v7_relativeSplatPath: true,
+      v7_skipActionErrorRevalidation: true,
+    },
   },
-  {
-    path: '/register',
-    element: <RegisterForm />,
-  },
-  {
-    path: '/forgot-password',
-    element: <ForgotPasswordForm />,
-  },
-  {
-    path: '/reset-password',
-    element: <ResetPasswordForm />,
-  },
-  {
-    element: <ProtectedRoute />,
-    children: [
-      {
-        path: '/change-password',
-        element: <ChangePasswordForm />,
-      },
-      {
-        path: '/dashboard',
-        element: <Dashboard />,
-      },
-    ],
-  },
-]);
+);

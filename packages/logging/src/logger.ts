@@ -28,7 +28,7 @@ export class Logger {
         }),
         format.colorize(),
         format.printf(({ timestamp, level, message, ...properties }) =>
-          printf(timestamp, level, message, properties),
+          printf(timestamp as string, level, message, properties),
         ),
       ),
       transports: [

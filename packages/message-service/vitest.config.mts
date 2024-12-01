@@ -1,9 +1,7 @@
-import { loadEnvFile } from 'process';
 import { defineConfig } from 'vitest/config';
 
-loadEnvFile('./packages/message-service/test.env');
-
 export default defineConfig({
+  envPrefix: 'MESSAGE_SERVICE_',
   test: {
     globals: true,
     environment: 'node',

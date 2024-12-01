@@ -1,9 +1,7 @@
-import { loadEnvFile } from 'process';
 import { defineConfig } from 'vitest/config';
 
-loadEnvFile('./packages/account-service/test.env');
-
 export default defineConfig({
+  envPrefix: 'ACCOUNT_SERVICE_',
   test: {
     globals: true,
     environment: 'node',

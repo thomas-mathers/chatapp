@@ -28,7 +28,9 @@ function renderComponent() {
   return {
     user,
     ...render(
-      <MemoryRouter>
+      <MemoryRouter
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
         <ChangePasswordForm />
       </MemoryRouter>,
       { wrapper: AppProvider },
