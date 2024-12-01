@@ -113,3 +113,15 @@ jobs:
 
       - name: Tear down containers with volumes
         run: docker compose down --volumes
+
+      - name: Upload coverage to GitHub Actions
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage/lcov-report/*
+
+      - name: Generate and comment coverage report
+        if: github.event_name == 'pull_request'
+        run: |
+          lcov-report=$(cat coverage/lcov-report/index.html)
+          echo "Coverage summary: $lcov-report"
