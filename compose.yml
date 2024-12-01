@@ -6,6 +6,7 @@ services:
       - 6379:6379
     volumes:
       - account-service-redis-data:/data
+    profiles: [development]
 
   account-service-redis-test:
     image: redis:alpine
@@ -14,6 +15,7 @@ services:
       - 6380:6379
     volumes:
       - account-service-redis-test-data:/data
+    profiles: [test, ci]
 
   account-service-mongo:
     image: mongo
@@ -25,6 +27,7 @@ services:
     volumes:
       - account-service-mongo-data:/data/db
       - account-service-mongo-config:/data/configdb
+    profiles: [development]
 
   account-service-mongo-express:
     image: mongo-express
@@ -36,6 +39,7 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://account-service-mongo:27017
     depends_on:
       - account-service-mongo
+    profiles: [development]
 
   account-service-mongo-test:
     image: mongo
@@ -47,6 +51,7 @@ services:
     volumes:
       - account-service-mongo-test-data:/data/db
       - account-service-mongo-test-config:/data/configdb
+    profiles: [test, ci]
 
   account-service-mongo-test-express:
     image: mongo-express
@@ -58,6 +63,7 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://account-service-mongo-test:27018
     depends_on:
       - account-service-mongo-test
+    profiles: [test]
 
   message-service-mongo:
     image: mongo
@@ -68,6 +74,7 @@ services:
     volumes:
       - message-service-mongo-data:/data/db
       - message-service-mongo-config:/data/configdb
+    profiles: [development]
 
   message-service-mongo-express:
     image: mongo-express
@@ -78,6 +85,7 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://message-service-mongo:27019
     depends_on:
       - message-service-mongo
+    profiles: [development]
 
   message-service-mongo-test:
     image: mongo
@@ -89,6 +97,7 @@ services:
     volumes:
       - message-service-mongo-test-data:/data/db
       - message-service-mongo-test-config:/data/configdb
+    profiles: [test, ci]
 
   message-service-mongo-test-express:
     image: mongo-express
@@ -99,6 +108,7 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://message-service-mongo-test:27020
     depends_on:
       - message-service-mongo-test
+    profiles: [test]
 
   rabbitmq:
     image: 'rabbitmq:management-alpine'
@@ -108,6 +118,7 @@ services:
       - '15672:15672'
     volumes:
       - rabbitmq:/var/lib/rabbitmq
+    profiles: [development]
 
   rabbitmq-test:
     image: 'rabbitmq:management-alpine'
@@ -117,6 +128,7 @@ services:
       - '15673:15672'
     volumes:
       - rabbitmq-test:/var/lib/rabbitmq
+    profiles: [test, ci]
 
 volumes:
   account-service-redis-data:

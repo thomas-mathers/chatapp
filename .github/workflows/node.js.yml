@@ -49,16 +49,34 @@ jobs:
         node-version: [23.1.0]
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Start Docker containers
+        run: |
+          docker compose --profile ci up -d
+        continue-on-error: false
+
+      - name: Wait for services to start
+        run: |
+          sleep 30
+
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9.12.3
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
+
       - name: Install dependencies
         run: pnpm install
+
       - name: Run tests
         run: pnpm test
