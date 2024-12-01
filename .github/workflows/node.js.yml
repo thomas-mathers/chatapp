@@ -123,5 +123,11 @@ jobs:
       - name: Generate and comment coverage report
         if: github.event_name == 'pull_request'
         run: |
-          lcov-report=$(cat coverage/lcov-report/index.html)
-          echo "Coverage summary: $lcov-report"
+          # Check if the coverage report exists and read it
+          if [ -f coverage/lcov-report/index.html ]; then
+            lcov_report=$(cat coverage/lcov-report/index.html)
+            echo "Coverage summary: $lcov_report"
+          else
+            echo "Coverage report not found."
+            exit 1
+          fi
