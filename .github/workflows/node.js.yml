@@ -83,6 +83,9 @@ jobs:
       - name: Run format
         run: pnpm format
 
+      - name: List all running containers
+        run: docker-compose ps --orphans=false
+
       - name: Wait for containers to be healthy
         run: |
           #!/bin/bash
