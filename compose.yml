@@ -203,6 +203,12 @@ services:
     volumes:
       - rabbitmq-test:/var/lib/rabbitmq
     profiles: [test, ci]
+    healthcheck:
+      test: ['CMD', 'rabbitmqctl', 'status']
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 5s
 
 volumes:
   account-service-redis-data:

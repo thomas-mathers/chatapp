@@ -85,9 +85,58 @@ jobs:
 
       - name: Wait for containers to be healthy
         run: |
-          until docker-compose --profile ci ps -q | xargs -I {} docker inspect --format '{{ .State.Health.Status }}' {} | grep -q healthy; do
-            sleep 3
+          #!/bin/bash
+
+          # Maximum number of attempts
+          max_attempts=10
+          attempt=1
+
+          # Function to check the health of containers
+          check_health() {
+              # Get the container IDs
+              containers=$(docker-compose ps --orphans=false -q)
+
+              # Check if containers exist
+              if [ -z "$containers" ]; then
+                  echo "No containers found, retrying..."
+                  return 1
+              fi
+
+              # Loop over each container and check its health status
+              for container in $containers; do
+                  # Check if the container has a health check configured
+                  health_status=$(docker inspect --format '{{.State.Health.Status}}' "$container" 2>/dev/null)
+
+                  # If the container does not have a health check configured, assume it is healthy
+                  if [ -z "$health_status" ]; then
+                      echo "Container $container does not have a health check configured, assuming it is healthy."
+                      continue
+                  fi
+
+                  # If any container is not healthy or starting, return failure
+                  if [ "$health_status" != "healthy" ]; then
+                      echo "Container $container is $health_status, retrying..."
+                      return 1
+                  fi
+              done
+
+              # If all containers are healthy
+              return 0
+          }
+
+          # Until loop with retry mechanism
+          until check_health; do
+              if [ "$attempt" -ge "$max_attempts" ]; then
+                  echo "Max attempts reached, exiting..."
+                  exit 1
+              fi
+
+              echo "Containers are not healthy, retrying... (Attempt $attempt)"
+              sleep 5  # Wait for 5 seconds before retrying
+              attempt=$((attempt + 1))
           done
+
+          echo "All containers are healthy!"
 
       - name: Run tests
         run: pnpm test
