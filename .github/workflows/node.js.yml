@@ -41,7 +41,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    environment: development
     strategy:
       matrix:
         node-version: [23.1.0]
