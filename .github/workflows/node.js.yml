@@ -1,8 +1,6 @@
 name: Node.js CI
 
 on:
-  push:
-    branches: ['main']
   pull_request:
     branches: ['main']
 
@@ -50,9 +48,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pnpm-store
+            node_modules
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
       - name: Run containers
         run: |
           docker compose --profile ci up -d
+          if [ $? -ne 0 ]; then
+            echo "Docker compose failed to start containers."
+            exit 1
+          fi
         continue-on-error: false
 
       - name: Install pnpm
@@ -112,6 +124,7 @@ jobs:
         run: pnpm test:ci
 
       - name: Tear down containers with volumes
+        if: always()
         run: docker compose down --volumes
 
       - name: Upload coverage reports to Codecov
